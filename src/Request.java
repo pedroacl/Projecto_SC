@@ -5,11 +5,7 @@ public class Request {
 		
 	}
 	
-	private enum RequestType {
-		AUTH, MESSAGE, FILE, ADDUSER, REMOVEUSER, ERR;
-	}
-	
-	private RequestType opCode;
+	private RequestType requestType;
 	
 	private String message;
 	
@@ -19,7 +15,6 @@ public class Request {
 	
 	
 	public String getMessage() {
-		opCode = RequestType.AUTH;
 		return message;
 	}
 
@@ -27,11 +22,11 @@ public class Request {
 		this.message = message;
 	}
 
-	public RequestType getOpCode() {
-		return opCode;
+	public RequestType getRequestType() {
+		return requestType;
 	}
 
-	public void setOpCode(RequestType opCode) {
-		this.opCode = opCode;
+	public void setRequestType(RequestType requestType) {
+		this.requestType = requestType;
 	}
 }
