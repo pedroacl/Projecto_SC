@@ -27,11 +27,11 @@ public class Request {
 		this.message = message;
 	}
 
-	public String getOpCode() {
+	public RequestType getOpCode() {
 		return opCode;
 	}
 
-	public void setOpCode(String opCode) {
+	public void setOpCode(RequestType opCode) {
 		this.opCode = opCode;
 	}
 }
