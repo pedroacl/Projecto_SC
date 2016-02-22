@@ -1,7 +1,10 @@
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 
 
-public class Cliente {
+public class Client implements ClienteInterface {
 
 	/**
 	 * @param args
@@ -27,9 +30,25 @@ public class Cliente {
 		}
 		
 		System.out.println("Adress= " + parameters[0]);
+		String[] serverAddress = parameters[0].split(":");
+		String serverIP = serverAddress[0];
+		String serverPort = serverAddress[1]; 
+		
 		System.out.println("User = " + parameters[1]);
 		System.out.println("Password= " + parameters[2]);
 		System.out.println("Acção= " + parameters[3]);
+		
+		Socket echoSocket = null;
+		
+		try {
+			echoSocket = new Socket(serverIP, Integer.parseInt(serverPort));
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/*
@@ -158,8 +177,12 @@ public class Cliente {
 		return res;
 		
 	}
-	
 
+	@Override
+	public void enviarMensagem(String fromUser, String toUser, String message) {
+		Request request = new Request();
+	}
+	
 }
 
 
