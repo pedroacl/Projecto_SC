@@ -6,7 +6,7 @@ public class Request {
 	}
 	
 	private enum RequestType {
-		AUTH, MESSAGE, FILE, ADDUSER, REMOVEUSER;
+		AUTH, MESSAGE, FILE, ADDUSER, REMOVEUSER, ERR;
 	}
 	
 	private RequestType opCode;
