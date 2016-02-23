@@ -20,7 +20,7 @@ public class ConversationFactory {
 		File file = new File("conversations/");
 		
 		if (!file.exists()) {
-			if (!file.mkdir()) {
+			if (file.mkdir()) {
 				System.out.println("Directorio criado");
 			} else {
 				System.out.println("Directorio nao criado");

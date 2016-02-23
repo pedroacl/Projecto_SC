@@ -15,7 +15,8 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 	}
 
 	public void run() {
-		
+		System.out.println("From: " + clientRequest.getFromUser());
+		System.out.println("To: " + clientRequest.getToUser());
 	}
 	
 	public Request processRequest(Request clientRequest) {
@@ -51,9 +52,7 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 
 		default:
 			break;
-		}
-		
-		
+		}		
 		
 		return serverResponse;
 	}

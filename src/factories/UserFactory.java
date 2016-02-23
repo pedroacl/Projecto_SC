@@ -20,7 +20,7 @@ public class UserFactory {
 		File file = new File("users/" + user.getId());
 		
 		if (!file.exists()) {
-			if (!file.mkdir()) {
+			if (file.mkdir()) {
 				System.out.println("Directorio criado");
 			} else {
 				System.out.println("Directorio nao criado");

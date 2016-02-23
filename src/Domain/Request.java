@@ -6,6 +6,16 @@ import java.io.Serializable;
 
 
 public class Request implements Serializable {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8053113085617628635L;
+
+
+	public Request() {
+		
+	}
 
 	public Request( String from, RequestType type ) {
 		this.fromUser = from;

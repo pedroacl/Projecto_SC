@@ -1,9 +1,11 @@
 package Domain;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -29,16 +31,18 @@ public class Server {
 		
 		//criar socket
 		try {		
-			serverSocket = new ServerSocket(serverPort);
+			serverSocket = getServerSocket(serverPort);
 			
 			//aceitar pedidos
 			socket = serverSocket.accept();			
 			
 			in = new ObjectInputStream(socket.getInputStream());					
 			out = new ObjectOutputStream(socket.getOutputStream());
+		} catch (BindException e) {
+			
 		} catch (IOException e) {
 			e.printStackTrace();
-		}	
+		} 
 		
 		Request clientRequest = null;
 		//out.writeObject(answer);
@@ -55,7 +59,7 @@ public class Server {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
+		}																																																																	
 		
 		//serverSocket.close();
 		//socket.close();
@@ -64,25 +68,51 @@ public class Server {
 	
 	private static ArrayList<User> loadUsers() {
 		FileInputStream in;
-		ObjectInputStream out;
+		ObjectInputStream oin;
 		ArrayList<User> users = null;
 		
 		try {
+			//criar pasta para o utilizador
+			File file = new File("users");
+			
+			if (!file.exists()) {
+				System.out.println("Ficheiro nao existe");
+				return null;
+			}
+			
 			in = new FileInputStream("users");
-			out = new ObjectInputStream(in);
-			users = (ArrayList<User>) out.readObject();
+			oin = new ObjectInputStream(in);
+			users = (ArrayList<User>) oin.readObject();
 									
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 			
 		return users;
 	}
+	
+	
+	private static ServerSocket getServerSocket(int serverPort) {
+		ServerSocket serverSocket = null;
+	
+		//procurar portos disponiveis
+		for (int i = 0; i < 50; i++) {
+			try {						
+				//criar socket
+				serverSocket = new ServerSocket(serverPort);
+				break;
+										
+			} catch (IOException e) {
+				serverPort++;
+				continue;
+			}
+		}
+		
+		System.out.println("Servidor ligado ao porto " + serverPort);		
+		return serverSocket;
+	} 
 }
