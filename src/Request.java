@@ -1,4 +1,5 @@
 
+
 public class Request {
 	
 	public Request() {
@@ -12,7 +13,6 @@ public class Request {
 	private String fromUser;
 	
 	private String toUser;
-	
 	
 	public String getMessage() {
 		return message;

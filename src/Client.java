@@ -3,8 +3,10 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
+import interfaces.ClientInterface;
 
-public class Client implements ClienteInterface {
+
+public class Client implements ClientInterface {
 
 	/**
 	 * @param args

@@ -1,5 +1,6 @@
+package interfaces;
 
-public interface ClienteInterface {
+public interface ClientInterface {
 	void enviarMensagem(String fromUser, String toUser, String message);
 	
 	

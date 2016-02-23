@@ -1,3 +1,4 @@
+import interfaces.ServerThreadInterface;
 
 public class ServerThread extends Thread implements ServerThreadInterface {
 	
