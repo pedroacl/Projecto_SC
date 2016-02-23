@@ -57,5 +57,13 @@ public class User implements Serializable {
 
 	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		User user = (User) obj;
+		
+		return this.id == user.getId() 
+				&& username.equals(user.getUsername());
 	}	
 }

@@ -14,10 +14,13 @@ public class Server {
 	private static final int serverPort = 8080;
 	
 	private ArrayList<User> users;
-	private ArrayList<User> authenticatedUsers = new ArrayList<User>();
+	
+	private Authentication authentication;	
 	
 	public static void main(String[] args) {
 		ArrayList<User> users = loadUsers();
+		
+		Authentication authentication = new Authentication(users);
 		
 		ServerSocket serverSocket = null;
 		Socket socket = null;
@@ -28,7 +31,7 @@ public class Server {
 		try {		
 			serverSocket = new ServerSocket(serverPort);
 			
-			//aceitar pedidos			
+			//aceitar pedidos
 			socket = serverSocket.accept();			
 			
 			in = new ObjectInputStream(socket.getInputStream());					
@@ -44,14 +47,14 @@ public class Server {
 		while(true) {
 			try {
 				clientRequest = (Request) in.readObject();
+				ServerThread serverThread = new ServerThread(authentication, clientRequest);
+				serverThread.run();
+
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
-			ServerThread serverThread = new ServerThread(clientRequest);
-			serverThread.run();
 		}
 		
 		//serverSocket.close();
@@ -82,35 +85,4 @@ public class Server {
 			
 		return users;
 	}
-	
-	
-	public boolean authenticateUser(User user) {
-		
-		for (User currentUser : users) {
-			//user registado
-			if (currentUser.getUsername().equals(user.getUsername())) {
-				//password valida
-				if (currentUser.getPassword().equals(user.getPassword())) {
-					authenticatedUsers.add(user);
-					return true;
-				}
-				
-				return false;
-			}
-		}
-		
-		return false;
-	}
-	
-	
-	public boolean isAuthenticated(User user) {
-		
-		for (User currentUser : authenticatedUsers) {
-			if (currentUser.equals(user)) {
-				return true;
-			}
-		}
-		
-		return false;
-	} 
 }

@@ -7,8 +7,11 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 	
 	private Request clientRequest;
 	
-	public ServerThread(Request clientRequest) {
-		this.clientRequest = clientRequest; 
+	private Authentication authentication;
+	
+	public ServerThread(Authentication authentication, Request clientRequest) {
+		this.clientRequest = clientRequest;
+		this.authentication = authentication;
 	}
 
 	public void run() {
@@ -31,7 +34,7 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 			break;
 			
 		case AUTH:
-			
+			//authentication.authenticateUser(clientRequest.getFromUser(), authentication.getUsers());
 			break;
 			
 		case ERR:
@@ -43,7 +46,7 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 			break;
 			
 		case MESSAGE:
-			
+			//authentication.authenticateUser(clientRequest.getFromUser(), clientRequest.get());
 			break;
 
 		default:
