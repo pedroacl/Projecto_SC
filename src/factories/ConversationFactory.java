@@ -1,5 +1,7 @@
 package factories;
 
+import java.io.File;
+
 import entities.Conversation;
 
 public class ConversationFactory {
@@ -13,6 +15,17 @@ public class ConversationFactory {
 	public Conversation build() {
 		Conversation conversation = new Conversation();
 		conversation.setId(conversationId + 1);
+		
+		//criar pasta para a conversa
+		File file = new File("conversations/");
+		
+		if (!file.exists()) {
+			if (!file.mkdir()) {
+				System.out.println("Directorio criado");
+			} else {
+				System.out.println("Directorio nao criado");
+			}
+		}
 		
 		return conversation;
 	}

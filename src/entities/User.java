@@ -3,7 +3,7 @@ package entities;
 import java.io.Serializable;
 import java.util.Date;
 
-public class User extends Contact implements Serializable {
+public class User implements Serializable {
 
 	/**
 	 * 
@@ -19,7 +19,7 @@ public class User extends Contact implements Serializable {
 	private Date createdAt;
 	
 	public User() {
-				
+		createdAt = new Date();		
 	}	
 	
 	public User(String username, String password) {

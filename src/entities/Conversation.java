@@ -1,5 +1,6 @@
 package entities;
 
+import java.io.File;
 import java.io.Serializable;
 
 public class Conversation implements Serializable {
