@@ -1,6 +1,6 @@
 package Domain;
 
 public enum RequestType {
-	AUTH, MESSAGE, FILE, ADDUSER, REMOVEUSER, ERR;
+	AUTH, MESSAGE, FILE, ADDUSER, REMOVEUSER, RECEIVER,ERR;
 }
 

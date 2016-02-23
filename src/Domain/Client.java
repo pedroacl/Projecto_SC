@@ -1,13 +1,17 @@
 package Domain;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
+import org.omg.CORBA.portable.OutputStream;
+
+import factories.RequestFactory;
 import interfaces.ClientInterface;
 
 
-public class Client implements ClientInterface {
+public class Client{
 
 	/**
 	 * @param args
@@ -41,16 +45,35 @@ public class Client implements ClientInterface {
 		System.out.println("Password= " + parameters[2]);
 		System.out.println("Acção= " + parameters[3]);
 		
-		Socket echoSocket = null;
+		RequestFactory rFactory= new RequestFactory();
+		Socket clientSocket = null;
 		
 		try {
-			echoSocket = new Socket(serverIP, Integer.parseInt(serverPort));
+			clientSocket = new Socket(serverIP, Integer.parseInt(serverPort));
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		Request request = rFactory.build(parameters[1],"-u " + parameters[2]);
+		try {
+			enviarMensagem(request, clientSocket);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		request = rFactory.build(parameters[1],parameters[3]);
+		try {
+			enviarMensagem(request, clientSocket);
+			clientSocket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+	
 	}
 	
 	/*
@@ -180,9 +203,13 @@ public class Client implements ClientInterface {
 		
 	}
 
-	@Override
-	public void enviarMensagem(String fromUser, String toUser, String message) {
-		Request request = new Request();
+	public static void enviarMensagem(Request request, Socket socket) throws IOException {
+		
+		ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+		oos.writeObject(request);
+		oos.close();
+
+		
 	}
 	
 }
