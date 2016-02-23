@@ -1,5 +1,6 @@
 package Domain;
-import Request;
+
+import Domain.Request;
 import interfaces.ServerThreadInterface;
 
 public class ServerThread extends Thread implements ServerThreadInterface {

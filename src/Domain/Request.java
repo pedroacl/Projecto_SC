@@ -1,7 +1,5 @@
 package Domain;
 
-
-
 public class Request {
 	
 	public Request() {

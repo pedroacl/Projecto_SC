@@ -17,7 +17,7 @@ public class User implements Serializable {
 	private String password;
 	
 	private Date createdAt;
-	
+		
 	public User() {
 		createdAt = new Date();		
 	}	
@@ -57,5 +57,5 @@ public class User implements Serializable {
 
 	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
-	}
+	}	
 }
