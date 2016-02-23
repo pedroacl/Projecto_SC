@@ -1,3 +1,4 @@
+package Domain;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -45,7 +46,6 @@ public class Client implements ClientInterface {
 		try {
 			echoSocket = new Socket(serverIP, Integer.parseInt(serverPort));
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
