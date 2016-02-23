@@ -4,11 +4,18 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+
+import Request;
+import entities.User;
 
 public class Server {
-	private static final int serverPort = 8080;
+	private static final int serverPort = 8080;	
 	
 	public static void main(String[] args) {
+		
+		ArrayList<User> users = loadUsers();
 		
 		ServerSocket serverSocket = null;
 		
@@ -29,7 +36,7 @@ public class Server {
 		}
 		
 		ObjectInputStream in = null;
-			
+				
 		try {
 			in = new ObjectInputStream(socket.getInputStream());
 		} catch (IOException e) {
@@ -45,15 +52,6 @@ public class Server {
 		}
 		
 		Request clientRequest = null;
-		
-		try {
-			clientRequest = (Request) in.readObject();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
 		//out.writeObject(answer);
 		
 		//aceitar pedidos
@@ -72,5 +70,9 @@ public class Server {
 		
 		//serverSocket.close();
 		//socket.close();
+	}
+	
+	private static ArrayList<User> loadUsers() {
+		return new ArrayList<User>();
 	}
 }
