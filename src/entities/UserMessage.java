@@ -3,7 +3,7 @@ package entities;
 import java.io.Serializable;
 import java.util.Date;
 
-public class Message implements Serializable {
+public class UserMessage implements Serializable {
 
 	/**
 	 * 
@@ -18,13 +18,13 @@ public class Message implements Serializable {
 	
 	private Date createdAt;
 
-	public Message() {
+	public UserMessage() {
 		id = 0L;
 		createdAt = new Date();
 	}
 
-	public Message(String fromUser, String toUser) {
-		Message message = new Message();
+	public UserMessage(String fromUser, String toUser) {
+		UserMessage message = new UserMessage();
 		
 		message.fromUser = fromUser;
 		message.toUser = toUser;

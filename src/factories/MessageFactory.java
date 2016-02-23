@@ -2,14 +2,14 @@ package factories;
 
 import java.util.Date;
 
-import entities.Message;
+import entities.UserMessage;
 
 public class MessageFactory {
 
 	private static Long id;
 	
-	public Message build(String fromUser, String toUser) {
-		Message message = new Message(fromUser, toUser);
+	public UserMessage build(String fromUser, String toUser) {
+		UserMessage message = new UserMessage(fromUser, toUser);
 		
 		message.setId(id + 1);
 		message.setCreatedAt(new Date());

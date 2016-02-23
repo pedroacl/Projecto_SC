@@ -1,27 +1,54 @@
 package Domain;
 
+
 import java.io.Serializable;
 
 
 
 public class Request implements Serializable {
-	
-	
-	private RequestType requestType;
-	
-	private String message;
-	
-	private byte [] file;
-	
-	private String fromUser;
-	
-	private String toContact;
-	
+
 	public Request( String from, RequestType type ) {
 		this.fromUser = from;
 		requestType = type;
 		
 	}
+	
+	private RequestType requestType;
+	
+	private String message;
+
+	private byte [] file;
+	
+	private String fromUser;
+	
+	private String toUser;
+
+
+	public void setRequestType(RequestType requestType) {
+		this.requestType = requestType;
+	}
+
+
+	private String toContact;
+	
+	
+	public String getFromUser() {
+		return fromUser;
+	}
+
+	public void setFromUser(String fromUser) {
+		this.fromUser = fromUser;
+	}
+
+	public String getToUser() {
+		return toUser;
+	}
+
+	public void setToUser(String toUser) {
+		this.toUser = toUser;
+	}
+
+
 	
 	public String getMessage() {
 		return message;
@@ -41,6 +68,7 @@ public class Request implements Serializable {
 	
 	public void setToContact(String toConctat) {
 		this.toContact = toContact;
+
 	}
 
 }
