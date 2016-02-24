@@ -1,4 +1,4 @@
-package Domain;
+package domain;
 
 import java.util.ArrayList;
 
@@ -24,13 +24,13 @@ public class Authentication {
 		this.users = users;
 	}
 	
-	public boolean authenticateUser(User user) {
+	public boolean authenticateUser(String username, String password) {
 		
 		for (User currentUser : users) {
 			//user registado
-			if (currentUser.getUsername().equals(user.getUsername())) {
+			if (currentUser.getUsername().equals(username)) {
 				//password valida
-				if (currentUser.getPassword().equals(user.getPassword())) {
+				if (currentUser.getPassword().equals(password)) {
 					return true;
 				}
 				

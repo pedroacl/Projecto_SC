@@ -1,11 +1,13 @@
-package Domain;
+package entities;
 
 
 import java.io.Serializable;
 
+import network.MessageType;
 
 
-public class Request implements Serializable {
+
+public class ChatMessage implements Serializable {
 	
 	/**
 	 * 
@@ -13,17 +15,14 @@ public class Request implements Serializable {
 	private static final long serialVersionUID = 8053113085617628635L;
 
 
-	public Request() {
+	public ChatMessage() {
 		
 	}
 
-	public Request( String from, RequestType type ) {
+	public ChatMessage( String from, MessageType type ) {
 		this.fromUser = from;
-		requestType = type;
-		
 	}
 	
-	private RequestType requestType;
 	
 	private String message;
 
@@ -34,14 +33,6 @@ public class Request implements Serializable {
 	private String toUser;
 
 
-	public void setRequestType(RequestType requestType) {
-		this.requestType = requestType;
-	}
-
-
-	private String toContact;
-	
-	
 	public String getFromUser() {
 		return fromUser;
 	}
@@ -70,15 +61,6 @@ public class Request implements Serializable {
 	
 	public void setFileByte(byte [] file) {
 		this.file = file;
-	}
-
-	public RequestType getRequestType() {
-		return requestType;
-	}
-	
-	public void setToContact(String toConctat) {
-		this.toContact = toContact;
-
 	}
 
 }

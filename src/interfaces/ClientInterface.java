@@ -2,11 +2,11 @@ package interfaces;
 
 import java.net.Socket;
 
-import Domain.Request;
+import entities.ChatMessage;
 
 public interface ClientInterface {
 	
-	void enviarMensagem(Request request, Socket socket);
+	void enviarMensagem(ChatMessage request, Socket socket);
 	
 	
 }

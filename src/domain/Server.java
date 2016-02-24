@@ -1,4 +1,4 @@
-package Domain;
+package domain;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import entities.User;
+import network.ClientMessage;
 
 public class Server {
 	private static final int serverPort = 8080;
@@ -44,13 +45,13 @@ public class Server {
 			e.printStackTrace();
 		} 
 		
-		Request clientRequest = null;
+		ClientMessage clientRequest = null;
 		//out.writeObject(answer);
 		
 		//aceitar pedidos
 		while(true) {
 			try {
-				clientRequest = (Request) in.readObject();
+				clientRequest = (ClientMessage) in.readObject();
 				ServerThread serverThread = new ServerThread(authentication, clientRequest);
 				serverThread.run();
 
@@ -77,6 +78,8 @@ public class Server {
 			
 			if (!file.exists()) {
 				System.out.println("Ficheiro nao existe");
+				file.createNewFile();
+				
 				return null;
 			}
 			

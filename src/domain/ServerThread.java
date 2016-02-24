@@ -1,29 +1,40 @@
-package Domain;
+package domain;
 
-import Domain.Request;
+import entities.ChatMessage;
 import interfaces.ServerThreadInterface;
+import network.ClientMessage;
+import network.ServerMessage;
 
 public class ServerThread extends Thread implements ServerThreadInterface {
 	
-	private Request clientRequest;
+	private ClientMessage clientRequest;
 	
 	private Authentication authentication;
 	
-	public ServerThread(Authentication authentication, Request clientRequest) {
+	public ServerThread(Authentication authentication, ClientMessage clientRequest) {
 		this.clientRequest = clientRequest;
 		this.authentication = authentication;
 	}
 
+	
 	public void run() {
 		System.out.println("From: " + clientRequest.getFromUser());
 		System.out.println("To: " + clientRequest.getToUser());
+		
+		ChatMessage serverResponse = processRequest(clientRequest);
 	}
+
 	
-	public Request processRequest(Request clientRequest) {
+	public ServerMessage processRequest(ClientMessage clientRequest) {
 		
-		Request serverResponse = new Request();
+		ServerMessage serverResponse = new ServerMessage();
 		
-		switch (clientRequest.getRequestType()) {
+		String user = clientRequest.getFromUser();
+		String password = clientRequest.getPassword();
+		
+		authentication.authenticateUser(user, password);
+		
+		switch (clientRequest.getMessageType()) {
 		//adicionar utilizador
 		case ADDUSER:	
 			serverResponse.setMessage("Teste");
@@ -31,14 +42,6 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 			
 		//remover utilizador
 		case REMOVEUSER:
-			
-			break;
-			
-		case AUTH:
-			//authentication.authenticateUser(clientRequest.getFromUser(), authentication.getUsers());
-			break;
-			
-		case ERR:
 			
 			break;
 			
