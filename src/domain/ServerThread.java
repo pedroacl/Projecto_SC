@@ -18,8 +18,6 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 
 	
 	public void run() {
-		
-		
 		ChatMessage serverResponse = processRequest(clientRequest);
 	}
 
