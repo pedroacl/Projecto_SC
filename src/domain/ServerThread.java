@@ -18,8 +18,7 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 
 	
 	public void run() {
-		System.out.println("From: " + clientRequest.getFromUser());
-		System.out.println("To: " + clientRequest.getToUser());
+		
 		
 		ChatMessage serverResponse = processRequest(clientRequest);
 	}
@@ -29,10 +28,10 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 		
 		ServerMessage serverResponse = new ServerMessage();
 		
-		String user = clientRequest.getFromUser();
+		//String user = clientRequest.getFromUser();
 		String password = clientRequest.getPassword();
 		
-		authentication.authenticateUser(user, password);
+		//authentication.authenticateUser(user, password);
 		
 		switch (clientRequest.getMessageType()) {
 		//adicionar utilizador

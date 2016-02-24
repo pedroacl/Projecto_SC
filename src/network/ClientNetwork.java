@@ -69,7 +69,7 @@ public class ClientNetwork {
 	}
 	
 	
-	public void sendMessage(ChatMessage message) {
+	public void sendMessage(ClientMessage message) {
 		//ClientMessage clientMessage = requestFactory().
 		try {
 			out.writeObject(message);

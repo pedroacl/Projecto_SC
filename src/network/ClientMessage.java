@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import entities.ChatMessage;
 
-public class ClientMessage extends ChatMessage implements Serializable {
+public class ClientMessage implements Serializable {
 
 	/**
 	 * 
@@ -16,6 +16,11 @@ public class ClientMessage extends ChatMessage implements Serializable {
 	private String password;
 	
 	private MessageType messageType;
+	
+	public ClientMessage(String username, String password) {
+		this.username = username;
+		this.password = password;
+	}
 	
 
 	public String getPassword() {

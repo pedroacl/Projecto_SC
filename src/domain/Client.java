@@ -22,7 +22,7 @@ public class Client{
 		ArgsParser argsParser = new ArgsParser(args);
 
 		//validar input
-		if(argsParser.validateInput()) {
+		if(!argsParser.validateInput()) {
 			System.exit(0);
 		}
 		

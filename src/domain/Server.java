@@ -14,7 +14,7 @@ import entities.User;
 import network.ClientMessage;
 
 public class Server {
-	private static final int serverPort = 2345;
+	private static final int serverPort = 23456;
 	
 	private ArrayList<User> users;
 	

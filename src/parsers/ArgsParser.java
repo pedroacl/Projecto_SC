@@ -1,14 +1,12 @@
 package parsers;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-
-import entities.ChatMessage;
+import network.ClientMessage;
 
 public class ArgsParser {
 	
 	private String username;
+	
+	private String [] args;
 	
 	private String password;
 	
@@ -38,14 +36,20 @@ public class ArgsParser {
 	
 	public ArgsParser(String[] args) {
 		this();
-
+		this.args = args;		
+	}
+	
+	
+	public boolean validateInput() {
 		if(args.length < 4 || args.length > 8) {
 			System.out.println("xau 0");
+			return false;
 		}
 		
 		//verifica 1º parametro(nome da aplicação)
 		if(! args[0].equals("myWhats")) {
 			System.out.println("xau 1");
+			return false;
 		}
 		
 		//coloca nome de utilizador na segunda posiçao do novo array
@@ -54,6 +58,7 @@ public class ArgsParser {
 		//verifica 3º parametro (serverAddress)
 		if(!args[2].matches("(\\d+\\.){3}(\\d:\\d+)")){
 			System.out.println(args[2] +"xau 2");
+			return false;
 		}
 		
 		//obter IP e porto do servidor
@@ -61,7 +66,7 @@ public class ArgsParser {
 		serverIP = address[0];
 		serverPort = address[1];
 		
-		//coloca serverAddress na primeira posição do array
+
 		
 		//Verifica se o utilizador colocou password e que os parametros estão corretos
 		if(args[3].equals("-p") && args.length > 4) {
@@ -74,20 +79,35 @@ public class ArgsParser {
 		}
 		
 		// se nao houver parametros errados retorna um novo array de argumentos estruturado,
-		if(action == null)
+		if(action == null) {
 			System.out.println("xau3");
+			return false;
+		}
 		
+		isValid = true;
+		return true;
 	}
 	
-	
-	public boolean validateInput() {
+	public boolean isValidInput() {
 		return isValid;
 	}
 	
 
-	public ChatMessage getMessage() {
-		//TODO
-		return new ChatMessage();
+	public ClientMessage getMessage() {
+		String [] act = action.split(" ");
+		ClientMessage clientMessage = null;
+		
+		switch(act[0]) {
+		case "-m":
+			clientMessage = new ClientMessage(username, password);
+			
+			
+			break;
+
+		default:
+			break;
+		}
+		return clientMessage;
 	} 	
 
 	
@@ -162,14 +182,6 @@ public class ArgsParser {
 		
 	}
 
-	
-	public static void enviarMensagem(ChatMessage request, Socket socket) throws IOException {
-		
-		ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-		oos.writeObject(request);
-		oos.close();
-		
-	}
 	
 	
 	/*
