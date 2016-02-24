@@ -1,6 +1,11 @@
 package parsers;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
 import network.ClientMessage;
+import network.MessageType;
 
 public class ArgsParser {
 	
@@ -95,21 +100,56 @@ public class ArgsParser {
 
 	public ClientMessage getMessage() {
 		String [] act = action.split(" ");
-		ClientMessage clientMessage = null;
+		ClientMessage pedido = null;
 		
 		switch(act[0]) {
 		case "-m":
-			clientMessage = new ClientMessage(username, password);
-			
-			
+			pedido = new ClientMessage(username, password, MessageType.MESSAGE);
+			//pedido.setToContact(splited[1]);
+			pedido.setMessage(act[2]);
 			break;
-
-		default:
+		case "-f":
+			pedido = new ClientMessage(username, password, MessageType.FILE);
+			pedido.setDestination(act[1]);
+			try {
+				pedido.setFile(transformFiletoByte(act[2]));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			pedido.setMessage(act[2]);
+			break;
+		case "-a":
+			pedido = new ClientMessage(username, password, MessageType.ADDUSER);
+			pedido.setDestination(act[2]);
+			break;
+		
+		case "-d":
+			pedido = new ClientMessage(username,password, MessageType.REMOVEUSER);
+			pedido.setDestination(act[2]);
+			break;
+			
+		case "-r":
+			if(act.length == 1) {
+				pedido = new ClientMessage(username, password, MessageType.RECEIVER);
+				pedido.setMessage("recent");
+			}
+			if(act.length == 2) {
+				pedido = new ClientMessage(username, password, MessageType.RECEIVER);
+				pedido.setDestination(act[1]);
+				pedido.setMessage("all");
+			}
+			if(act.length == 3) {
+				pedido = new ClientMessage(username, password, MessageType.RECEIVER);
+				pedido.setDestination(act[1]);
+				pedido.setMessage(act[2]);
+			}
 			break;
 		}
-		return clientMessage;
-	} 	
-
+		
+		return pedido;
+				
+	}
 	
 	private static String parseAction(String[] args, int i) {
 		
@@ -124,17 +164,23 @@ public class ArgsParser {
 		
 		switch(args[i]) {
 			case"-m":
-				if(args.length == i+3) 
+				if(args.length == i+3)
 					res = args[i] + " " +args[i+1] + " " + args[i+2];
 				else {
-					System.out.println("adeus 1");
 					res = null;
 				}
 				break;
 				
 			case "-f":
-				if(args.length == i+3) 
+				if(args.length == i+3) {
 					res = args[i] + " " +args[i+1] + " " + args[i+2];
+					File file = new File(args[i+2]);
+					if(!file.isFile() || file.length() >= Integer.MAX_VALUE) {
+						System.out.println("ficheiro não existe ou excede limite");
+						res = null;
+					}
+				}
+					
 				else {
 					System.out.println("adeus 2");
 					res = null;
@@ -181,8 +227,22 @@ public class ArgsParser {
 		return res;
 		
 	}
-
 	
+	private byte[] transformFiletoByte(String path) throws IOException {
+		
+		File file = new File(path);
+		byte [] bFile = new byte[(int) file.length()]; //temos de limitar o tamanho do ficheiro
+		
+		FileInputStream fileInputStream = new FileInputStream(file);
+	    int length = fileInputStream.read(bFile);
+	    if(length != file.length())
+	    	System.out.print("ERRO na transformação do ficheiro para byte");
+	    	
+	    fileInputStream.close();
+	    
+		return bFile;
+	}
+
 	
 	/*
 	 * imprime a mensagem  de como usar a aplicação
@@ -193,5 +253,7 @@ public class ArgsParser {
 				+ "[ ‐m <contact> <message> | ‐f <contact> <file>  | ‐r contact file  |  "
 				+ "‐a <user> <group> |  ‐d <user> <group>  ]");
 	}
+	
+	
 	
 }

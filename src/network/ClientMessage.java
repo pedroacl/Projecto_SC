@@ -2,7 +2,6 @@ package network;
 
 import java.io.Serializable;
 
-import entities.ChatMessage;
 
 public class ClientMessage implements Serializable {
 
@@ -12,14 +11,21 @@ public class ClientMessage implements Serializable {
 	private static final long serialVersionUID = 90127206322736048L;
 
 	private String username;
+	
+	private String destination;
 
 	private String password;
 	
 	private MessageType messageType;
 	
-	public ClientMessage(String username, String password) {
+	private byte [] file;
+	
+	private String message;
+	
+	public ClientMessage(String username, String password, MessageType type) {
 		this.username = username;
 		this.password = password;
+		messageType = type;
 	}
 	
 
@@ -27,25 +33,44 @@ public class ClientMessage implements Serializable {
 		return password;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
 
 	public String getUsername() {
 		return username;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	
+	public byte[] getFile() {
+		return file;
+	}
+
+
+	public void setFile(byte[] file) {
+		this.file = file;
+	}
+
+
+	public String getMessage() {
+		return message;
+	}
+
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 	
+	public void setDestination(String to) {
+		this.destination = to;
+	}
+	
+	public String getDestinatio() {
+		return destination;
+	}
+
+
 	public MessageType getMessageType() {
 		return messageType;
 	}
 
-	public void setMessageType(MessageType messageType) {
-		this.messageType = messageType;
-	}
 
 	@Override
 	public String toString() {

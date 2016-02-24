@@ -6,19 +6,15 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import entities.ChatMessage;
-import factories.MessageFactory;
 
 public class ClientNetwork {
 
 	private Socket socket;
 	private ObjectOutputStream out = null;
 	private ObjectInputStream in = null;
-	private MessageFactory requestFactory = null;
 	
 	public ClientNetwork() {
 		socket = null;
-		requestFactory = new MessageFactory();
 	}
 	
 
@@ -79,7 +75,7 @@ public class ClientNetwork {
 	}
 
 
-	public ServerMessage getServerMessage() {
+	public ServerMessage receiveMessage() {
 		ServerMessage serverMessage = null;
 
 		try {

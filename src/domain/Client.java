@@ -30,7 +30,7 @@ public class Client{
 		clientNetwork.connect(argsParser.getServerIP(), argsParser.getServerPort());
 		clientNetwork.sendMessage(argsParser.getMessage());
 
-		ServerResponseParser serverResponseParser = new ServerResponseParser(clientNetwork.getServerMessage());
+		ServerResponseParser serverResponseParser = new ServerResponseParser(clientNetwork.receiveMessage());
 		
 		if (serverResponseParser.isValid()) {
 			serverResponseParser.parseMessage();
