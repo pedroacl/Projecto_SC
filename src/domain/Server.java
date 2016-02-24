@@ -14,7 +14,7 @@ import entities.User;
 import network.ClientMessage;
 
 public class Server {
-	private static final int serverPort = 8080;
+	private static final int serverPort = 2345;
 	
 	private ArrayList<User> users;
 	
@@ -49,9 +49,14 @@ public class Server {
 		//out.writeObject(answer);
 		
 		//aceitar pedidos
+		System.out.println("Servidor inicializado e ah espera de pedidos.");
 		while(true) {
 			try {
 				clientRequest = (ClientMessage) in.readObject();
+				
+				System.out.println("Mensagem recebida!");
+				System.out.println(clientRequest);
+				
 				ServerThread serverThread = new ServerThread(authentication, clientRequest);
 				serverThread.run();
 

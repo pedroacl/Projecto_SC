@@ -2,6 +2,7 @@ package entities;
 
 
 import java.io.Serializable;
+import java.util.Date;
 
 import network.MessageType;
 
@@ -16,10 +17,11 @@ public class ChatMessage implements Serializable {
 
 
 	public ChatMessage() {
-		
+		createdAt = new Date();
 	}
 
 	public ChatMessage( String from, MessageType type ) {
+		this();
 		this.fromUser = from;
 	}
 	
@@ -31,7 +33,17 @@ public class ChatMessage implements Serializable {
 	private String fromUser;
 	
 	private String toUser;
+	
+	private Date createdAt;
 
+
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
 
 	public String getFromUser() {
 		return fromUser;
@@ -48,8 +60,6 @@ public class ChatMessage implements Serializable {
 	public void setToUser(String toUser) {
 		this.toUser = toUser;
 	}
-
-
 	
 	public String getMessage() {
 		return message;

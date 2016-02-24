@@ -1,8 +1,15 @@
 package network;
 
+import java.io.Serializable;
+
 import entities.ChatMessage;
 
-public class ClientMessage extends ChatMessage {
+public class ClientMessage extends ChatMessage implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 90127206322736048L;
 
 	private String username;
 
@@ -33,5 +40,10 @@ public class ClientMessage extends ChatMessage {
 
 	public void setMessageType(MessageType messageType) {
 		this.messageType = messageType;
+	}
+
+	@Override
+	public String toString() {
+		return "ClientMessage [username=" + username + ", password=" + password + ", messageType=" + messageType + "]";
 	}
 }

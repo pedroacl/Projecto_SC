@@ -38,6 +38,7 @@ public class ServerResponseParser {
 			break;
 
 		default:
+			System.out.println("Mensagem invalida");
 			break;
 		}
 	}

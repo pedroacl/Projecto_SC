@@ -19,18 +19,18 @@ public class Client{
 			System.out.println(s);
 		}
 		
-		ArgsParser inputParser = new ArgsParser(args);
+		ArgsParser argsParser = new ArgsParser(args);
 
 		//validar input
-		if(inputParser.validateInput()) {
+		if(argsParser.validateInput()) {
 			System.exit(0);
 		}
 		
 		clientNetwork = new ClientNetwork();
-		clientNetwork.connect(inputParser.getServerIP(), inputParser.getServerPort());
-		clientNetwork.sendMessage(inputParser.getMessage());
+		clientNetwork.connect(argsParser.getServerIP(), argsParser.getServerPort());
+		clientNetwork.sendMessage(argsParser.getMessage());
 
-		ServerResponseParser serverResponseParser = new ServerResponseParser(clientNetwork.getMessage());
+		ServerResponseParser serverResponseParser = new ServerResponseParser(clientNetwork.getServerMessage());
 		
 		if (serverResponseParser.isValid()) {
 			serverResponseParser.parseMessage();
