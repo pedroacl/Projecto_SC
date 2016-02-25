@@ -36,7 +36,7 @@ public class ClientNetwork {
 			e.printStackTrace();
 		}
 		
-		if (socket != null && out != null) {
+		if (socket != null && in != null && out != null) {
 			return true;
 		}
 		

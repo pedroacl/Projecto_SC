@@ -27,12 +27,14 @@ public class Client{
 		}
 		
 		clientNetwork = new ClientNetwork(argsParser.getServerIP(), argsParser.getServerPort());
-		ClientMessage clientMessage = argsParser.getMessage();
 		clientNetwork.connect();
 		System.out.println("Cliente ligado ao servidor " + argsParser.getServerIP() + ":" + argsParser.getServerPort());
 	
-		/*
+		ClientMessage clientMessage = argsParser.getMessage();
+		System.out.println("[Client.java] message: " + clientMessage);
 		clientNetwork.sendMessage(clientMessage);
+		
+		/*
 		ServerResponseParser serverResponseParser = new ServerResponseParser(clientNetwork.receiveMessage());
 		
 		if (serverResponseParser.isValid()) {

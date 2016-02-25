@@ -1,10 +1,5 @@
 package domain;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-
 import network.ClientMessage;
 import network.ServerSocketNetwork;
 
@@ -14,6 +9,16 @@ public class ServerThreadContext {
 	
 	private ClientMessage clientMessage;
 	
+	public ClientMessage getClientMessage() {
+		return clientMessage;
+	}
+
+
+	public void setClientMessage(ClientMessage clientMessage) {
+		this.clientMessage = clientMessage;
+	}
+
+
 	private ServerSocketNetwork serverSocketNetwork;
 
 	

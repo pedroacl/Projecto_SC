@@ -6,16 +6,17 @@ import network.ServerMessage;
 
 public class ServerThread extends Thread implements ServerThreadInterface {
 	
-	private ClientMessage clientRequest;
+	private ServerThreadContext serverThreadContext;
 	
 	
 	public ServerThread(ServerThreadContext serverThreadContext) {
-		this.clientRequest = clientRequest;
+		this.serverThreadContext = serverThreadContext;
 	}
 
 	
 	public void run() {
-		System.out.println(clientRequest);
+		System.out.println("Mensagem: " + serverThreadContext.getClientMessage());
+		System.out.println("Thread terminada.");
 	}
 
 	
