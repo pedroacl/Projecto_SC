@@ -3,6 +3,7 @@ import java.net.Socket;
 
 import network.ClientMessage;
 import network.ServerNetwork;
+import network.ServerSocketNetwork;
 
 public class Server {
 	
@@ -16,28 +17,24 @@ public class Server {
 		
 		authentication = new Authentication();
 		
-		ClientMessage clientRequest = null;
-		
 		serverNetwork = new ServerNetwork(serverPort);
 		System.out.println("Servidor inicializado e ah espera de pedidos.");
 
 		while(true) {
 			Socket socket = serverNetwork.getRequest();
+			ServerSocketNetwork serverSocketNetwork = new ServerSocketNetwork(socket);
 			System.out.println("Cliente ligado!");
 			
-			clientRequest = serverNetwork.getClientMessage(socket);
-			System.out.println("Mensagem recebida!");
-			System.out.println(clientRequest);
-			
-			ServerThreadContext serverThreadContext = new ServerThreadContext(authentication, serverNetwork, socket);
-			
-			ServerThread serverThread = new ServerThread(serverThreadContext, clientRequest);
+			ClientMessage clientRequest = null;
+			ServerThreadContext serverThreadContext = new ServerThreadContext(authentication, serverSocketNetwork, 
+					clientRequest);
+
+			ServerThread serverThread = new ServerThread(serverThreadContext);
 			serverThread.run();
 			
-			serverNetwork.closeSocket(socket);
+			serverSocketNetwork.close();
 		}																																																																	
 		
 		//serverNetwork.disconnect();
 	}
-
 }

@@ -1,17 +1,27 @@
 package domain;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import network.ServerNetwork;
+import network.ClientMessage;
+import network.ServerSocketNetwork;
 
 public class ServerThreadContext {
 	
 	private Authentication authentication;
 	
-	private ServerNetwork serverNetwork;
+	private ClientMessage clientMessage;
 	
-	public ServerThreadContext(Authentication authentication, ServerNetwork serverNetwork, Socket socket) {
+	private ServerSocketNetwork serverSocketNetwork;
+
+	
+	public ServerThreadContext(Authentication authentication, ServerSocketNetwork serverSocketNetwork, 
+			ClientMessage clientMessage) {
+		
 		this.authentication = authentication;
-		this.serverNetwork = serverNetwork;
+		this.clientMessage = clientMessage;
+		this.serverSocketNetwork = serverSocketNetwork;
 	}
 }

@@ -1,6 +1,5 @@
 package domain;
 
-import entities.ChatMessage;
 import interfaces.ServerThreadInterface;
 import network.ClientMessage;
 import network.ServerMessage;
@@ -10,13 +9,13 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 	private ClientMessage clientRequest;
 	
 	
-	public ServerThread(ServerThreadContext serverThreadContext, ClientMessage clientRequest) {
+	public ServerThread(ServerThreadContext serverThreadContext) {
 		this.clientRequest = clientRequest;
 	}
 
 	
 	public void run() {
-		//ChatMessage serverResponse = processRequest(clientRequest);
+		System.out.println(clientRequest);
 	}
 
 	

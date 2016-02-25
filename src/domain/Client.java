@@ -2,7 +2,6 @@ package domain;
 import network.ClientMessage;
 import network.ClientNetwork;
 import parsers.ArgsParser;
-import parsers.ServerResponseParser;
 
 
 public class Client{
@@ -27,16 +26,19 @@ public class Client{
 			System.exit(0);
 		}
 		
-		clientNetwork = new ClientNetwork();
+		clientNetwork = new ClientNetwork(argsParser.getServerIP(), argsParser.getServerPort());
 		ClientMessage clientMessage = argsParser.getMessage();
-		clientNetwork.connect(argsParser.getServerIP(), argsParser.getServerPort());
+		clientNetwork.connect();
+		System.out.println("Cliente ligado ao servidor " + argsParser.getServerIP() + ":" + argsParser.getServerPort());
+	
+		/*
 		clientNetwork.sendMessage(clientMessage);
-
 		ServerResponseParser serverResponseParser = new ServerResponseParser(clientNetwork.receiveMessage());
 		
 		if (serverResponseParser.isValid()) {
 			serverResponseParser.parseMessage();
 		}
+		*/
 	}
 
 }

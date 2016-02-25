@@ -10,31 +10,44 @@ import java.net.UnknownHostException;
 public class ClientNetwork {
 
 	private Socket socket;
-	private ObjectOutputStream out = null;
-	private ObjectInputStream in = null;
+	private ObjectInputStream in;
+	private ObjectOutputStream out;
+	private String serverIP;
+	private int serverPort;
 	
-	public ClientNetwork() {
-		socket = null;
+	public ClientNetwork(String serverIP, String serverPort) {
+		this.serverPort = Integer.parseInt(serverPort);
+		this.serverIP = serverIP;
 	}
 	
 
-	public boolean connect(String serverIP, String serverPort) {
-		socket = getSocket(serverIP, serverPort);
+	public boolean connect() {
+		socket = getSocket();
 		
 		try {
-			out = new ObjectOutputStream(socket.getOutputStream());
 			in = new ObjectInputStream(socket.getInputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		try {
+			out = new ObjectOutputStream(socket.getOutputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
-		return socket != null && out != null;
+		if (socket != null && out != null) {
+			return true;
+		}
+		
+		return false;
 	}
 	
 	
 	public void disconnetc() {
 		try {
 			out.close();
+			in.close();
 			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -42,13 +55,12 @@ public class ClientNetwork {
 	}
 	
 	
-	private static Socket getSocket(String serverIP, String serverPort) {
-		Socket socket = null;
-		int port = Integer.parseInt(serverPort);
+	private Socket getSocket() {
+		Socket socket;
 
 		for (int i = 0; i < 50; i++) {
 			try {
-				socket = new Socket(serverIP, port);
+				socket = new Socket(serverIP, serverPort);
 				return socket;
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
@@ -56,8 +68,9 @@ public class ClientNetwork {
 				e.printStackTrace();
 			} catch (IOException e) {
 				//tentar proximo porto
-				System.out.println("Porto " + port + " nao disponivel");
-				port++;
+				System.out.println("Porto " + serverPort + " nao disponivel");
+				serverPort++;
+				continue;
 			}
 		}
 		
@@ -66,7 +79,6 @@ public class ClientNetwork {
 	
 	
 	public void sendMessage(ClientMessage message) {
-		//ClientMessage clientMessage = requestFactory().
 		try {
 			out.writeObject(message);
 		} catch (IOException e) {
