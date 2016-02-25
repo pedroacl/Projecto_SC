@@ -10,19 +10,23 @@ import java.net.Socket;
 public class ServerNetwork {
 	
 	private ServerSocket serverSocket;
-	private Socket socket;
-	private ObjectInputStream in;
-	private ObjectOutputStream out;
 
 	public ServerNetwork(int serverPort) {
 		serverSocket = getServerSocket(serverPort);
+	}
 
+	//obter pedido de cliente
+	public Socket getRequest() {
+		Socket socket = null;
+		
 		try {
 			socket = serverSocket.accept();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
+		
+		return socket;
+	} 
 
 	
 	private ServerSocket getServerSocket(int serverPort) {
@@ -48,16 +52,33 @@ public class ServerNetwork {
 
 	
 	public void disconnect (){
-		
-		
+		try {
+			serverSocket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
-	public ClientMessage getClientMessage() {
+	
+	public void closeSocket(Socket socket) {
+		try {
+			socket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public ClientMessage getClientMessage(Socket socket) {
 		ClientMessage clientMessage = null;
-			
+		ObjectInputStream in = null;
+		
 		try {		
+			socket = serverSocket.accept();
+
 			in = new ObjectInputStream(socket.getInputStream());					
-			
 	 		clientMessage = (ClientMessage) in.readObject();
 			in.close();
 			
@@ -73,11 +94,12 @@ public class ServerNetwork {
 	}
 	
 	
-	public void sendMessage(ServerMessage serverMessage) {
+	public void sendMessage(Socket socket, ServerMessage serverMessage) {
+		ObjectOutputStream out = null;
+
 		try {
 			out = new ObjectOutputStream(socket.getOutputStream());
 			out.writeObject(serverMessage);
-
 			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
