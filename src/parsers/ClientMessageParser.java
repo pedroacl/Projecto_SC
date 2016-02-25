@@ -23,7 +23,7 @@ public class ClientMessageParser {
 		case "MESSAGE":
 			ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername()
 					,clientMessage.getDestination(), MessageType.MESSAGE);
-			ProcessRequest process
+			
 			
 			
 			break;
