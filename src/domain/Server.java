@@ -17,6 +17,7 @@ public class Server {
 		
 		//aceitar pedidos
 		System.out.println("Servidor inicializado e ah espera de pedidos.");
+
 		while(true) {
 			clientRequest = serverNetwork.getClientMessage();
 			
