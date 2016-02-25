@@ -10,14 +10,23 @@ import java.net.Socket;
 public class ServerNetwork {
 	
 	private ServerSocket serverSocket;
+	private Socket socket;
+	private ObjectInputStream in;
+	private ObjectOutputStream out;
 
 	public ServerNetwork(int serverPort) {
 		serverSocket = getServerSocket(serverPort);
+
+		try {
+			socket = serverSocket.accept();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	
-	private static ServerSocket getServerSocket(int serverPort) {
-		ServerSocket serverSocket = null;
+	private ServerSocket getServerSocket(int serverPort) {
+		serverSocket = null;
 	
 		//procurar portos disponiveis
 		for (int i = 0; i < 50; i++) {
@@ -36,25 +45,42 @@ public class ServerNetwork {
 		
 		return serverSocket;
 	} 
+
 	
+	public void disconnect (){
+		
+		
+	}
 	
 	public ClientMessage getClientMessage() {
-		Socket socket;
-		ObjectInputStream in;
-		ObjectOutputStream out;
-		
-		try {		
-			//aceitar pedido
-			socket = serverSocket.accept();
+		ClientMessage clientMessage = null;
 			
+		try {		
 			in = new ObjectInputStream(socket.getInputStream());					
-			out = new ObjectOutputStream(socket.getOutputStream());
+			
+	 		clientMessage = (ClientMessage) in.readObject();
+			in.close();
+			
 		} catch (BindException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 
-		return null;
+		return clientMessage;
+	}
+	
+	
+	public void sendMessage(ServerMessage serverMessage) {
+		try {
+			out = new ObjectOutputStream(socket.getOutputStream());
+			out.writeObject(serverMessage);
+
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

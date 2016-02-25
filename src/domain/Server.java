@@ -14,14 +14,13 @@ public class Server {
 		
 		authentication = new Authentication();
 		
-		serverNetwork = new ServerNetwork(serverPort);
-		
 		ClientMessage clientRequest = null;
 		
 		//aceitar pedidos
 		System.out.println("Servidor inicializado e ah espera de pedidos.");
 
 		while(true) {
+			serverNetwork = new ServerNetwork(serverPort);
 			clientRequest = serverNetwork.getClientMessage();
 			
 			System.out.println("Mensagem recebida!");
