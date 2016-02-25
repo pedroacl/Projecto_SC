@@ -11,17 +11,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import entities.ChatMessage;
-import entities.Conversation;
+import factories.ConversationFactory;
+import parsers.AppendingObjectOutputStream;
 
 public class ConversationDAO {
 	
 	public ConversationDAO() {
-
+		
 	}
 	
 	/**
 	 * Função que permite persistir uma determinada mensagem
-	 * @param chatMessage
+	 * @param chatMessage Mensagem a ser persistida
 	 */
 	public void addChatMessage(ChatMessage chatMessage) {
 		File file = new File("users/conversations");
@@ -35,9 +36,9 @@ public class ConversationDAO {
 		
 		try {
 			fout = new FileOutputStream(file);
-			ObjectOutputStream oos = new ObjectOutputStream(fout);
-			oos.writeObject(chatMessage);
-			oos.close();
+			AppendingObjectOutputStream aStream = new AppendingObjectOutputStream(new ObjectOutputStream(fout));
+			aStream.writeObject(chatMessage);
+			aStream.close();
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
