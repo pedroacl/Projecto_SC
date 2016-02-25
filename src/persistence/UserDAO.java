@@ -2,66 +2,92 @@ package persistence;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.HashMap;
 
 import entities.User;
-import factories.UserFactory;
 
 public class UserDAO {
 	
 	private HashMap<String, String> users;
 	
-	private UserFactory userFactory;
-	
 	public UserDAO() {
-		users = loadUsers();
-		userFactory = new UserFactory();
+		loadUsers();
 	}
 	
-	
+	/**
+	 * Função que permite obter um utilizador registado
+	 * @param username Nome do utilizador
+	 * @return Devolve um utilizador caso este exista ou null caso contrário
+	 */
 	public User getUser(String username) {
-		String password = users.get(username);
-		User user = new User();
+		if (username == null)
+			return null;
 		
+		String password = users.get(username);
+		User user = null; 
+
 		if (password != null) {
-			user.setUsername(username);
-			user.setPassword(password);
+			user = new User(username, password);
 		}
 		
 		return user;
 	}
 	
-	
+	/**
+	 * Função que permite adicionar um utilizador 
+	 * @param username Nome do utilizador
+	 * @param password Password do utilizador
+	 * @return Devolve true caso o utilizador tenha sido adicionado e false caso contrário
+	 */
 	public boolean addUser(String username, String password) {
-		//User user = userFactory.build(username, password);
+		if (username == null || password == null)		
+			return false;
 		
 		User user = getUser(username);
 		
-		if (user == null) {
-			users.put(username, password);
-			return true;
-		}
+		//user ja existe
+		if (user != null)
+			return false;
+
+		//adicionar user
+		users.put(username, password);
+	
+		//atualizar ficheiro
+		try {
+			FileWriter fw = new FileWriter("users.txt", true);
+			fw.write(username + " " + password + "\n");
+			fw.close();
 		
-		return false;
+			//criar directorias
+			File file = new File("users/" + username + "/files");
+			file.mkdir();
+			
+			//cirar ficheiro de conversas
+			file = new File("users/" + username + "/conversations");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+		
+		return true;
 	}
 	
-	
-	private HashMap<String, String>loadUsers() {
-		users = new HashMap<>();
-		
-		FileInputStream in;
-		ObjectInputStream oin;
+
+	/**
+	 * Função que carrega em memória todos os utilizadores registados
+	 * @return 
+	 */
+	private void loadUsers() {
+		users = new HashMap<String, String>();
 		
 		String line;
 		BufferedReader br;
 
 		//criar ficheiro users
-		File file = new File("users");
+		File file = new File("users.txt");
 		
 		if (!file.exists()) {
 			try {
@@ -73,20 +99,17 @@ public class UserDAO {
 		
 		
 		//carregar utilizadores
-		file = new File("users");
+		file = new File("users.txt");
 
 		try {
 			FileReader fr = new FileReader(file);
 			
 			br = new BufferedReader(fr);
-			//UserFactory userFactory = new UserFactory();
 			
 			while ((line = br.readLine()) != null) {
 				String[] args = line.split(" ");
 				String username = args[0];
 				String password = args[1];
-				
-				//User user = userFactory.build(username, password);
 				
 				users.put(username, password);
 				System.out.println(line);
@@ -104,13 +127,10 @@ public class UserDAO {
 					file.createNewFile();
 				}
 			}
-		} catch (FileNotFoundException e2) {
-			e2.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		return users;
 	}
-
 }
