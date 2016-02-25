@@ -18,7 +18,7 @@ public class ClientMessage implements Serializable {
 	
 	private MessageType messageType;
 	
-	private byte [] file;
+	private int fileSize;
 	
 	private String message;
 	
@@ -39,13 +39,13 @@ public class ClientMessage implements Serializable {
 	}
 
 	
-	public byte[] getFile() {
-		return file;
+	public int getFileSize() {
+		return fileSize;
 	}
 
 
-	public void setFile(byte[] file) {
-		this.file = file;
+	public void setFileSize(int size) {
+		this.fileSize = size;
 	}
 
 

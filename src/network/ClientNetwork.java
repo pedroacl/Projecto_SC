@@ -1,5 +1,6 @@
 package network;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -78,12 +79,19 @@ public class ClientNetwork {
 	}
 	
 	
-	public void sendMessage(ClientMessage message) {
+	private void send(ClientMessage message) {
 		try {
 			out.writeObject(message);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void sendMessage(ClientMessage message) {
+		if(message.getMessageType().equals(MessageType.FILE))
+			sendFile(message);
+		else
+			send(message);
 	}
 
 
@@ -99,5 +107,47 @@ public class ClientNetwork {
 		}
 		
 		return serverMessage;
+	}
+	
+	public boolean sendFile(ClientMessage message) {
+		boolean isValid = false;
+		
+		send(message);
+		
+		ServerMessage sm = receiveMessage();
+		
+		if(sm.getMessageType().equals(MessageType.OK)) {
+			isValid = true;
+			try {
+				sendByteFile(message.getMessage(), message.getFileSize());
+			} catch (IOException e) {
+				e.printStackTrace();
+				isValid = false;
+			}
+			
+		}
+		else
+			isValid = false;
+		
+		return isValid;
+	}
+	
+	private void sendByteFile(String name,int fileSize) throws IOException {
+		int packageSize = 1024;
+		
+		FileInputStream fileInputStream = new FileInputStream(name);
+		int currentLength = 0;
+		int resto = 0;
+		byte [] bfile;
+		while(currentLength < fileSize) {
+			if(resto < packageSize)
+				bfile= new byte[resto];
+			else
+				bfile = new byte[packageSize];
+			int lido = fileInputStream.read(bfile,0,bfile.length);
+			currentLength += lido;
+			out.write(bfile,0,bfile.length);
+		}
+		fileInputStream.close();	
 	}
 }

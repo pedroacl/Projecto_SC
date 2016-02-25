@@ -111,12 +111,16 @@ public class ArgsParser {
 		case "-f":
 			pedido = new ClientMessage(username, password, MessageType.FILE);
 			pedido.setDestination(act[1]);
+			pedido.setFileSize(fileSize(act[2]));
+			
+			/*
 			try {
 				pedido.setFile(transformFiletoByte(act[2]));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			*/
 			pedido.setMessage(act[2]);
 			break;
 		case "-a":
@@ -228,6 +232,7 @@ public class ArgsParser {
 		
 	}
 	
+	//PAra REMOVER
 	private byte[] transformFiletoByte(String path) throws IOException {
 		
 		File file = new File(path);
@@ -242,6 +247,11 @@ public class ArgsParser {
 	    
 		return bFile;
 	}
+	
+	private int fileSize(String name) {
+		File file = new File(name);
+		return (int) file.length();
+	}
 
 	
 	/*
@@ -253,7 +263,7 @@ public class ArgsParser {
 				+ "[ ‐m <contact> <message> | ‐f <contact> <file>  | ‐r contact file  |  "
 				+ "‐a <user> <group> |  ‐d <user> <group>  ]");
 	}
+	/*
 	
-	
-	
+	*/
 }
