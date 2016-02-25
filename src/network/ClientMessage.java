@@ -62,7 +62,7 @@ public class ClientMessage implements Serializable {
 		this.destination = to;
 	}
 	
-	public String getDestinatio() {
+	public String getDestination() {
 		return destination;
 	}
 

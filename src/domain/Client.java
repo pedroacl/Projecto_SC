@@ -1,4 +1,5 @@
 package domain;
+import network.ClientMessage;
 import network.ClientNetwork;
 import parsers.ArgsParser;
 import parsers.ServerResponseParser;
@@ -27,8 +28,9 @@ public class Client{
 		}
 		
 		clientNetwork = new ClientNetwork();
+		ClientMessage clientMessage = argsParser.getMessage();
 		clientNetwork.connect(argsParser.getServerIP(), argsParser.getServerPort());
-		clientNetwork.sendMessage(argsParser.getMessage());
+		clientNetwork.sendMessage(clientMessage);
 
 		ServerResponseParser serverResponseParser = new ServerResponseParser(clientNetwork.receiveMessage());
 		

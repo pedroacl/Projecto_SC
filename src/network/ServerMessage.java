@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import entities.ChatMessage;
 
-public class ServerMessage extends ChatMessage {
+public class ServerMessage  {
 
 	private ArrayList<ChatMessage> messages;
 	

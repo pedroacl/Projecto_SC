@@ -10,7 +10,7 @@ import network.MessageType;
 public class MessageFactory {
 	
 	public MessageFactory() {};
-	
+	/*
 	public ChatMessage build(String from, String accao) {
 		
 		String [] splited = accao.split(" ");
@@ -70,7 +70,7 @@ public class MessageFactory {
 		return pedido;
 				
 	}
-	
+	*/
 	
 	//tratar da exceçao
 	private byte[] transformFiletoByte(String path) throws IOException {

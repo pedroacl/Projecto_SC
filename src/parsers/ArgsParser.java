@@ -105,7 +105,7 @@ public class ArgsParser {
 		switch(act[0]) {
 		case "-m":
 			pedido = new ClientMessage(username, password, MessageType.MESSAGE);
-			//pedido.setToContact(splited[1]);
+			pedido.setDestination(act[1]);
 			pedido.setMessage(act[2]);
 			break;
 		case "-f":
