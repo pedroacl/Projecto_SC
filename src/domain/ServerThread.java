@@ -9,11 +9,9 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 	
 	private ClientMessage clientRequest;
 	
-	private Authentication authentication;
 	
-	public ServerThread(Authentication authentication, ClientMessage clientRequest) {
+	public ServerThread(ServerThreadContext serverThreadContext, ClientMessage clientRequest) {
 		this.clientRequest = clientRequest;
-		this.authentication = authentication;
 	}
 
 	
