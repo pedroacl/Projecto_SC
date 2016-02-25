@@ -16,7 +16,7 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 
 	
 	public void run() {
-		ChatMessage serverResponse = processRequest(clientRequest);
+		//ChatMessage serverResponse = processRequest(clientRequest);
 	}
 
 	
@@ -32,7 +32,7 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 		switch (clientRequest.getMessageType()) {
 		//adicionar utilizador
 		case ADDUSER:	
-			serverResponse.setMessage("Teste");
+			//serverResponse.setMessage("Teste");
 			break;
 			
 		//remover utilizador
