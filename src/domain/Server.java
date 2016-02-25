@@ -8,10 +8,13 @@ public class Server {
 	
 	private static ServerNetwork serverNetwork;
 	
-	
+	private static final int serverPort = 23456;
+
 	public static void main(String[] args) {
 		
 		authentication = new Authentication();
+		
+		serverNetwork = new ServerNetwork(serverPort);
 		
 		ClientMessage clientRequest = null;
 		

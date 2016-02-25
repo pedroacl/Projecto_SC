@@ -9,28 +9,10 @@ import java.net.Socket;
 
 public class ServerNetwork {
 	
-	private static final int serverPort = 23456;
 	private ServerSocket serverSocket;
-	private Socket socket;
-	private ObjectInputStream in;
-	private ObjectOutputStream out;
 
-
-	public ServerNetwork() {
-		//criar socket
-		try {		
-			serverSocket = getServerSocket(serverPort);
-			
-			//aceitar pedidos
-			socket = serverSocket.accept();			
-			
-			in = new ObjectInputStream(socket.getInputStream());					
-			out = new ObjectOutputStream(socket.getOutputStream());
-		} catch (BindException e) {
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
+	public ServerNetwork(int serverPort) {
+		serverSocket = getServerSocket(serverPort);
 	}
 
 	
@@ -50,13 +32,29 @@ public class ServerNetwork {
 			}
 		}
 		
-		System.out.println("Servidor ligado ao porto " + serverPort);		
+		System.out.println("Servidor ligado ao porto: " + serverPort);
+		
 		return serverSocket;
 	} 
 	
 	
 	public ClientMessage getClientMessage() {
+		Socket socket;
+		ObjectInputStream in;
+		ObjectOutputStream out;
+		
+		try {		
+			//aceitar pedido
+			socket = serverSocket.accept();
+			
+			in = new ObjectInputStream(socket.getInputStream());					
+			out = new ObjectOutputStream(socket.getOutputStream());
+		} catch (BindException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+
 		return null;
 	}
-	
 }
