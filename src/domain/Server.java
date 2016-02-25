@@ -1,7 +1,6 @@
 package domain;
 import java.net.Socket;
 
-import network.ClientMessage;
 import network.ServerNetwork;
 import network.ServerSocketNetwork;
 
@@ -22,12 +21,10 @@ public class Server {
 
 		while(true) {
 			Socket socket = serverNetwork.getRequest();
-			ServerSocketNetwork serverSocketNetwork = new ServerSocketNetwork(socket);
 			System.out.println("Cliente ligado!");
-			
-			ClientMessage clientRequest = null;
-			ServerThreadContext serverThreadContext = new ServerThreadContext(authentication, serverSocketNetwork, 
-					clientRequest);
+
+			ServerSocketNetwork serverSocketNetwork = new ServerSocketNetwork(socket);
+			ServerThreadContext serverThreadContext = new ServerThreadContext(authentication, serverSocketNetwork);
 
 			ServerThread serverThread = new ServerThread(serverThreadContext);
 			serverThread.run();

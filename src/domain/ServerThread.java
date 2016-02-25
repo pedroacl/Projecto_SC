@@ -3,6 +3,7 @@ package domain;
 import interfaces.ServerThreadInterface;
 import network.ClientMessage;
 import network.ServerMessage;
+import network.ServerSocketNetwork;
 
 public class ServerThread extends Thread implements ServerThreadInterface {
 	
@@ -15,7 +16,9 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 
 	
 	public void run() {
-		System.out.println("Mensagem: " + serverThreadContext.getClientMessage());
+		ServerSocketNetwork serverSocketNetwork = serverThreadContext.getServerSocketNetwork();
+		ClientMessage clientMessage = serverSocketNetwork.getClientMessage();
+		System.out.println("Mensagem: " + clientMessage);
 		System.out.println("Thread terminada.");
 	}
 

@@ -36,16 +36,6 @@ public class ServerSocketNetwork {
 		try {
 			socket.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	
-	public void closeSocket(Socket socket) {
-		try {
-			socket.close();
-		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

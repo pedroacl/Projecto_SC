@@ -7,26 +7,22 @@ public class ServerThreadContext {
 	
 	private Authentication authentication;
 	
-	private ClientMessage clientMessage;
-	
-	public ClientMessage getClientMessage() {
-		return clientMessage;
-	}
-
-
-	public void setClientMessage(ClientMessage clientMessage) {
-		this.clientMessage = clientMessage;
-	}
-
-
 	private ServerSocketNetwork serverSocketNetwork;
-
 	
-	public ServerThreadContext(Authentication authentication, ServerSocketNetwork serverSocketNetwork, 
-			ClientMessage clientMessage) {
+
+	public ServerThreadContext(Authentication authentication, ServerSocketNetwork serverSocketNetwork) {
 		
 		this.authentication = authentication;
-		this.clientMessage = clientMessage;
+		this.serverSocketNetwork = serverSocketNetwork;
+	}
+	
+	
+	public ServerSocketNetwork getServerSocketNetwork() {
+		return serverSocketNetwork;
+	}
+
+
+	public void setServerSocketNetwork(ServerSocketNetwork serverSocketNetwork) {
 		this.serverSocketNetwork = serverSocketNetwork;
 	}
 }
