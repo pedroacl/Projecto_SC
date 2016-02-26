@@ -36,21 +36,27 @@ public class ConversationDAO {
 		//obter lista de chat messages
 		try {
 			//carregar ficheiro
-			FileInputStream fin = new FileInputStream(file);
-			ObjectInputStream ois = new ObjectInputStream(fin);
-			List<ChatMessage> chatMessages = (List<ChatMessage>) ois.readObject();
+			FileInputStream fileInputStream = new FileInputStream(file);
+			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+			List<ChatMessage> chatMessages = (List<ChatMessage>) objectInputStream.readObject();
+			
+			//ficheiro vazio
+			if (chatMessages == null) {
+				chatMessages = new ArrayList<ChatMessage>();
+			}
+			
 			chatMessages.add(chatMessage);
 			
-			ois.close();
-			fin.close();
+			objectInputStream.close();
+			fileInputStream.close();
 		
 			//atualizar ficheiro
-			FileOutputStream fout = new FileOutputStream(file);
-			ObjectOutputStream oos = new ObjectOutputStream(fout);
-			oos.writeObject(chatMessages);
+			FileOutputStream fileOutputStream = new FileOutputStream(file);
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+			objectOutputStream.writeObject(chatMessages);
 
-			oos.close();
-			fout.close();
+			objectOutputStream.close();
+			fileOutputStream.close();
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -74,12 +80,12 @@ public class ConversationDAO {
 			return null;
 		}
 		
-		FileInputStream fin = null;
+		FileInputStream fileInputStream = null;
 		List<Long> conversationsIds = null;
 		
 		try {
-			fin = new FileInputStream(file);
-			ObjectInputStream ois = new ObjectInputStream(fin);
+			fileInputStream = new FileInputStream(file);
+			ObjectInputStream ois = new ObjectInputStream(fileInputStream);
 			conversationsIds = (List<Long>) ois.readObject();
 			ois.close();
 			

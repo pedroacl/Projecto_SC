@@ -1,6 +1,7 @@
 package persistence;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -78,6 +79,42 @@ public class UserDAO {
 		}	
 		
 		return true;
+	}
+	
+	/**
+	 * 
+	 * @param username
+	 */
+	public void removeUser(String username) {
+		users.remove(username);
+		
+		File file = new File("users/" + username + ".txt");
+		File tempFile = new File("users/tempUser.txt");
+		
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+			
+			String line;
+			
+			//copiar todos os users para o ficheiro temp
+			while((line = reader.readLine()) != null) {
+				String currentUsername = line.split(" ")[0];
+
+				//nao copiar user
+				if (currentUsername.equals(username))
+					continue;
+					
+			    writer.write(line);
+			}
+			
+			writer.close();
+			reader.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 
