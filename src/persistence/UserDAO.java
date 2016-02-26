@@ -10,6 +10,11 @@ import java.util.HashMap;
 
 import entities.User;
 
+/**
+ * 
+ * @author pedro
+ *
+ */
 public class UserDAO {
 	
 	private HashMap<String, String> users;

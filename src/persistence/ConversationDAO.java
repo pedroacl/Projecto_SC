@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import entities.ChatMessage;
-import factories.ConversationFactory;
-import parsers.AppendingObjectOutputStream;
 
 public class ConversationDAO {
 	
@@ -24,27 +22,43 @@ public class ConversationDAO {
 	 * Função que permite persistir uma determinada mensagem
 	 * @param chatMessage Mensagem a ser persistida
 	 */
-	public void addChatMessage(ChatMessage chatMessage) {
-		File file = new File("users/conversations");
+	public void addChatMessage(Long conversationId, ChatMessage chatMessage) {
+		File file = new File("conversations/" + conversationId);
 		
 		if (!file.exists()) {
-			return;
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		
-		FileOutputStream fout = null;
-		List<Long> conversationsIDs = null;
-		
+
+		//obter lista de chat messages
 		try {
-			fout = new FileOutputStream(file);
-			AppendingObjectOutputStream aStream = new AppendingObjectOutputStream(new ObjectOutputStream(fout));
-			aStream.writeObject(chatMessage);
-			aStream.close();
+			//carregar ficheiro
+			FileInputStream fin = new FileInputStream(file);
+			ObjectInputStream ois = new ObjectInputStream(fin);
+			List<ChatMessage> chatMessages = (List<ChatMessage>) ois.readObject();
+			chatMessages.add(chatMessage);
 			
+			ois.close();
+			fin.close();
+		
+			//atualizar ficheiro
+			FileOutputStream fout = new FileOutputStream(file);
+			ObjectOutputStream oos = new ObjectOutputStream(fout);
+			oos.writeObject(chatMessages);
+
+			oos.close();
+			fout.close();
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 
@@ -53,7 +67,7 @@ public class ConversationDAO {
 	 * @param username
 	 * @return Devolve uma lista de IDs
 	 */
-	public List<Long> getUserConversationsIDs(String username) {
+	public List<Long> getUserConversationsIds(String username) {
 		File file = new File("users/conversations");
 		
 		if (!file.exists()) {
@@ -61,12 +75,12 @@ public class ConversationDAO {
 		}
 		
 		FileInputStream fin = null;
-		List<Long> conversationsIDs = null;
+		List<Long> conversationsIds = null;
 		
 		try {
 			fin = new FileInputStream(file);
 			ObjectInputStream ois = new ObjectInputStream(fin);
-			conversationsIDs = (List<Long>) ois.readObject();
+			conversationsIds = (List<Long>) ois.readObject();
 			ois.close();
 			
 		} catch (FileNotFoundException e) {
@@ -77,7 +91,7 @@ public class ConversationDAO {
 			e.printStackTrace();
 		}
 	
-		return conversationsIDs;
+		return conversationsIds;
 	}
 
 
