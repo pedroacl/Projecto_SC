@@ -180,6 +180,8 @@ public class ArgsParser {
 					res = args[i] + " " +args[i+1] + " " + args[i+2];
 					File file = new File(args[i+2]);
 					if(!file.isFile() || file.length() >= Integer.MAX_VALUE) {
+						
+						System.out.println(file.getPath());
 						System.out.println("ficheiro não existe ou excede limite");
 						res = null;
 					}

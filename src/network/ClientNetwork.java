@@ -137,11 +137,10 @@ public class ClientNetwork {
 		
 		FileInputStream fileInputStream = new FileInputStream(name);
 		int currentLength = 0;
-		int resto = 0;
 		byte [] bfile;
 		while(currentLength < fileSize) {
-			if(resto < packageSize)
-				bfile= new byte[resto];
+			if((fileSize - currentLength) < packageSize)
+				bfile= new byte[(fileSize - currentLength)];
 			else
 				bfile = new byte[packageSize];
 			int lido = fileInputStream.read(bfile,0,bfile.length);
