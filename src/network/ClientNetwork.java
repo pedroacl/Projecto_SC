@@ -115,6 +115,7 @@ public class ClientNetwork {
 		send(message);
 		
 		ServerMessage sm = receiveMessage();
+		System.out.println("Mensagem é: " + sm.getMessageType().toString());
 		
 		if(sm.getMessageType().equals(MessageType.OK)) {
 			isValid = true;
@@ -144,6 +145,7 @@ public class ClientNetwork {
 			else
 				bfile = new byte[packageSize];
 			int lido = fileInputStream.read(bfile,0,bfile.length);
+			System.out.println("li: " + lido);
 			currentLength += lido;
 			out.write(bfile,0,bfile.length);
 		}

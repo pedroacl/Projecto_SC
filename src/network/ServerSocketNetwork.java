@@ -59,7 +59,7 @@ public class ServerSocketNetwork {
 	}
 	
 	
-	private void send(ClientMessage message) {
+	private void send(ServerMessage message) {
 		try {
 			out.writeObject(message);
 		} catch (IOException e) {
@@ -67,14 +67,14 @@ public class ServerSocketNetwork {
 		}
 	}
 	
-	public void sendMessage(ClientMessage message) {
+	public void sendMessage(ServerMessage message) {
 		if(message.getMessageType().equals(MessageType.FILE))
 			sendFile(message);
 		else
 			send(message);
 	}
 	
-	public boolean sendFile(ClientMessage message) {
+	public boolean sendFile(ServerMessage message) {
 		boolean isValid = false;
 		
 		send(message);
@@ -118,16 +118,26 @@ public class ServerSocketNetwork {
 	public File receiveFile( int sizeFile, String name ) throws IOException {
 		File file = new File(name);
 		FileOutputStream fileOut =  new FileOutputStream(file);
+		System.out.println("O tamnho do ficheiro é :" + sizeFile);
 		int packageSize = 1024;
 		int currentLength = 0;
 		byte [] bfile;
 		int lido;
 		while(currentLength < sizeFile) {
-			if((sizeFile-currentLength) < packageSize)
+			if((sizeFile-currentLength) < packageSize) {
+				System.out.println(sizeFile-currentLength);
 				bfile= new byte [sizeFile-currentLength];
+			}
 			else
 				bfile= new byte [packageSize];
+			System.out.println("Avaliable: "+in.available());
 			lido = in.read(bfile, 0, bfile.length);
+			if(lido == -1) {
+				System.out.println("li: "+ lido );
+				break;
+			}
+			System.out.println("li: "+ lido );	
+			
 			fileOut.write(bfile);
 			currentLength += lido;
 		}

@@ -111,6 +111,7 @@ public class ArgsParser {
 		case "-f":
 			pedido = new ClientMessage(username, password, MessageType.FILE);
 			pedido.setDestination(act[1]);
+			System.out.println("Client: fileSize= "+ fileSize(act[2]));
 			pedido.setFileSize(fileSize(act[2]));
 			
 			/*

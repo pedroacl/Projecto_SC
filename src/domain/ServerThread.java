@@ -24,8 +24,9 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 		ClientMessage clientMessage = serverSocketNetwork.getClientMessage();
 		
 		if(clientMessage.getMessageType().equals(MessageType.FILE))
+			serverSocketNetwork.sendMessage(new ServerMessage(MessageType.OK));
 			try {
-				File b =serverSocketNetwork.receiveFile(clientMessage.getFileSize(), "teste1.jpeg");
+				File b =serverSocketNetwork.receiveFile(clientMessage.getFileSize(), "teste1.mp3");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
