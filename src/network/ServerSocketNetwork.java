@@ -47,24 +47,6 @@ public class ServerSocketNetwork {
 	
 	public ClientMessage getClientMessage() {
 		ClientMessage clientMessage = null;
-		
-		try {		
-	 		clientMessage = (ClientMessage) in.readObject();
-			in.close();
-			
-		} catch (BindException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-
-		return clientMessage;
-	}
-	
-	public ClientMessage receiveMessage() {
-		ClientMessage clientMessage = null;
 
 		try {
 			clientMessage = (ClientMessage) in.readObject();
@@ -73,7 +55,6 @@ public class ServerSocketNetwork {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 		return clientMessage;
 	}
 	
@@ -98,7 +79,7 @@ public class ServerSocketNetwork {
 		
 		send(message);
 		
-		ClientMessage cm = receiveMessage();
+		ClientMessage cm = getClientMessage();
 		
 		if(cm.getMessageType().equals(MessageType.OK)) {
 			isValid = true;

@@ -27,4 +27,9 @@ public class Authentication {
 
 		return true;
 	}
+
+
+	public boolean exists(String user) {
+		return true;
+	}
 }

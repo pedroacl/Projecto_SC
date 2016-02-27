@@ -26,10 +26,11 @@ public class ChatMessage implements Serializable {
 	
 	private Date createdAt;
 
-	public ChatMessage( String from, String destination, MessageType type ) {
+	public ChatMessage( String from, String destination, String message, MessageType type ) {
 		this.fromUser = from;
 		this.destination = destination;
 		this.type = type;
+		this.message = message;
 		createdAt = new Date();
 	}
 	

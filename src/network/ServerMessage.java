@@ -8,9 +8,15 @@ public class ServerMessage {
 
 	private ArrayList<ChatMessage> messages;
 	
-	private byte[] file;
+	private int sizeFile;
 	
 	private MessageType messageType;
+	
+	private String content;
+	
+	public ServerMessage(MessageType type) {
+		messageType = type;
+	}
 
 	
 	public MessageType getMessageType() {
