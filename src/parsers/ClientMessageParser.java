@@ -26,6 +26,7 @@ public class ClientMessageParser {
 		ServerMessage serverMessage = null;
 		
 		switch (clientMessage.getMessageType().toString()) {
+		
 		case "MESSAGE":
 			authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword());
 			if(authentication.exists(clientMessage.getDestination())) {
@@ -57,6 +58,8 @@ public class ClientMessageParser {
 				serverMessage = new ServerMessage(MessageType.NOK);
 				serverMessage.setMessage("Não existe esse contact");
 			}
+			
+		case "
 
 		default:
 			break;
