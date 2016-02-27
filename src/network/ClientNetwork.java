@@ -149,6 +149,7 @@ public class ClientNetwork {
 			currentLength += lido;
 			out.write(bfile,0,bfile.length);
 		}
+		out.flush();
 		fileInputStream.close();	
 	}
 }

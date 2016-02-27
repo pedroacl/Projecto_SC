@@ -121,27 +121,22 @@ public class ServerSocketNetwork {
 		System.out.println("O tamnho do ficheiro é :" + sizeFile);
 		int packageSize = 1024;
 		int currentLength = 0;
-		byte [] bfile;
+		byte [] bfile = new byte [packageSize];
 		int lido;
 		while(currentLength < sizeFile) {
-			if((sizeFile-currentLength) < packageSize) {
-				System.out.println(sizeFile-currentLength);
-				bfile= new byte [sizeFile-currentLength];
-			}
-			else
-				bfile= new byte [packageSize];
+			int resto = sizeFile-currentLength;
+			int numThisTime = resto < packageSize ? resto : bfile.length;
 			System.out.println("Avaliable: "+in.available());
-			lido = in.read(bfile, 0, bfile.length);
+			lido = in.read(bfile, 0, numThisTime);
 			if(lido == -1) {
-				System.out.println("li: "+ lido );
 				break;
 			}
 			System.out.println("li: "+ lido );	
 			
-			fileOut.write(bfile);
+			fileOut.write(bfile,0,numThisTime);
 			currentLength += lido;
 		}
-		
+		System.out.println("li no total2: "+ currentLength );
 		fileOut.close();
 		
 		return file;
