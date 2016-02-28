@@ -5,6 +5,12 @@ public class ConversationHeader {
 	
 	private String toUser;
 	
+	
+	public ConversationHeader(Long conversationId, String toUser) {
+		this.Id = conversationId;
+		this.toUser = toUser;
+	}
+	
 
 	public String getToUser() {
 		return toUser;

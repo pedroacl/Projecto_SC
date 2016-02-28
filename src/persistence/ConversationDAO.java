@@ -13,6 +13,7 @@ import java.util.List;
 import entities.ChatMessage;
 import entities.Conversation;
 import entities.ConversationHeader;
+import factories.ConversationFactory;
 
 public class ConversationDAO {
 	
@@ -21,44 +22,46 @@ public class ConversationDAO {
 	}
 	
 	/**
-	 * Função que permite persistir uma determinada mensagem
-	 * @param chatMessage Mensagem a ser persistida
+	 * Função que permite persistir uma determinada mensagem em disco
+	 * @param chatMessage Mensagem a ser guardada
 	 */
 	public void addChatMessage(ChatMessage chatMessage) {
-		
+
+		ConversationFactory conversationFactory = ConversationFactory.getInstance();
 		Conversation conversation = getConversationByChatMessage(chatMessage);
+		File file;
 		
 		//criar conversa
 		if (conversation == null) {
-						
+			conversation = conversationFactory.build(chatMessage.getFromUser(), chatMessage.getDestination());
+			file = new File("conversations/" + conversation.getId());
+			
+			//pasta da conversation nao existe
+			if (!file.exists()) {
+				file.mkdir();						
+			}			
 		}
 		
-		File file = new File("conversations/" + conversation.getId());
-		
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
 		//obter lista de chat messages
 		try {
 			//carregar ficheiro
-			FileInputStream fileInputStream = new FileInputStream(file);
-			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-			List<ChatMessage> chatMessages = (List<ChatMessage>) objectInputStream.readObject();
+			file = new File("conversations/" + conversation.getId() + "/messages");
+			List<ChatMessage> chatMessages;
 			
-			//ficheiro vazio
-			if (chatMessages == null) {
+			if (!file.exists()) {
+				file.createNewFile();
 				chatMessages = new ArrayList<ChatMessage>();
+
+			} else {
+				FileInputStream fileInputStream = new FileInputStream(file);
+				ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+				chatMessages = (List<ChatMessage>) objectInputStream.readObject();
+				
+				objectInputStream.close();
+				fileInputStream.close();
 			}
 			
 			chatMessages.add(chatMessage);
-			
-			objectInputStream.close();
-			fileInputStream.close();
 		
 			//atualizar ficheiro
 			FileOutputStream fileOutputStream = new FileOutputStream(file);
@@ -67,6 +70,10 @@ public class ConversationDAO {
 
 			objectOutputStream.close();
 			fileOutputStream.close();
+			
+			//atualizar conversation headers de cada user
+			updateUserConversationHeaders(conversation.getFromUser(), conversation);
+			updateUserConversationHeaders(conversation.getToUser(), conversation);
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -74,6 +81,75 @@ public class ConversationDAO {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	
+	/**
+	 * 
+	 * @param username
+	 * @param conversation
+	 */
+	public void updateUserConversationHeaders(String username, Conversation conversation) {
+		File file = new File("users/" + username + "/conversations");
+		
+		ConversationHeader conversationHeader = 
+				new ConversationHeader(conversation.getId(), conversation.getToUser());
+		
+		//ficheiro nao existe
+		if (!file.exists()) {
+			//criar ficheiro
+			try {
+				file.createNewFile();
+				
+				FileOutputStream fileOutputStream = new FileOutputStream(file);
+				ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+
+				//atualizar ficheiro
+				List<ConversationHeader> conversationHeaders = new ArrayList<ConversationHeader>(); 
+				conversationHeaders.add(conversationHeader);
+				objectOutputStream.writeObject(conversationHeaders);
+				
+				objectOutputStream.close();
+				fileOutputStream.close();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		//ficheiro ja existe
+		//atualizar conversation headers do utilizador
+		} else {
+			//ler conversation headers do utilizador
+			try {
+				FileInputStream fileInputStream = new FileInputStream(file);
+				ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+
+				ArrayList<ConversationHeader> conversationHeaders = 
+						(ArrayList<ConversationHeader>) objectInputStream.readObject();
+				
+				if (!conversationHeaders.contains(conversationHeader)) {
+					conversationHeaders.add(conversationHeader);
+				}
+				
+				objectInputStream.close();
+				fileInputStream.close();
+			
+				//atualizar ficheiro
+				FileOutputStream fileOutputStream = new FileOutputStream(file);
+				ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+				objectOutputStream.writeObject(conversationHeaders);
+				
+				objectInputStream.close();
+				fileOutputStream.close();
+				
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -88,11 +164,7 @@ public class ConversationDAO {
 		File file = new File("users/" + chatMessage.getFromUser() + "/conversations");
 		
 		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			return null;
 		}
 		
 		List<ConversationHeader> conversationHeaders = new ArrayList<ConversationHeader>();
