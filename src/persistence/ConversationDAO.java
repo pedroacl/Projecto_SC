@@ -12,6 +12,7 @@ import java.util.List;
 
 import entities.ChatMessage;
 import entities.Conversation;
+import entities.ConversationHeader;
 
 public class ConversationDAO {
 	
@@ -23,8 +24,16 @@ public class ConversationDAO {
 	 * Função que permite persistir uma determinada mensagem
 	 * @param chatMessage Mensagem a ser persistida
 	 */
-	public void addChatMessage(Long conversationId, ChatMessage chatMessage) {
-		File file = new File("conversations/" + conversationId);
+	public void addChatMessage(ChatMessage chatMessage) {
+		
+		Conversation conversation = getConversationByChatMessage(chatMessage);
+		
+		//criar conversa
+		if (conversation == null) {
+						
+		}
+		
+		File file = new File("conversations/" + conversation.getId());
 		
 		if (!file.exists()) {
 			try {
@@ -69,37 +78,52 @@ public class ConversationDAO {
 	}
 
 
+	
 	/**
-	 * Função que devolve os IDs de todas as conversas de um utilizador
-	 * @param username
-	 * @return Devolve uma lista de IDs
+	 * 
+	 * @param chatMessage
+	 * @return
 	 */
-	public List<Long> getUserConversationsIds(String username) {
-		File file = new File("users/conversations");
+	public Conversation getConversationByChatMessage(ChatMessage chatMessage) {
+
+		File file = new File("users/" + chatMessage.getFromUser() + "/conversations");
 		
 		if (!file.exists()) {
-			return null;
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		
-		FileInputStream fileInputStream = null;
-		List<Long> conversationsIds = null;
+		List<ConversationHeader> conversationHeaders = new ArrayList<ConversationHeader>();
 		
+		//obter conversas do utilizador
 		try {
-			fileInputStream = new FileInputStream(file);
-			ObjectInputStream ois = new ObjectInputStream(fileInputStream);
-			conversationsIds = (List<Long>) ois.readObject();
-			ois.close();
+			FileInputStream fin = new FileInputStream(file);
+			ObjectInputStream ois = new ObjectInputStream(fin);
+			conversationHeaders = (List<ConversationHeader>) ois.readObject();
 			
+			fin.close();
+			ois.close();
+
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		for (ConversationHeader conversationHeader : conversationHeaders) {
+			if (conversationHeader.getToUser().equals(chatMessage.getDestination())) {
+				return getConversationById(conversationHeader.getId());
+			}
 		}
 	
-		return conversationsIds;
+		return null;
 	}
+	
 
 
 	/**
@@ -107,21 +131,19 @@ public class ConversationDAO {
 	 * @param conversationId ID da conversa
 	 * @return Devolve uma conversa caso esta exista ou null caso contrário
 	 */
-	public List<ChatMessage> getConversation(Long conversationId) {
+	public Conversation getConversationById(Long conversationId) {
 		File file = new File("conversations/" + conversationId);
 
 		if (!file.exists()){
 			return null;
 		}
 		
-		List<ChatMessage> chatMessages = new ArrayList<ChatMessage>();
-		ChatMessage chatMessage = null;
+		Conversation conversation = new Conversation();
 		
 		try {
 			FileInputStream fin = new FileInputStream(file);
 			ObjectInputStream ois = new ObjectInputStream(fin);
-			chatMessage = (ChatMessage) ois.readObject();
-			chatMessages.add(chatMessage);
+			conversation = (Conversation) ois.readObject();
 			ois.close();
 
 		} catch (FileNotFoundException e) {
@@ -132,7 +154,7 @@ public class ConversationDAO {
 			e.printStackTrace();
 		}
 		
-		return chatMessages;
+		return conversation;
 	}
 	
 

@@ -1,6 +1,7 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Conversation implements Serializable {
 	
@@ -14,8 +15,10 @@ public class Conversation implements Serializable {
 	private String fromUser;
 	
 	private String toUser;
-
 	
+	private List<ChatMessage> chatMessages;
+
+
 	public Conversation() {
 		
 	}
@@ -47,6 +50,10 @@ public class Conversation implements Serializable {
 
 	public void setToUser(String toUser) {
 		this.toUser = toUser;
+	}
+	
+	public List<ChatMessage> getChatMessages() {
+		return chatMessages;
 	}
 
 

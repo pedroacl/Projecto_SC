@@ -1,7 +1,8 @@
 package parsers;
 
 
-import persistence.ConversationDAO;
+import java.io.File;
+
 import domain.Authentication;
 import entities.ChatMessage;
 import network.ClientMessage;
@@ -12,9 +13,10 @@ import network.ServerSocketNetwork;
 public class ClientMessageParser {
 	
 	private ClientMessage clientMessage;
-	Authentication authentication;
-	ServerSocketNetwork ssn;
-	
+
+	private Authentication authentication;
+
+	private ServerSocketNetwork ssn;
 	
 
 	public ClientMessageParser(ClientMessage clientMessage, Authentication auth) {
@@ -31,16 +33,17 @@ public class ClientMessageParser {
 			authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword());
 
 			if(authentication.exists(clientMessage.getDestination())) {
-				ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername()
-					,clientMessage.getDestination(), clientMessage.getMessage(), MessageType.MESSAGE);
+				ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(),
+					clientMessage.getDestination(), 
+					clientMessage.getMessage(), 
+					MessageType.MESSAGE);
 
-//				ConversationDAO.addChatMessage(???,chatMessage);
+				//conversationDAO.addChatMessage(chatMessage);
 				serverMessage = new ServerMessage(MessageType.OK);
-
 			}
 			else {
 				serverMessage = new ServerMessage(MessageType.NOK);
-				serverMessage.setMessage("Não existe esse contact");
+				serverMessage.setContent("Não existe esse contact");
 			}
 				
 			break;
@@ -53,20 +56,21 @@ public class ClientMessageParser {
 
 				String path = fileDAO.saveFile(clientMessage.getUsername(),
 						clientMessage.getDestination(), clientMessage.getMessage());
-
+				
 				File file = ssn.receiveFile(clientMessage.getFileSize(), path);
+				
 				ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername()
 						,clientMessage.getDestination(), clientMessage.getMessage(), MessageType.File);
 
-				ConversationDAO.addChatMessage(???,chatMessage);
+				//ConversationDAO.addChatMessage(???,chatMessage);
 				serverMessage = new ServerMessage(MessageType.OK);
 			}
 			else {
 				serverMessage = new ServerMessage(MessageType.NOK);
-				serverMessage.setMessage("Não existe esse contact");
+				serverMessage.setContent("Não existe esse contact");
 			}
 			
-		case "
+			break;
 
 		default:
 			break;

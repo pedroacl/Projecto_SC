@@ -20,10 +20,18 @@ public class ServerMessage implements Serializable  {
 	
 	private String content;
 	
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
 	public ServerMessage(MessageType type) {
 		messageType = type;
 	}
-
 	
 	public MessageType getMessageType() {
 		return messageType;
@@ -33,12 +41,10 @@ public class ServerMessage implements Serializable  {
 		this.messageType = messageType;
 	}
 
-
 	public String getMessage() {
 		
 		return content;
 	}
-
 
 	public int getFileSize() {
 		return sizeFile;
