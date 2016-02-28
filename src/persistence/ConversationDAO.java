@@ -77,7 +77,6 @@ public class ConversationDAO {
 		}
 	}
 
-
 	
 	/**
 	 * 
@@ -115,6 +114,7 @@ public class ConversationDAO {
 			e.printStackTrace();
 		}
 		
+		//obter conversa
 		for (ConversationHeader conversationHeader : conversationHeaders) {
 			if (conversationHeader.getToUser().equals(chatMessage.getDestination())) {
 				return getConversationById(conversationHeader.getId());

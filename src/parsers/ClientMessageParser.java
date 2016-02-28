@@ -54,13 +54,15 @@ public class ClientMessageParser {
 			if(authentication.exists(clientMessage.getDestination()) && 
 					clientMessage.getFileSize() < Integer.MAX_VALUE) {
 
+				/*
 				String path = fileDAO.saveFile(clientMessage.getUsername(),
 						clientMessage.getDestination(), clientMessage.getMessage());
 				
 				File file = ssn.receiveFile(clientMessage.getFileSize(), path);
+				*/
 				
 				ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername()
-						,clientMessage.getDestination(), clientMessage.getMessage(), MessageType.File);
+						,clientMessage.getDestination(), clientMessage.getMessage(), MessageType.FILE);
 
 				//ConversationDAO.addChatMessage(???,chatMessage);
 				serverMessage = new ServerMessage(MessageType.OK);
@@ -75,5 +77,7 @@ public class ClientMessageParser {
 		default:
 			break;
 		}
+		
+		return serverMessage;
 	}
 }
