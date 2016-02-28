@@ -29,11 +29,14 @@ public class ClientMessageParser {
 		
 		case "MESSAGE":
 			authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword());
+
 			if(authentication.exists(clientMessage.getDestination())) {
 				ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername()
 					,clientMessage.getDestination(), clientMessage.getMessage(), MessageType.MESSAGE);
-				ConversationDAO.addChatMessage(???,chatMessage);
+
+//				ConversationDAO.addChatMessage(???,chatMessage);
 				serverMessage = new ServerMessage(MessageType.OK);
+
 			}
 			else {
 				serverMessage = new ServerMessage(MessageType.NOK);
@@ -44,13 +47,17 @@ public class ClientMessageParser {
 			
 		case "FILE":
 			authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword());
+
 			if(authentication.exists(clientMessage.getDestination()) && 
 					clientMessage.getFileSize() < Integer.MAX_VALUE) {
+
 				String path = fileDAO.saveFile(clientMessage.getUsername(),
 						clientMessage.getDestination(), clientMessage.getMessage());
+
 				File file = ssn.receiveFile(clientMessage.getFileSize(), path);
 				ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername()
 						,clientMessage.getDestination(), clientMessage.getMessage(), MessageType.File);
+
 				ConversationDAO.addChatMessage(???,chatMessage);
 				serverMessage = new ServerMessage(MessageType.OK);
 			}

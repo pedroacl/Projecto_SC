@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
+import entities.Conversation;
 import entities.User;
 
 /**

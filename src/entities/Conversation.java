@@ -1,7 +1,6 @@
 package entities;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class Conversation implements Serializable {
 	
@@ -16,9 +15,7 @@ public class Conversation implements Serializable {
 	
 	private String toUser;
 
-	private List<ChatMessage> chatMessages; 
 	
-
 	public Conversation() {
 		
 	}
@@ -35,16 +32,28 @@ public class Conversation implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}	
-	
-	public List<ChatMessage> getChatMessages() {
-		return chatMessages;
+
+		public String getFromUser() {
+		return fromUser;
 	}
 
-	public void setChatMessages(List<ChatMessage> chatMessages) {
-		this.chatMessages = chatMessages;
+	public void setFromUser(String fromUser) {
+		this.fromUser = fromUser;
 	}
 
-	public ChatMessage getFirstChatMessage() {
-		return chatMessages.get(0);
+	public String getToUser() {
+		return toUser;
+	}
+
+	public void setToUser(String toUser) {
+		this.toUser = toUser;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		Conversation conversation = (Conversation) obj;
+		
+		return (this.id == conversation.getId());
 	}
 }

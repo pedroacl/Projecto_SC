@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import entities.ChatMessage;
+import entities.Conversation;
 
 public class ConversationDAO {
 	
@@ -170,5 +171,72 @@ public class ConversationDAO {
 		}
 		
 		return null;
+	}
+	
+
+	/**
+	 * Permite registar uma conversa com os seus utilizadores
+	 * @param conversation
+	 */
+	public void addConversationToUsers(Conversation conversation) {
+		
+		addConversationToUser(conversation, conversation.getFromUser());
+		addConversationToUser(conversation, conversation.getToUser());
+	}
+	
+	
+	/**
+	 * 
+	 * @param conversation
+	 * @param username
+	 */
+	private void addConversationToUser(Conversation conversation, String username) {
+
+		List<Conversation> conversations = new ArrayList<Conversation>();
+
+		File file = new File("users/" + username + "/conversations");
+
+		//utilizador ainda não tem conversas
+		if (!file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		} else {
+			try {
+				FileInputStream fileInputStream = new FileInputStream(file);
+				ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+				conversations = (ArrayList<Conversation>) objectInputStream.readObject();
+				
+				fileInputStream.close();
+				objectInputStream.close();
+
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+	
+		//conversa ainda nao registada com o utilizador
+		if (!conversations.contains(conversation)) {
+			conversations.add(conversation);
+		}
+		
+		//atualizar ficheiro
+		try {
+			FileOutputStream fileOutputStream = new FileOutputStream(file);
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+			objectOutputStream.writeObject(conversations);
+
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
