@@ -101,6 +101,7 @@ public class ConversationDAO {
 			//criar ficheiro
 			try {
 				file.createNewFile();
+				System.out.println("Criado o ficheiro " + file.getAbsolutePath());
 				
 				FileOutputStream fileOutputStream = new FileOutputStream(file);
 				ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
@@ -247,13 +248,16 @@ public class ConversationDAO {
 			if (!file.exists()) {
 				continue;
 			}
-			
+		
+			//ler ficheiro
 			try {
-				FileInputStream fin = new FileInputStream(file);
-				ObjectInputStream ois = new ObjectInputStream(fin);
-				chatMessage = (ChatMessage) ois.readObject();
+				FileInputStream fileInputStream = new FileInputStream(file);
+				ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+				chatMessage = (ChatMessage) objectInputStream.readObject();
 				chatMessages.add(chatMessage);
-				ois.close();
+
+				objectInputStream.close();
+				fileInputStream.close();
 
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -294,6 +298,7 @@ public class ConversationDAO {
 		if (!file.exists()) {
 			try {
 				file.createNewFile();
+				System.out.println("Criado o ficheiro " + file.getAbsolutePath());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -319,6 +324,7 @@ public class ConversationDAO {
 		//conversa ainda nao registada com o utilizador
 		if (!conversations.contains(conversation)) {
 			conversations.add(conversation);
+			System.out.println("Conversa adicionada");
 		}
 		
 		//atualizar ficheiro
@@ -326,6 +332,7 @@ public class ConversationDAO {
 			FileOutputStream fileOutputStream = new FileOutputStream(file);
 			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
 			objectOutputStream.writeObject(conversations);
+			System.out.println("Atualizado o ficheiro " + file.getAbsolutePath());
 
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
