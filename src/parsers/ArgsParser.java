@@ -256,17 +256,4 @@ public class ArgsParser {
 		return (int) file.length();
 	}
 
-	
-	/*
-	 * imprime a mensagem  de como usar a aplicação
-	 */
-	public static void printUsage() {
-		System.out.println("exemplo de uso:");
-		System.out.println("myWhats <localUser> <serverAddress> [ ‐p <password> ] "
-				+ "[ ‐m <contact> <message> | ‐f <contact> <file>  | ‐r contact file  |  "
-				+ "‐a <user> <group> |  ‐d <user> <group>  ]");
-	}
-	/*
-	
-	*/
 }

@@ -1,6 +1,8 @@
 package network;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -151,5 +153,33 @@ public class ClientNetwork {
 		}
 		out.flush();
 		fileInputStream.close();	
+	}
+	
+	public File receiveFile( int sizeFile, String name ) throws IOException {
+		File file = new File(name);
+		FileOutputStream fileOut =  new FileOutputStream(file);
+		System.out.println("O tamnho do ficheiro é :" + sizeFile);
+		int packageSize = 1024;
+		int currentLength = 0;
+		byte [] bfile = new byte [packageSize];
+		int lido;
+		while(currentLength < sizeFile) {
+			int resto = sizeFile-currentLength;
+			int numThisTime = resto < packageSize ? resto : bfile.length;
+			System.out.println("Avaliable: "+in.available());
+			lido = in.read(bfile, 0, numThisTime);
+			if(lido == -1) {
+				break;
+			}
+			System.out.println("li: "+ lido );	
+			
+			fileOut.write(bfile,0,numThisTime);
+			currentLength += lido;
+		}
+		System.out.println("li no total2: "+ currentLength );
+		fileOut.close();
+		
+		return file;
+					
 	}
 }

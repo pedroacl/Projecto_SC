@@ -1,44 +1,50 @@
 package parsers;
 
+import java.io.File;
+import java.io.IOException;
+
+import domain.UserInterface;
+import network.ClientNetwork;
 import network.ServerMessage;
 
 public class ServerResponseParser {
 	
-	private boolean isValid;
 	
-	private ServerMessage serverMessage;
+	private UserInterface userInterface;
+	private ClientNetwork clientNetwork;
 	
-	public ServerResponseParser() {
-		isValid = false;
-	}
 
-	public ServerResponseParser(ServerMessage serverMessage) {
-		this();
-		this.serverMessage = serverMessage;
+	public ServerResponseParser (UserInterface userInterface, ClientNetwork clientNetwork) {
+		this.userInterface = userInterface;
+		this.clientNetwork = clientNetwork;
 	}
 	
-	public boolean isValid() {
-		return isValid;
-	}
 	
-	public void parseMessage() {
+	public void ProcessMessage(ServerMessage serverMessage) {
 		switch (serverMessage.getMessageType()) {
 		case OK:
-			System.out.println("OK");
+			userInterface.print("OK");
 			break;
 			
 		case NOK:
-			System.out.println("NOK");
+			userInterface.print(serverMessage.getMessage());
 			break;
 			
 		case CONVERSATION:
+			//userInterface.printConversation(serverMessage.getList());
 			break;
 			
 		case FILE:
+			try {
+				File file = clientNetwork.receiveFile(serverMessage.getFileSize(), serverMessage.getMessage());
+			} catch (IOException e) {
+				userInterface.print("ERRO a receber o ficheiro");
+				e.printStackTrace();
+			}
 			break;
 
 		default:
-			System.out.println("Mensagem invalida");
+			userInterface.print("Mensagem invalida");
 			break;
 		}
 	}
