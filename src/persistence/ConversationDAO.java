@@ -17,11 +17,16 @@ import factories.ConversationFactory;
 
 public class ConversationDAO {
 	
-	private static ConversationDAO conversationDAO = new ConversationDAO();
+	private static ConversationDAO conversationDAO;
+	
+	private static ConversationHeaderDAO conversationHeaderDAO;
+	
 	
 	private ConversationDAO() {
-		
+		conversationDAO = ConversationDAO.getInstance();
+		conversationHeaderDAO = ConversationHeaderDAO.getInstance();
 	}
+	
 	
 	/**
 	 * Função que permite persistir uma determinada mensagem em disco
@@ -30,7 +35,7 @@ public class ConversationDAO {
 	public void addChatMessage(ChatMessage chatMessage) {
 
 		ConversationFactory conversationFactory = ConversationFactory.getInstance();
-		Conversation conversation = getConversationByChatMessage(chatMessage);
+		Conversation conversation = getConversationByUsername(chatMessage);
 		File file;
 		
 		//criar conversa
@@ -90,8 +95,8 @@ public class ConversationDAO {
 			fileOutputStream.close();
 			
 			//atualizar conversation headers de cada user
-			updateUserConversationHeaders(conversation.getFromUser(), conversation);
-			updateUserConversationHeaders(conversation.getToUser(), conversation);
+			conversationHeaderDAO.addUserConversationHeader(conversation.getFromUser(), conversation);
+			conversationHeaderDAO.addUserConversationHeader(conversation.getToUser(), conversation);
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -103,77 +108,7 @@ public class ConversationDAO {
 	}
 	
 	
-	/**
-	 * 
-	 * @param username
-	 * @param conversation
-	 */
-	public void updateUserConversationHeaders(String username, Conversation conversation) {
-		File file = new File("users/" + username + "/conversations");
-		
-		ConversationHeader conversationHeader = 
-				new ConversationHeader(conversation.getId(), conversation.getToUser());
-		
-		//ficheiro nao existe
-		if (!file.exists()) {
-			System.out.println("Aqui!");
-			System.out.println("Ficheiro " + file.getAbsolutePath() + " nao existe!");
-			//criar ficheiro
-			try {
-				System.out.println(file.getAbsolutePath());
-				file.getParentFile().mkdirs();
-				file.createNewFile();
-				
-				FileOutputStream fileOutputStream = new FileOutputStream(file);
-				ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
 
-				//atualizar ficheiro
-				List<ConversationHeader> conversationHeaders = new ArrayList<ConversationHeader>(); 
-				conversationHeaders.add(conversationHeader);
-				objectOutputStream.writeObject(conversationHeaders);
-				
-				objectOutputStream.close();
-				fileOutputStream.close();
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-		//ficheiro ja existe
-		//atualizar conversation headers do utilizador
-		} else {
-			//ler conversation headers do utilizador
-			try {
-				FileInputStream fileInputStream = new FileInputStream(file);
-				ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-
-				ArrayList<ConversationHeader> conversationHeaders = 
-						(ArrayList<ConversationHeader>) objectInputStream.readObject();
-				
-				if (!conversationHeaders.contains(conversationHeader)) {
-					conversationHeaders.add(conversationHeader);
-				}
-				
-				objectInputStream.close();
-				fileInputStream.close();
-			
-				//atualizar ficheiro
-				FileOutputStream fileOutputStream = new FileOutputStream(file);
-				ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-				objectOutputStream.writeObject(conversationHeaders);
-				
-				objectInputStream.close();
-				fileOutputStream.close();
-				
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-	}
 
 	
 	/**
@@ -181,7 +116,7 @@ public class ConversationDAO {
 	 * @param chatMessage
 	 * @return
 	 */
-	public Conversation getConversationByChatMessage(ChatMessage chatMessage) {
+	public Conversation getConversationByUsername(ChatMessage chatMessage) {
 
 		File file = new File("users/" + chatMessage.getFromUser() + "/conversations");
 		
@@ -219,7 +154,6 @@ public class ConversationDAO {
 	}
 	
 
-
 	/**
 	 * Função que devolve uma conversa 
 	 * @param conversationId ID da conversa
@@ -228,17 +162,18 @@ public class ConversationDAO {
 	public Conversation getConversationById(Long conversationId) {
 		File file = new File("conversations/" + conversationId + "/conversation");
 
-		if (!file.exists()){
+		if (!file.exists())
 			return null;
-		}
 		
-		Conversation conversation = new Conversation();
+		Conversation conversation = null;
 		
 		try {
 			FileInputStream fin = new FileInputStream(file);
 			ObjectInputStream ois = new ObjectInputStream(fin);
 			conversation = (Conversation) ois.readObject();
+
 			ois.close();
+			fin.close();
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -290,76 +225,6 @@ public class ConversationDAO {
 		}
 		
 		return null;
-	}
-	
-
-	/**
-	 * Permite registar uma conversa com os seus utilizadores
-	 * @param conversation
-	 */
-	public void addConversationToUsers(Conversation conversation) {
-		
-		addConversationToUser(conversation, conversation.getFromUser());
-		addConversationToUser(conversation, conversation.getToUser());
-	}
-	
-	
-	/**
-	 * 
-	 * @param conversation
-	 * @param username
-	 */
-	private void addConversationToUser(Conversation conversation, String username) {
-
-		List<Conversation> conversations = new ArrayList<Conversation>();
-
-		File file = new File("users/" + username + "/conversations");
-
-		//utilizador ainda não tem conversas
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-				System.out.println("Criado o ficheiro " + file.getAbsolutePath());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-		} else {
-			try {
-				FileInputStream fileInputStream = new FileInputStream(file);
-				ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-				conversations = (ArrayList<Conversation>) objectInputStream.readObject();
-				
-				fileInputStream.close();
-				objectInputStream.close();
-
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-	
-		//conversa ainda nao registada com o utilizador
-		if (!conversations.contains(conversation)) {
-			conversations.add(conversation);
-			System.out.println("Conversa adicionada");
-		}
-		
-		//atualizar ficheiro
-		try {
-			FileOutputStream fileOutputStream = new FileOutputStream(file);
-			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-			objectOutputStream.writeObject(conversations);
-			System.out.println("Atualizado o ficheiro " + file.getAbsolutePath());
-
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 	
 

@@ -14,7 +14,7 @@ public class Group {
 	
 	private Date createdAt;
 	
-	private List<User> users;
+	private List<String> users;
 	
 	public String getName() {
 		return name;
@@ -40,11 +40,11 @@ public class Group {
 		this.createdAt = createdAt;
 	}
 
-	public List<User> getUsers() {
+	public List<String> getUsers() {
 		return users;
 	}
 
-	public void setUsers(List<User> users) {
+	public void setUsers(List<String> users) {
 		this.users = users;
 	}
 

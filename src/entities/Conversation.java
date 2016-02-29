@@ -20,7 +20,7 @@ public class Conversation implements Serializable {
 	private List<ChatMessage> chatMessages;
 
 
-	public Conversation() {
+	private Conversation() {
 		chatMessages = new ArrayList<ChatMessage>();
 	}
 	
