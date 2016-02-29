@@ -12,16 +12,16 @@ import java.util.ArrayList;
 import entities.Conversation;
 import entities.ConversationHeader;
 
-public class ConversationHeaderDAO {
+public class UserConversationHeaderDAO {
 	
-	private static ConversationHeaderDAO conversationHeader = new ConversationHeaderDAO();
+	private static UserConversationHeaderDAO conversationHeader = new UserConversationHeaderDAO();
 	
-	private ConversationHeaderDAO(){
+	
+	private UserConversationHeaderDAO(){
 		
 	}
 	
-	
-	public static ConversationHeaderDAO getInstance() {
+	public static UserConversationHeaderDAO getInstance() {
 		return conversationHeader;
 	}
 

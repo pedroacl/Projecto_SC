@@ -19,12 +19,12 @@ public class ConversationDAO {
 	
 	private static ConversationDAO conversationDAO;
 	
-	private static ConversationHeaderDAO conversationHeaderDAO;
+	private static UserConversationHeaderDAO conversationHeaderDAO;
 	
 	
 	private ConversationDAO() {
 		conversationDAO = ConversationDAO.getInstance();
-		conversationHeaderDAO = ConversationHeaderDAO.getInstance();
+		conversationHeaderDAO = UserConversationHeaderDAO.getInstance();
 	}
 	
 	
@@ -233,9 +233,7 @@ public class ConversationDAO {
 	}
 
 	
-	public String getFilePath(String username, String destination, String message) {
-		
-		
+	public String getFilePath(String username, String destination, String message) {		
 		return null;
 	}
 }

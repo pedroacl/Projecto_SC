@@ -8,6 +8,7 @@ public class Group {
 		
 	}
 
+	
 	private String name;
 	
 	private User owner;
@@ -15,6 +16,11 @@ public class Group {
 	private Date createdAt;
 	
 	private List<String> users;
+	
+	
+	public void addUser(String username) {
+		users.add(username);
+	} 
 	
 	public String getName() {
 		return name;
@@ -47,5 +53,4 @@ public class Group {
 	public void setUsers(List<String> users) {
 		this.users = users;
 	}
-
 }
