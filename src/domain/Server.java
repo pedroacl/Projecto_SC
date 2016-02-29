@@ -14,7 +14,7 @@ public class Server {
 
 	public static void main(String[] args) {
 		
-		authentication = new Authentication();
+		authentication = Authentication.getInstance();
 		
 		serverNetwork = new ServerNetwork(serverPort);
 		System.out.println("Servidor inicializado e ah espera de pedidos.");

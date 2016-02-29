@@ -1,6 +1,7 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Conversation implements Serializable {
@@ -20,10 +21,11 @@ public class Conversation implements Serializable {
 
 
 	public Conversation() {
-		
+		chatMessages = new ArrayList<ChatMessage>();
 	}
 	
 	public Conversation(String fromUser, String toUser) {
+		this();
 		this.fromUser = fromUser;
 		this.toUser = toUser;
 	}
@@ -57,10 +59,28 @@ public class Conversation implements Serializable {
 	}
 
 
+	public void addChatMessage(ChatMessage chatMessage) {
+		System.out.println(chatMessage);
+		chatMessages.add(chatMessage);
+	}
+
+
 	@Override
 	public boolean equals(Object obj) {
 		Conversation conversation = (Conversation) obj;
-		
 		return (this.id == conversation.getId());
+	}
+
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+
+		for (ChatMessage chatMessage : chatMessages) {
+			sb.append(chatMessage.toString());
+			sb.append("\n");
+		}
+
+		return sb.toString();
 	}
 }

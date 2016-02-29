@@ -16,7 +16,7 @@ public class ChatMessage implements Serializable {
 	private static final long serialVersionUID = 8053113085617628635L;
 
 	
-	private String message;
+	private String content;
 	
 	private String fromUser;
 	
@@ -30,11 +30,9 @@ public class ChatMessage implements Serializable {
 		this.fromUser = from;
 		this.destination = destination;
 		this.type = type;
-		this.message = message;
+		this.content = message;
 		createdAt = new Date();
 	}
-	
-	
 
 	public Date getCreatedAt() {
 		return createdAt;
@@ -49,11 +47,19 @@ public class ChatMessage implements Serializable {
 		return destination;
 	}
 
-	
-	public String getMessage() {
-		return message;
+	public String getContent() {
+		return content;
 	}
 
-	
-
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("From: " + fromUser + "\n");
+		sb.append("To: " + destination + "\n");
+		sb.append("Content: " + content + "\n");
+		sb.append("Data: " + createdAt + "\n");
+		
+		return sb.toString();
+	}
 }

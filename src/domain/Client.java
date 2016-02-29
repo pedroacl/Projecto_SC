@@ -53,11 +53,7 @@ public class Client{
 		Fecha a ligação
 		ClientNetWork.disconect();
 		*/
-		
-		
-
 	}
-
 }
 
 

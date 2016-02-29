@@ -6,9 +6,17 @@ import persistence.UserDAO;
 public class Authentication {
 	
 	private UserDAO userDAO;
+	
+	private static Authentication authentication = new Authentication();
+	
 
-	public Authentication() {
+	private Authentication() {
 		userDAO = new UserDAO();
+	}
+	
+	
+	public static Authentication getInstance() {
+		return authentication;
 	}
 
 	
@@ -29,7 +37,7 @@ public class Authentication {
 	}
 
 
-	public boolean exists(String user) {
-		return true;
+	public boolean exists(String username) {
+		return userDAO.getUser(username) != null;
 	}
 }

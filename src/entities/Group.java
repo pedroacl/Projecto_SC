@@ -7,12 +7,22 @@ public class Group {
 	public Group() {
 		
 	}
+
+	private String name;
 	
 	private User owner;
 	
 	private Date createdAt;
 	
 	private List<User> users;
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 	
 	public User getOwner() {
 		return owner;

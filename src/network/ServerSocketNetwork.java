@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.BindException;
 import java.net.Socket;
 
 public class ServerSocketNetwork {
@@ -115,29 +114,47 @@ public class ServerSocketNetwork {
 		fileInputStream.close();	
 	}
 	
-	public File receiveFile( int sizeFile, String name ) throws IOException {
+	public File receiveFile( int sizeFile, String name ) {
 		File file = new File(name);
-		FileOutputStream fileOut =  new FileOutputStream(file);
+		FileOutputStream fileOut = null;
+
+		try {
+			fileOut = new FileOutputStream(file);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		System.out.println("O tamnho do ficheiro é :" + sizeFile);
+
 		int packageSize = 1024;
 		int currentLength = 0;
 		byte [] bfile = new byte [packageSize];
 		int lido;
+
 		while(currentLength < sizeFile) {
 			int resto = sizeFile-currentLength;
 			int numThisTime = resto < packageSize ? resto : bfile.length;
-			System.out.println("Avaliable: "+in.available());
-			lido = in.read(bfile, 0, numThisTime);
-			if(lido == -1) {
-				break;
-			}
-			System.out.println("li: "+ lido );	
 			
-			fileOut.write(bfile,0,numThisTime);
-			currentLength += lido;
+			try {
+				lido = in.read(bfile, 0, numThisTime);
+
+				if(lido == -1) {
+					break;
+				}
+
+				System.out.println("li: "+ lido );	
+				
+				fileOut.write(bfile,0,numThisTime);
+				currentLength += lido;
+				fileOut.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 		}
+
 		System.out.println("li no total2: "+ currentLength );
-		fileOut.close();
 		
 		return file;
 					

@@ -1,13 +1,13 @@
 package domain;
 
 import java.io.File;
-import java.io.IOException;
 
 import interfaces.ServerThreadInterface;
 import network.ClientMessage;
 import network.MessageType;
 import network.ServerMessage;
 import network.ServerSocketNetwork;
+import parsers.ClientMessageParser;
 
 public class ServerThread extends Thread implements ServerThreadInterface {
 	
@@ -22,19 +22,20 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 	public void run() {
 		ServerSocketNetwork serverSocketNetwork = serverThreadContext.getServerSocketNetwork();
 		ClientMessage clientMessage = serverSocketNetwork.getClientMessage();
+		ClientMessageParser clientMessageParser = new ClientMessageParser(clientMessage, serverSocketNetwork);
 		
+		ServerMessage serverMessage = clientMessageParser.processRequest();
+		System.out.println(serverMessage);
+		serverSocketNetwork.sendMessage(serverMessage);
+	
+		/*
 		if(clientMessage.getMessageType().equals(MessageType.FILE))
 			serverSocketNetwork.sendMessage(new ServerMessage(MessageType.OK));
-			try {
-				File b =serverSocketNetwork.receiveFile(clientMessage.getFileSize(), "teste1.jpeg");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		
-		
+		File b = serverSocketNetwork.receiveFile(clientMessage.getFileSize(), "teste1.jpeg");
+
 		System.out.println("Mensagem: " + clientMessage);
 		System.out.println("Thread terminada.");
+		 */
 	}
 
 	

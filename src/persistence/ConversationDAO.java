@@ -17,7 +17,9 @@ import factories.ConversationFactory;
 
 public class ConversationDAO {
 	
-	public ConversationDAO() {
+	private static ConversationDAO conversationDAO = new ConversationDAO();
+	
+	private ConversationDAO() {
 		
 	}
 	
@@ -45,28 +47,47 @@ public class ConversationDAO {
 		//obter lista de chat messages
 		try {
 			//carregar ficheiro
-			file = new File("conversations/" + conversation.getId() + "/messages");
-			List<ChatMessage> chatMessages;
-			
+			file = new File("conversations/" + conversation.getId() + "/conversation");
+		
+			//ficheiro nao existe
 			if (!file.exists()) {
-				file.createNewFile();
-				chatMessages = new ArrayList<ChatMessage>();
+				FileOutputStream fileOutputStream = new FileOutputStream(file);
+				ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
 
+				conversation = new Conversation(chatMessage.getFromUser(), chatMessage.getDestination());
+				objectOutputStream.writeObject(conversation);
+
+			//ficheiro ja existe
 			} else {
-				FileInputStream fileInputStream = new FileInputStream(file);
-				ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-				chatMessages = (List<ChatMessage>) objectInputStream.readObject();
+				System.out.println("Ficheiro: " + file.getAbsolutePath());
+				System.out.println("Tamanho: " + file.length());
 				
-				objectInputStream.close();
-				fileInputStream.close();
+				if (file.length() == 0) {
+					System.out.println("Ficheiro vazio!");
+					conversation = conversationFactory.build(
+							chatMessage.getFromUser(), chatMessage.getDestination());
+					
+				} else {
+					FileInputStream fileInputStream = new FileInputStream(file);
+					ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+					conversation = (Conversation) objectInputStream.readObject();
+					
+					if (conversation == null) {
+						conversation = conversationFactory.build(
+								chatMessage.getFromUser(), chatMessage.getDestination());
+					}
+				
+					objectInputStream.close();
+					fileInputStream.close();
+				}
 			}
-			
-			chatMessages.add(chatMessage);
+		
+			conversation.addChatMessage(chatMessage);
 		
 			//atualizar ficheiro
 			FileOutputStream fileOutputStream = new FileOutputStream(file);
 			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-			objectOutputStream.writeObject(chatMessages);
+			objectOutputStream.writeObject(conversation);
 
 			objectOutputStream.close();
 			fileOutputStream.close();
@@ -98,10 +119,13 @@ public class ConversationDAO {
 		
 		//ficheiro nao existe
 		if (!file.exists()) {
+			System.out.println("Aqui!");
+			System.out.println("Ficheiro " + file.getAbsolutePath() + " nao existe!");
 			//criar ficheiro
 			try {
+				System.out.println(file.getAbsolutePath());
+				file.getParentFile().mkdirs();
 				file.createNewFile();
-				System.out.println("Criado o ficheiro " + file.getAbsolutePath());
 				
 				FileOutputStream fileOutputStream = new FileOutputStream(file);
 				ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
@@ -190,7 +214,7 @@ public class ConversationDAO {
 		//obter conversa
 		for (ConversationHeader conversationHeader : conversationHeaders) {
 			if (conversationHeader.getToUser().equals(chatMessage.getDestination())) {
-				return getConversationById(conversationHeader.getId());
+				return getConversationById(conversationHeader.getConversationId());
 			}
 		}
 	
@@ -205,7 +229,7 @@ public class ConversationDAO {
 	 * @return Devolve uma conversa caso esta exista ou null caso contrário
 	 */
 	public Conversation getConversationById(Long conversationId) {
-		File file = new File("conversations/" + conversationId);
+		File file = new File("conversations/" + conversationId + "/conversation");
 
 		if (!file.exists()){
 			return null;
@@ -339,5 +363,17 @@ public class ConversationDAO {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+
+	public static ConversationDAO getInstance() {
+		return conversationDAO;
+	}
+
+	
+	public String getFilePath(String username, String destination, String message) {
+		
+		
+		return null;
 	}
 }

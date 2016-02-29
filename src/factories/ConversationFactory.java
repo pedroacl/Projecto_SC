@@ -9,7 +9,7 @@ public class ConversationFactory {
 	
 	
 	private ConversationFactory() {
-		conversationId = 0L;
+		conversationId = 1L;
 	}
 	
 	
@@ -20,7 +20,8 @@ public class ConversationFactory {
 	
 	public Conversation build(String fromUser, String toUser) {
 		Conversation conversation = new Conversation(fromUser, toUser);
-		conversation.setId(conversationId++);
+		conversation.setId(conversationId);
+		conversationId++;
 		
 		return conversation;
 	}

@@ -4,13 +4,16 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
 import entities.Conversation;
 import entities.User;
+import factories.ConversationFactory;
 
 /**
  * 
@@ -21,7 +24,10 @@ public class UserDAO {
 	
 	private HashMap<String, String> users;
 	
+	private ConversationFactory conversationFactory;
+	
 	public UserDAO() {
+		conversationFactory = ConversationFactory.getInstance();
 		loadUsers();
 	}
 	
@@ -81,6 +87,7 @@ public class UserDAO {
 		
 		return true;
 	}
+
 	
 	/**
 	 * 
@@ -116,6 +123,10 @@ public class UserDAO {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	
+		//eliminar pasta do utilizador
+		file = new File("users/" + username);
+		file.delete();
 	}
 	
 
@@ -140,35 +151,32 @@ public class UserDAO {
 			}
 		}
 		
-		
 		//carregar utilizadores
 		file = new File("users.txt");
+	
+		//nao existe ficheiro
+		if (!file.exists()) {
+			System.out.println("Nao existem utilizadores adicionados.");
+		}
 
 		try {
 			FileReader fr = new FileReader(file);
-			
 			br = new BufferedReader(fr);
 			
 			while ((line = br.readLine()) != null) {
-				String[] args = line.split(" ");
+				String[] args = line.split(":");
 				String username = args[0];
 				String password = args[1];
 				
 				users.put(username, password);
-				System.out.println(line);
-				
+				System.out.println(username + " " + users.get(username));
+		
 				//criar pasta para o user
 				file = new File("users/" + username);
 
 				if (!(file.exists() && file.isDirectory())) {
 					file.mkdir();
-				}
-				
-				file = new File("users/" + username + "/conversations");
-				
-				if (!file.exists()) {
-					file.createNewFile();
-				}
+				}	
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
