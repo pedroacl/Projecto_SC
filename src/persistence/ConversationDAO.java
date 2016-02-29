@@ -36,12 +36,6 @@ public class ConversationDAO {
 		//criar conversa
 		if (conversation == null) {
 			conversation = conversationFactory.build(chatMessage.getFromUser(), chatMessage.getDestination());
-			file = new File("conversations/" + conversation.getId());
-			
-			//pasta da conversation nao existe
-			if (!file.exists()) {
-				file.mkdir();						
-			}			
 		}
 		
 		//obter lista de chat messages
@@ -51,6 +45,9 @@ public class ConversationDAO {
 		
 			//ficheiro nao existe
 			if (!file.exists()) {
+				file.getParentFile().mkdirs();
+				file.createNewFile();
+
 				FileOutputStream fileOutputStream = new FileOutputStream(file);
 				ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
 

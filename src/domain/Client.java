@@ -41,7 +41,7 @@ public class Client{
 		
 		//envia a mensagem
 		clientNetwork.sendMessage(clientMessage);
-		
+
 		//recebe a resposta
 		ServerMessage serverMsg = clientNetwork.receiveMessage();
 		

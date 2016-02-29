@@ -37,8 +37,8 @@ public class ClientMessageParser {
 		
 		boolean isAuthenticated = false;
 		
-		switch (clientMessage.getMessageType().toString()) {
-		case "MESSAGE":
+		switch (clientMessage.getMessageType()) {
+		case MESSAGE:
 			isAuthenticated = authentication.authenticateUser(clientMessage.getUsername(), 
 					clientMessage.getPassword());
 
@@ -48,7 +48,7 @@ public class ClientMessageParser {
 					clientMessage.getMessage(), 
 					MessageType.MESSAGE);
 
-				System.out.println("Adicionar chat message");
+				System.out.println("[ClientMessageParser.java] Adicionar chat message");
 				System.out.println(chatMessage.getFromUser());
 				
 				conversationDAO.addChatMessage(chatMessage);
@@ -65,7 +65,7 @@ public class ClientMessageParser {
 				
 			break;
 			
-		case "FILE":
+		case FILE:
 			isAuthenticated = authentication.authenticateUser(clientMessage.getUsername(), 
 					clientMessage.getPassword());
 
