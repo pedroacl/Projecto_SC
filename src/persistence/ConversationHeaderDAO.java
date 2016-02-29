@@ -16,7 +16,6 @@ public class ConversationHeaderDAO {
 	
 	private static ConversationHeaderDAO conversationHeader = new ConversationHeaderDAO();
 	
-	
 	private ConversationHeaderDAO(){
 		
 	}
@@ -33,10 +32,11 @@ public class ConversationHeaderDAO {
 	 * @return
 	 */
 	ArrayList<ConversationHeader> getUserConversationHeaders(String username) {
-		File file = new File("users/" + username + "/conversations");
 		ArrayList<ConversationHeader> conversationHeaders = null;
 				
 		try {
+			File file = new File("users/" + username + "/conversations");
+
 			FileInputStream fileInputStream = new FileInputStream(file);
 			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 			
