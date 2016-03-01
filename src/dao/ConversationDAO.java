@@ -1,4 +1,4 @@
-package persistence;
+package dao;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,8 +14,9 @@ import entities.ChatMessage;
 import entities.Conversation;
 import entities.ConversationHeader;
 import factories.ConversationFactory;
+import interfaces.dao.ConversationDAOInterface;
 
-public class ConversationDAO {
+public class ConversationDAO implements ConversationDAOInterface {
 	
 	private static ConversationDAO conversationDAO = new ConversationDAO();
 	
@@ -32,6 +33,7 @@ public class ConversationDAO {
 	 * Função que permite persistir uma determinada mensagem em disco
 	 * @param chatMessage Mensagem a ser guardada
 	 */
+	@Override
 	public void addChatMessage(ChatMessage chatMessage) {
 
 		ConversationFactory conversationFactory = ConversationFactory.getInstance();
@@ -108,14 +110,12 @@ public class ConversationDAO {
 	}
 	
 	
-
-
-	
 	/**
 	 * 
 	 * @param chatMessage
 	 * @return
 	 */
+	@Override
 	public Conversation getConversationByUsername(ChatMessage chatMessage) {
 
 		File file = new File("users/" + chatMessage.getFromUser() + "/conversations");
@@ -159,6 +159,7 @@ public class ConversationDAO {
 	 * @param conversationId ID da conversa
 	 * @return Devolve uma conversa caso esta exista ou null caso contrário
 	 */
+	@Override
 	public Conversation getConversationById(Long conversationId) {
 		File file = new File("conversations/" + conversationId + "/conversation");
 
@@ -192,6 +193,7 @@ public class ConversationDAO {
 	 * @param conversationsIDs Lista de IDs de cada conversa em que o utilizador participou
 	 * @return Lista das ultimas mensagens
 	 */
+	@Override
 	public List<ChatMessage> getLastChatMessages(List<Long> conversationsIDs) {
 		List<ChatMessage> chatMessages = new ArrayList<ChatMessage>();
 		ChatMessage chatMessage = null;

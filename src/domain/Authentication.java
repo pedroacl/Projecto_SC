@@ -2,8 +2,8 @@ package domain;
 
 import java.util.HashMap;
 
+import dao.UserDAO;
 import entities.User;
-import persistence.UserDAO;
 
 public class Authentication {
 	

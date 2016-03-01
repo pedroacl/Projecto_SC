@@ -3,6 +3,7 @@ package parsers;
 
 import java.io.File;
 
+import dao.ConversationDAO;
 import domain.Authentication;
 import entities.ChatMessage;
 import entities.Conversation;
@@ -10,7 +11,6 @@ import network.ClientMessage;
 import network.MessageType;
 import network.ServerMessage;
 import network.ServerSocketNetwork;
-import persistence.ConversationDAO;
 
 public class ClientMessageParser {
 	

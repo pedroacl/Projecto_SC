@@ -4,9 +4,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import dao.ConversationDAO;
 import entities.ChatMessage;
 import network.MessageType;
-import persistence.ConversationDAO;
 
 public class TestConversationDAO {
 	

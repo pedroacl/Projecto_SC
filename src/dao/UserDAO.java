@@ -1,4 +1,4 @@
-package persistence;
+package dao;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -12,13 +12,14 @@ import java.util.HashMap;
 import domain.Authentication;
 import entities.User;
 import factories.ConversationFactory;
+import interfaces.dao.UserDAOInterface;
 
 /**
  * 
  * @author pedro
  *
  */
-public class UserDAO {
+public class UserDAO implements UserDAOInterface {
 	
 	private static UserDAO userDAO = new UserDAO();
 	
@@ -36,6 +37,7 @@ public class UserDAO {
 	 * Função que carrega em memória todos os utilizadores registados
 	 * @return 
 	 */
+	@Override
 	public HashMap<String, String> getUsers() {
 		HashMap<String, String> users = new HashMap<String, String>();
 		
@@ -96,6 +98,7 @@ public class UserDAO {
 	 * @param password Password do utilizador
 	 * @return Devolve true caso o utilizador tenha sido adicionado e false caso contrário
 	 */
+	@Override
 	public void addUser(String username, String password) {
 		if (username == null || password == null)		
 			return;
@@ -126,6 +129,7 @@ public class UserDAO {
 	 * 
 	 * @param username
 	 */
+	@Override
 	public void deleteUser(String username) {
 		
 		File file = new File("users/" + username + ".txt");
