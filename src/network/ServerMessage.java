@@ -49,4 +49,9 @@ public class ServerMessage implements Serializable  {
 	public int getFileSize() {
 		return sizeFile;
 	}
+	
+	public void setMessages(ArrayList<ChatMessage> list) {
+		this.messages = list;
+	}
+	
 }

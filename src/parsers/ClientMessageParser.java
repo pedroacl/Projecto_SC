@@ -62,7 +62,11 @@ public class ClientMessageParser {
 			}
 			else {
 				serverMessage = new ServerMessage(MessageType.NOK);
-				serverMessage.setContent("Não existe esse contact");
+				if(!isAuthenticated) {
+					serverMessage.setContent("Password errada");
+				}else
+					serverMessage.setContent("Não existe esse contact");
+				
 			}
 				
 			break;
@@ -90,12 +94,91 @@ public class ClientMessageParser {
 			}
 			else {
 				serverMessage = new ServerMessage(MessageType.NOK);
-				serverMessage.setContent("Não existe esse contact");
+				
+				if(!isAuthenticated) {
+					serverMessage.setContent("Password errada");
+				}else
+					serverMessage.setContent("Não existe esse contact");
 			}
 			
 			break;
-
+		case RECEIVER:
+			
+			switch(clientMessage.getMessage()) {
+			
+			case "recent":
+				 if(authentication.authenticateUser(clientMessage.getUsername(), 
+						clientMessage.getPassword())){
+				//obtem a mensagem mais recente de todas as suas conversas
+					//ir a sua pasta /users/getFrom()
+					//Ir ao ficheiro conversations e retirar os ids de todas as conversas
+					//ir a pasta das conversas /consersation e por cada id retirar a mensagem mais recente
+				//colocar essa lista no serverMessagem serverNetwork.setMessages(List)
+					 serverMessage = new ServerMessage(MessageType.OK);
+				 }
+				 else {
+					 serverMessage = new ServerMessage(MessageType.NOK);
+					 serverMessage.setContent("Password errada");
+				 }
+				 break;
+			case "all" :
+				if(!authentication.authenticateUser(clientMessage.getUsername(), 
+						clientMessage.getPassword())) {
+					
+					serverMessage = new ServerMessage(MessageType.NOK);
+					serverMessage.setContent("Password errada");
+				}
+				else {
+					if(authentication.exists(clientMessage.getDestination())) {
+						//ir buscar todas os ids de conversas deste utilizador
+						// sacar aquele que tem com getDestination()
+						//ir buscar toda a conversação
+						serverMessage = new ServerMessage(MessageType.OK);
+						//serverMessage.setMessages(list);
+					}
+					else {
+						serverMessage = new ServerMessage(MessageType.NOK);
+						serverMessage.setContent("Não existe esse contact");
+					}			
+				}
+				break;
+				default:
+					if(!authentication.authenticateUser(clientMessage.getUsername(), 
+							clientMessage.getPassword())) {
+						
+						serverMessage = new ServerMessage(MessageType.NOK);
+						serverMessage.setContent("Password errada");
+					}
+					else {
+						if(authentication.exists(clientMessage.getDestination())
+								/*&& conversationDAO.existFile(clientMessage.getMessage())*/) {
+							/*
+							File file = new File (conversationDAO.getPath())
+							serverMessage = new ServerMessage(MessageType.File);
+							serverMessage.setFileSize(file.length())
+							serverMessage.setMessage(conversationDAO.getPath())
+							ssn.sendFile(ServerMessage);
+							
+							
+							*/
+						}
+						else {
+							serverMessage = new ServerMessage(MessageType.NOK);
+							serverMessage.setContent("Não existe esse contact");
+						}
+					}
+					
+					
+			}
+			break;
+		case ADDUSER:
+			break;
+		case REMOVEUSER:
+			break;
+		
 		default:
+			serverMessage = new ServerMessage(MessageType.NOK);
+			serverMessage.setContent("erro");
 			break;
 		}
 		
