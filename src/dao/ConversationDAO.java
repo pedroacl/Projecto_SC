@@ -20,12 +20,14 @@ public class ConversationDAO implements ConversationDAOInterface {
 	
 	private static ConversationDAO conversationDAO = new ConversationDAO();
 	
-	private static UserConversationHeaderDAO conversationHeaderDAO;
+	private static UserConversationHeaderDAO userConversationHeaderDAO;
 	
+	private ConversationFactory conversationFactory;
 	
 	private ConversationDAO() {
 		conversationDAO = ConversationDAO.getInstance();
-		conversationHeaderDAO = UserConversationHeaderDAO.getInstance();
+		userConversationHeaderDAO = UserConversationHeaderDAO.getInstance();
+		conversationFactory = ConversationFactory.getInstance();
 	}
 	
 	
@@ -36,12 +38,17 @@ public class ConversationDAO implements ConversationDAOInterface {
 	@Override
 	public void addChatMessage(ChatMessage chatMessage) {
 
-		ConversationFactory conversationFactory = ConversationFactory.getInstance();
 		
 		ConversationHeader conversationHeader = 
-				conversationHeaderDAO.getUserConversationHeader(chatMessage.getFromUser(), chatMessage.getDestination());
-		
+				userConversationHeaderDAO.getUserConversationHeader(chatMessage.getFromUser(), chatMessage.getDestination());
+	
 		Conversation conversation = null;
+
+		//conversa nao existe
+		if (conversationHeader == null) {
+			conversation = conversationFactory.build(chatMessage.getFromUser(), chatMessage.getDestination());
+			userConversationHeaderDAO.addUserConversationHeader(chatMessage.getFromUser(), conversation);
+		}
 		
 		File file;
 		
@@ -108,8 +115,8 @@ public class ConversationDAO implements ConversationDAOInterface {
 			fileOutputStream.close();
 			
 			//atualizar conversation headers de cada user
-			conversationHeaderDAO.addUserConversationHeader(conversation.getFromUser(), conversation);
-			conversationHeaderDAO.addUserConversationHeader(conversation.getToUser(), conversation);
+			userConversationHeaderDAO.addUserConversationHeader(conversation.getFromUser(), conversation);
+			userConversationHeaderDAO.addUserConversationHeader(conversation.getToUser(), conversation);
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
