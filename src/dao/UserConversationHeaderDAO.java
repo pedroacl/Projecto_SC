@@ -35,6 +35,12 @@ public class UserConversationHeaderDAO {
 	public ConversationHeader getUserConversationHeader(String username, String toUser) {
 		ArrayList<ConversationHeader> conversationHeaders = getUserConversationHeaders(username);
 		
+		if (conversationHeaders == null) {
+			return null;
+		}
+		
+		System.out.println(conversationHeaders == null);
+		
 		for (ConversationHeader conversationHeader : conversationHeaders)
 			if (conversationHeader.getToUser().equals(toUser)) 
 				return conversationHeader;
@@ -50,10 +56,14 @@ public class UserConversationHeaderDAO {
 	 */
 	private ArrayList<ConversationHeader> getUserConversationHeaders(String username) {
 		ArrayList<ConversationHeader> conversationHeaders = null;
+
+		File file = new File("users/" + username + "/conversations");
+		
+		if (!file.exists()) {
+			return null;
+		}
 				
 		try {
-			File file = new File("users/" + username + "/conversations");
-
 			FileInputStream fileInputStream = new FileInputStream(file);
 			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 			
