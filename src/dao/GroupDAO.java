@@ -9,8 +9,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import entities.Group;
+import interfaces.dao.GroupDAOInterface;
 
-public class GroupDAO {
+public class GroupDAO implements GroupDAOInterface {
 	
 	private static GroupDAO groupDAO = new GroupDAO();
 	
@@ -30,6 +31,7 @@ public class GroupDAO {
 	 * @param groupName
 	 * @return
 	 */
+	@Override
 	public Group getGroupByName(String groupName) {
 		File file = new File("groups/" + groupName + "/group");
 		Group group = null;
@@ -60,6 +62,7 @@ public class GroupDAO {
 	 * @param groupName
 	 * @param username
 	 */
+	@Override
 	public void addUserToGroup(String groupName, String username) {
 		File file = new File("groups/" + groupName + "/group");
 	

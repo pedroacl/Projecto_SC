@@ -48,22 +48,28 @@ public class ConversationDAO implements ConversationDAOInterface {
 		//criar conversa
 		if (conversationHeader == null) {
 			conversation = conversationFactory.build(chatMessage.getFromUser(), chatMessage.getDestination());
+		} else {
+			conversation = conversationDAO.getConversationById(conversationHeader.getConversationId());
 		}
+
 		
 		//obter lista de chat messages
 		try {
 			//carregar ficheiro
-			file = new File("conversations/" + conversation.getId() + "/conversation");
+			System.out.println("NULL??");
+			System.out.println(conversation == null);
+			file = new File("conversations/" + conversation.getId() + "/message_" + chatMessage.getId());
 		
 			//ficheiro nao existe
 			if (!file.exists()) {
+				System.out.println("Criar mensagem");
+				
 				file.getParentFile().mkdirs();
 				file.createNewFile();
 
 				FileOutputStream fileOutputStream = new FileOutputStream(file);
 				ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
 
-				conversation = new Conversation(chatMessage.getFromUser(), chatMessage.getDestination());
 				objectOutputStream.writeObject(conversation);
 
 			//ficheiro ja existe

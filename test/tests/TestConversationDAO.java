@@ -51,10 +51,18 @@ public class TestConversationDAO {
 
 	@Test
 	public void testAddChatMessage() {
-		ChatMessage chatMessage = chatMessageFactory.build("maria", "pedro", "mensagem de teste", MessageType.MESSAGE);
+		ChatMessage chatMessage = chatMessageFactory.build("maria", "pedro", "mensagem de teste 1", MessageType.MESSAGE);
 		conversationDAO.addChatMessage(chatMessage);
 
 		File file = new File("conversations/" + chatMessage.getId());
+		assertThat(file.exists(), is(not(nullValue())));
+		
+		chatMessage = chatMessageFactory.build("maria", "pedro", "mensagem de teste 2", MessageType.MESSAGE);
+		System.out.println("!!!");
+		System.out.println(chatMessage);
+		conversationDAO.addChatMessage(chatMessage);
+
+		file = new File("conversations/" + chatMessage.getId());
 		assertThat(file.exists(), is(not(nullValue())));
 		
 		//conversationDAO.getLastChatMessage(conversationsId);
