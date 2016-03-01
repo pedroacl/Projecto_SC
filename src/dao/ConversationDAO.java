@@ -37,11 +37,16 @@ public class ConversationDAO implements ConversationDAOInterface {
 	public void addChatMessage(ChatMessage chatMessage) {
 
 		ConversationFactory conversationFactory = ConversationFactory.getInstance();
-		Conversation conversation = getConversationByUsername(chatMessage);
+		
+		ConversationHeader conversationHeader = 
+				conversationHeaderDAO.getUserConversationHeader(chatMessage.getFromUser(), chatMessage.getDestination());
+		
+		Conversation conversation = null;
+		
 		File file;
 		
 		//criar conversa
-		if (conversation == null) {
+		if (conversationHeader == null) {
 			conversation = conversationFactory.build(chatMessage.getFromUser(), chatMessage.getDestination());
 		}
 		

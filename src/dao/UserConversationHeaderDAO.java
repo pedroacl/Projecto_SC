@@ -24,6 +24,23 @@ public class UserConversationHeaderDAO {
 	public static UserConversationHeaderDAO getInstance() {
 		return conversationHeader;
 	}
+	
+	
+	/**
+	 * 
+	 * @param username
+	 * @param toUser
+	 * @return
+	 */
+	public ConversationHeader getUserConversationHeader(String username, String toUser) {
+		ArrayList<ConversationHeader> conversationHeaders = getUserConversationHeaders(username);
+		
+		for (ConversationHeader conversationHeader : conversationHeaders)
+			if (conversationHeader.getToUser().equals(toUser)) 
+				return conversationHeader;
+		
+		return null;
+	}
 
 	
 	/**
@@ -31,7 +48,7 @@ public class UserConversationHeaderDAO {
 	 * @param username
 	 * @return
 	 */
-	ArrayList<ConversationHeader> getUserConversationHeaders(String username) {
+	private ArrayList<ConversationHeader> getUserConversationHeaders(String username) {
 		ArrayList<ConversationHeader> conversationHeaders = null;
 				
 		try {

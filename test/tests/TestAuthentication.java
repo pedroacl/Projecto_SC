@@ -3,18 +3,18 @@ package tests;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
+import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import domain.Authentication;
 import entities.User;
-import util.MiscUtil;
 
 public class TestAuthentication {
 	
@@ -24,15 +24,18 @@ public class TestAuthentication {
     public void setUp() {
 		authentication = Authentication.getInstance();
 
-		MiscUtil.delete(new File("users"));
-		MiscUtil.delete(new File("conversations"));
-		MiscUtil.delete(new File("users.txt"));
+		try {
+			FileUtils.deleteDirectory(new File("users"));
+			FileUtils.deleteDirectory(new File("conversations"));
+			FileUtils.forceDelete(new File("users.txt"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
 	
     @After
     public void tearDown() {
-		MiscUtil.delete(new File("users"));
-		MiscUtil.delete(new File("conversations"));
+
     }
 
     
@@ -45,15 +48,15 @@ public class TestAuthentication {
 	
 	@Test
 	public void testAddUser() {
-		File file = new File("users");
-		assertThat(file.exists(), is(false));
-		
 		User user = authentication.getUser("pedro");
 		assertThat("Utilizador ja existe", user, is(nullValue()));
 
 		authentication.addUser("pedro", "1234");
 		user = authentication.getUser("pedro");
 		assertThat("User nao existe", user, is(not(nullValue())));
+		
+		File file = new File("users.txt");
+		assertThat(file.exists(), is(true));
 
 		file = new File("users/pedro");
 		assertThat("Ficheiro nao existe", file.exists(), is(true));

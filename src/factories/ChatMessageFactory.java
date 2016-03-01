@@ -7,14 +7,14 @@ public class ChatMessageFactory {
 	private Long id;
 	
 
-	private ChatMessageFactory messageFactory = new ChatMessageFactory();
+	private static ChatMessageFactory messageFactory = new ChatMessageFactory();
 	
 	private ChatMessageFactory() {
 		id = 1L;
 	}
 	
 
-	public ChatMessageFactory getInstance() {
+	public static ChatMessageFactory getInstance() {
 		return messageFactory;
 	}
 	

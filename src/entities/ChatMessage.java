@@ -35,6 +35,11 @@ public class ChatMessage implements Serializable {
 		this.content = message;
 		createdAt = new Date();
 	}
+	
+	
+	public Long getId() {
+		return id;
+	}
 
 	public Date getCreatedAt() {
 		return createdAt;
