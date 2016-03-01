@@ -50,6 +50,8 @@ public class ClientMessageParser {
 
 				System.out.println("[ClientMessageParser.java] Adicionar chat message");
 				System.out.println(chatMessage.getFromUser());
+			
+				System.out.println("[ClientMessageParser.java] " + (conversationDAO == null));
 				
 				conversationDAO.addChatMessage(chatMessage);
 				

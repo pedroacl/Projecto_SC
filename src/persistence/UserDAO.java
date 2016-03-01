@@ -52,6 +52,8 @@ public class UserDAO {
 	 * @return Devolve true caso o utilizador tenha sido adicionado e false caso contrário
 	 */
 	public void addUser(String username, String password) {
+		System.out.println(authentication == null);
+		
 		if (username == null || password == null || authentication.getUser(username) == null)		
 			return;
 		

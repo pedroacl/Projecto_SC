@@ -23,7 +23,7 @@ public class Authentication {
 		userDAO = UserDAO.getInstance();
 		users = loadUsers();
 		
-		System.out.println(users);
+		System.out.println("[Authentication.java]" + users);
 	}
 	
 	
@@ -96,8 +96,9 @@ public class Authentication {
 	 */
 	public User getUser(String username) {
 		String password = users.get(username);
+		User user = new User(username, password);
 		
-		return new User(username, password);
+		return user;
 	}
 	
 	

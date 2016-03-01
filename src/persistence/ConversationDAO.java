@@ -17,7 +17,7 @@ import factories.ConversationFactory;
 
 public class ConversationDAO {
 	
-	private static ConversationDAO conversationDAO;
+	private static ConversationDAO conversationDAO = new ConversationDAO();
 	
 	private static UserConversationHeaderDAO conversationHeaderDAO;
 	
