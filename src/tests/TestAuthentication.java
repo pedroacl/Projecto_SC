@@ -13,7 +13,7 @@ import org.junit.Test;
 import domain.Authentication;
 import entities.User;
 
-public class TestUserDAO {
+public class TestAuthentication {
 	
 	private Authentication authentication;
 	
@@ -30,16 +30,16 @@ public class TestUserDAO {
 	@Test
 	public void testAddUser() {
 		
-		File file = new File("users/pedro");
-		assertEquals(file.exists(), false);
-		
 		User user = authentication.getUser("pedro");
-		assertThat(user, is(not(nullValue())));
-		
+		assertThat(user, is(nullValue()));
+
 		authentication.addUser("pedro", "1234");
-		
+
+		File file = new File("users/pedro");
 		assertEquals(file.exists(), true);
 		
+		file = new File("users/pedro/conversations");
+		assertEquals(file.exists(), true);
 	}
 	
 	
