@@ -1,11 +1,11 @@
 package tests;
 
-import static org.junit.Assert.fail;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import entities.ChatMessage;
+import network.MessageType;
 import persistence.ConversationDAO;
 
 public class TestConversationDAO {
@@ -24,6 +24,7 @@ public class TestConversationDAO {
 	
 	@Test
 	public void testAddChatMessage() {
-		//conversationDAO.addChatMessage(chatMessage);
+		ChatMessage chatMessage = new ChatMessage("maria", "pedro", "mensagem de teste", MessageType.MESSAGE);
+		conversationDAO.addChatMessage(chatMessage);
 	}
 }
