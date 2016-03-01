@@ -24,16 +24,15 @@ public class TestConversationDAO {
 	private static ConversationDAO conversationDAO;
 
 	private static ChatMessageFactory chatMessageFactory;
-	
-	private static Authentication authentication;
 
+	private static Authentication authentication;
 
 	@Before
 	public void setUp() {
 		conversationDAO = ConversationDAO.getInstance();
 		chatMessageFactory = ChatMessageFactory.getInstance();
 		authentication = Authentication.getInstance();
-		
+
 		try {
 			FileUtils.deleteDirectory(new File("users"));
 			FileUtils.deleteDirectory(new File("conversations"));
@@ -41,7 +40,7 @@ public class TestConversationDAO {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		authentication.addUser("antonio", "my_password");
 	}
 
@@ -57,5 +56,7 @@ public class TestConversationDAO {
 
 		File file = new File("conversations/" + chatMessage.getId());
 		assertThat(file.exists(), is(not(nullValue())));
+		
+		//conversationDAO.getLastChatMessage(conversationsId);
 	}
 }

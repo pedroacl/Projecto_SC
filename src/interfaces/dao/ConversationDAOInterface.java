@@ -1,7 +1,5 @@
 package interfaces.dao;
 
-import java.util.List;
-
 import entities.ChatMessage;
 import entities.Conversation;
 
@@ -13,6 +11,6 @@ public interface ConversationDAOInterface {
 
 	public Conversation getConversationById(Long conversationId);
 
-	public List<ChatMessage> getLastChatMessages(List<Long> conversationsIDs);
+	public ChatMessage getLastChatMessage(Long conversationId);
 
 }

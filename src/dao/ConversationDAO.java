@@ -199,39 +199,48 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 * @return Lista das ultimas mensagens
 	 */
 	@Override
-	public List<ChatMessage> getLastChatMessages(List<Long> conversationsIDs) {
-		List<ChatMessage> chatMessages = new ArrayList<ChatMessage>();
+	public ChatMessage getLastChatMessage(Long conversationId) {
+
 		ChatMessage chatMessage = null;
-		File file = null;
 		
-		for (Long conversationID: conversationsIDs) {
-			file = new File("conversations/" + conversationID);
-		
-			//saltar para o proximo ficheiro
-			if (!file.exists()) {
-				continue;
-			}
-		
-			//ler ficheiro
-			try {
-				FileInputStream fileInputStream = new FileInputStream(file);
-				ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-				chatMessage = (ChatMessage) objectInputStream.readObject();
-				chatMessages.add(chatMessage);
+		File file = new File("conversations/" + conversationId);
 
-				objectInputStream.close();
-				fileInputStream.close();
-
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		if (!file.exists()) {
+			return null;
 		}
 		
-		return null;
+		File[] files = file.listFiles();
+		int maxId = 0;
+	
+		//obter ultima mensagem
+		for (File currentFile : files) {
+			String fileName = currentFile.getName();
+			int messageId = Integer.parseInt(fileName.split("_")[1]);
+			
+			if (messageId > maxId)
+				maxId = messageId;
+		}
+		
+		//ler ficheiro
+		try {
+			file = new File("conversations/" + conversationId + "/message_" + maxId);
+			
+			FileInputStream fileInputStream = new FileInputStream(file);
+			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+			chatMessage = (ChatMessage) objectInputStream.readObject();
+			
+			objectInputStream.close();
+			fileInputStream.close();
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	
+		return chatMessage;
 	}
 	
 
