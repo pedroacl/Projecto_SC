@@ -65,6 +65,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 					ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
 
 					objectOutputStream.writeObject(conversation);
+					fileOutputStream.close();
 
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -81,21 +82,19 @@ public class ConversationDAO implements ConversationDAOInterface {
 		// obter lista de chat messages
 		try {
 			// carregar ficheiro
-			System.out.println("!Conversation \n" + conversation);
-			System.out.println("!Chat Message \n" + chatMessage);
-			
 			File file = new File("conversations/" + conversation.getId() + "/messages/message_" + chatMessage.getId());
 
 			// ficheiro nao existe
 			if (!file.exists()) {
-				System.out.println("Criar mensagem");
 				file.getParentFile().mkdirs();
 				file.createNewFile();
 
 				FileOutputStream fileOutputStream = new FileOutputStream(file);
 				ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-
 				objectOutputStream.writeObject(conversation);
+				
+				objectOutputStream.close();
+				fileOutputStream.close();
 
 				// ficheiro ja existe
 			} else {
@@ -162,8 +161,8 @@ public class ConversationDAO implements ConversationDAOInterface {
 			ObjectInputStream ois = new ObjectInputStream(fin);
 			conversationHeaders = (List<UserConversationHeader>) ois.readObject();
 
-			fin.close();
 			ois.close();
+			fin.close();
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
