@@ -7,10 +7,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import entities.Conversation;
-import entities.ConversationHeader;
+import entities.UserConversationHeader;
 import interfaces.dao.UserConversationHeaderDAOInterface;
 
 public class UserConversationHeaderDAO implements UserConversationHeaderDAOInterface {
@@ -26,43 +26,32 @@ public class UserConversationHeaderDAO implements UserConversationHeaderDAOInter
 	}
 
 	/**
-	 * 
-	 * @param username
-	 * @param toUser
-	 * @return
+	 * Funcao que permite adicionar conversation headers a cada utilizador
+	 * presente na conversa
 	 */
 	@Override
-	public ConversationHeader getUserConversationHeader(String username, String toUser) {
-		ArrayList<ConversationHeader> conversationHeaders = getUserConversationHeaders(username);
-
-		if (conversationHeaders == null) {
-			return null;
-		}
-
-		System.out.println(conversationHeaders == null);
-
-		for (ConversationHeader conversationHeader : conversationHeaders)
-			if (conversationHeader.getToUser().equals(toUser))
-				return conversationHeader;
-
-		return null;
+	public void addUsersConversationHeaders(Conversation conversation) {
+		addUserConversationHeader(conversation.getFromUser(), conversation);
+		addUserConversationHeader(conversation.getToUser(), conversation);
 	}
 
 	/**
-	 * 
+	 * Função que permite adicionar a um utilizador da conversa um conversation header
 	 * @param username
 	 * @param conversation
 	 */
-	@Override
-	public void addUserConversationHeader(String username, Conversation conversation) {
-		File file = new File("users/" + username + "/conversations");
-
-		ConversationHeader conversationHeader = new ConversationHeader(conversation.getId(), conversation.getToUser());
+	private void addUserConversationHeader(String username, Conversation conversation) {
 
 		FileOutputStream fileOutputStream;
 		ObjectOutputStream objectOutputStream;
 
-		ArrayList<ConversationHeader> conversationHeaders = null;
+		// obter conversation headers do utilizador
+		HashMap<String, UserConversationHeader> userConversationHeaders = getUserConversationHeaders(username);
+		
+		if (userConversationHeaders == null)
+			userConversationHeaders = new HashMap<String, UserConversationHeader>();
+
+		File file = new File("users/" + username + "/conversations");
 
 		// ficheiro nao existe
 		if (!file.exists()) {
@@ -72,33 +61,27 @@ public class UserConversationHeaderDAO implements UserConversationHeaderDAOInter
 				file.getParentFile().mkdirs();
 				file.createNewFile();
 
-				conversationHeaders = new ArrayList<ConversationHeader>();
-
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		} else {
-			conversationHeaders = getUserConversationHeaders(username);
 		}
 
-		// conversa ainda nao adicionada ao utilizador
-		if (!conversationHeaders.contains(conversationHeader)) {
-			// adicionar conversa
-			conversationHeaders.add(conversationHeader);
+		// adicionar/atualizar conversation header
+		userConversationHeaders.put(conversation.getToUser(), new UserConversationHeader(conversation.getToUser(), conversation.getId()));
 
-			// atualizar ficheiro
-			try {
-				fileOutputStream = new FileOutputStream(file);
-				objectOutputStream = new ObjectOutputStream(fileOutputStream);
-				objectOutputStream.writeObject(conversationHeaders);
+		// atualizar ficheiro
+		try {
+			fileOutputStream = new FileOutputStream(file);
+			objectOutputStream = new ObjectOutputStream(fileOutputStream);
+			objectOutputStream.writeObject(userConversationHeaders);
 
-				objectOutputStream.close();
-				fileOutputStream.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			objectOutputStream.close();
+			fileOutputStream.close();
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -107,8 +90,8 @@ public class UserConversationHeaderDAO implements UserConversationHeaderDAOInter
 	 * @param username
 	 * @return
 	 */
-	private ArrayList<ConversationHeader> getUserConversationHeaders(String username) {
-		ArrayList<ConversationHeader> conversationHeaders = null;
+	private HashMap<String, UserConversationHeader> getUserConversationHeaders(String username) {
+		HashMap<String, UserConversationHeader> userConversationHeaders = null;
 
 		File file = new File("users/" + username + "/conversations");
 
@@ -120,7 +103,7 @@ public class UserConversationHeaderDAO implements UserConversationHeaderDAOInter
 			FileInputStream fileInputStream = new FileInputStream(file);
 			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 
-			conversationHeaders = (ArrayList<ConversationHeader>) objectInputStream.readObject();
+			userConversationHeaders = (HashMap<String, UserConversationHeader>) objectInputStream.readObject();
 
 			objectInputStream.close();
 			fileInputStream.close();
@@ -133,6 +116,33 @@ public class UserConversationHeaderDAO implements UserConversationHeaderDAOInter
 			e.printStackTrace();
 		}
 
-		return conversationHeaders;
+		return userConversationHeaders;
+	}
+
+	@Override
+	public Long getConversationId(String fromUser, String toUser) {
+		HashMap<String, UserConversationHeader> userConversationHeaders = getUserConversationHeaders(fromUser);
+
+		if (userConversationHeaders == null) {
+			return null;
+		}
+		
+		UserConversationHeader userConversationHeader = userConversationHeaders.get(toUser);
+
+		if (userConversationHeader != null) {
+			return userConversationHeader.getConversationId();
+		}
+
+		return null;
+	}
+
+	@Override
+	public UserConversationHeader getUserConversationHeader(String username, String toUser) {
+		HashMap<String, UserConversationHeader> userConversationHeader = getUserConversationHeaders(username);
+
+		if (userConversationHeader != null) 
+			return userConversationHeader.get(toUser);
+		
+		return null;
 	}
 }

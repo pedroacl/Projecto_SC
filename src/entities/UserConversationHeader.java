@@ -2,7 +2,7 @@ package entities;
 
 import java.io.Serializable;
 
-public class ConversationHeader implements Serializable {
+public class UserConversationHeader implements Serializable {
 	/**
 	 * 
 	 */
@@ -13,7 +13,7 @@ public class ConversationHeader implements Serializable {
 	private String toUser;
 	
 	
-	public ConversationHeader(Long conversationId, String toUser) {
+	public UserConversationHeader(String toUser, Long conversationId) {
 		this.conversationId = conversationId;
 		this.toUser = toUser;
 	}

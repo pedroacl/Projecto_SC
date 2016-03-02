@@ -1,5 +1,10 @@
 package tests;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -12,22 +17,30 @@ import dao.ConversationDAO;
 import dao.UserConversationHeaderDAO;
 import domain.Authentication;
 import entities.Conversation;
+import entities.UserConversationHeader;
 import factories.ChatMessageFactory;
+import factories.ConversationFactory;
 
 public class TestUserConversationHeaderDAO {
 
 	private static UserConversationHeaderDAO userConversationHeaderDAO;
-	
+
 	private static ConversationDAO conversationDAO;
 
 	private static ChatMessageFactory chatMessageFactory;
+
+	private static ConversationFactory conversationFactory;
 
 	private static Authentication authentication;
 
 	@Before
 	public void setUp() {
 		userConversationHeaderDAO = UserConversationHeaderDAO.getInstance();
-		
+
+		conversationFactory = ConversationFactory.getInstance();
+
+		chatMessageFactory = ChatMessageFactory.getInstance();
+
 		conversationDAO = ConversationDAO.getInstance();
 
 		authentication = Authentication.getInstance();
@@ -49,8 +62,37 @@ public class TestUserConversationHeaderDAO {
 	}
 
 	@Test
-	public void testAddUserConversationHeader() {
-		Conversation conversation = conversationDAO.getConversationById(1L);
-		userConversationHeaderDAO.addUserConversationHeader("pedro", conversation);
+	public void testAddUsersConversationHeaders() {
+		String fromUser = "maria";
+		String toUser = "pedro";
+
+		Conversation conversation = conversationFactory.build("maria", "pedro");
+
+		userConversationHeaderDAO.addUsersConversationHeaders(conversation);
+		Long conversationId = userConversationHeaderDAO.getConversationId(fromUser, toUser);
+
+		assertThat(conversationId, is(not(nullValue())));
+		System.out.println(conversationId);
+	}
+
+	@Test
+	public void testGetUserConversationHeader() {
+		String fromUser = "maria";
+		String toUser = "pedro";
+
+		Conversation conversation = conversationFactory.build(fromUser, toUser);
+		userConversationHeaderDAO.addUsersConversationHeaders(conversation);
+
+		UserConversationHeader userConversationHeader = userConversationHeaderDAO.getUserConversationHeader(fromUser,
+				toUser);
+		
+		assertThat(userConversationHeader, is(not(nullValue())));
+		assertThat(userConversationHeader.getToUser(), is(toUser));
+	}
+
+	@Test
+	public void testGetConversationId() {
+		String username = "pedro";
+
 	}
 }

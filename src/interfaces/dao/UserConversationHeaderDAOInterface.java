@@ -1,12 +1,14 @@
 package interfaces.dao;
 
 import entities.Conversation;
-import entities.ConversationHeader;
+import entities.UserConversationHeader;
 
 public interface UserConversationHeaderDAOInterface {
 	
-	public ConversationHeader getUserConversationHeader(String username, String toUser);
-
-	public void addUserConversationHeader(String username, Conversation conversation);
+	public void addUsersConversationHeaders(Conversation conversation);
+	
+	public UserConversationHeader getUserConversationHeader(String username, String toUser);
+	
+	public Long getConversationId(String fromUser, String toUser);
 
 }
