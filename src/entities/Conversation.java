@@ -75,6 +75,10 @@ public class Conversation implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
+		
+		sb.append("Id: " + id + "\n");
+		sb.append("From: " + fromUser + "\n");
+		sb.append("To: " + toUser + "\n");
 
 		for (ChatMessage chatMessage : chatMessages) {
 			sb.append(chatMessage.toString());

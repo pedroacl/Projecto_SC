@@ -48,7 +48,13 @@ public class TestUserConversationHeaderDAO {
 		try {
 			FileUtils.deleteDirectory(new File("users"));
 			FileUtils.deleteDirectory(new File("conversations"));
-			FileUtils.forceDelete(new File("users.txt"));
+		
+			File file = new File("users.txt");
+
+			if (file.exists()) {
+				FileUtils.forceDelete(file);
+			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -70,9 +76,7 @@ public class TestUserConversationHeaderDAO {
 
 		userConversationHeaderDAO.addUsersConversationHeaders(conversation);
 		Long conversationId = userConversationHeaderDAO.getConversationId(fromUser, toUser);
-
 		assertThat(conversationId, is(not(nullValue())));
-		System.out.println(conversationId);
 	}
 
 	@Test
@@ -92,7 +96,15 @@ public class TestUserConversationHeaderDAO {
 
 	@Test
 	public void testGetConversationId() {
-		String username = "pedro";
+		String fromUser = "maria";
+		String toUser = "pedro";
 
+		Conversation conversation = conversationFactory.build("maria", "pedro");
+
+		userConversationHeaderDAO.addUsersConversationHeaders(conversation);
+		Long conversationId = userConversationHeaderDAO.getConversationId(fromUser, toUser);
+
+		assertThat(conversationId, is(not(nullValue())));;
+		assertThat(conversationId, is(1L));
 	}
 }

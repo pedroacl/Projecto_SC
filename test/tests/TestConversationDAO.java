@@ -16,7 +16,9 @@ import org.junit.Test;
 import dao.ConversationDAO;
 import domain.Authentication;
 import entities.ChatMessage;
+import entities.Conversation;
 import factories.ChatMessageFactory;
+import factories.ConversationFactory;
 import network.MessageType;
 
 public class TestConversationDAO {
@@ -25,18 +27,26 @@ public class TestConversationDAO {
 
 	private static ChatMessageFactory chatMessageFactory;
 
+	private static ConversationFactory conversationFactory;
+
 	private static Authentication authentication;
 
 	@Before
 	public void setUp() {
 		conversationDAO = ConversationDAO.getInstance();
+		conversationFactory = ConversationFactory.getInstance();
 		chatMessageFactory = ChatMessageFactory.getInstance();
 		authentication = Authentication.getInstance();
 
 		try {
 			FileUtils.deleteDirectory(new File("users"));
 			FileUtils.deleteDirectory(new File("conversations"));
-			FileUtils.forceDelete(new File("users.txt"));
+
+			File file = new File("users.txt");
+
+			if (file.exists()) {
+				FileUtils.forceDelete(file);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -51,20 +61,30 @@ public class TestConversationDAO {
 
 	@Test
 	public void testAddChatMessage() {
-		ChatMessage chatMessage = chatMessageFactory.build("maria", "pedro", "mensagem de teste 1", MessageType.MESSAGE);
+		String fromUser = "maria";
+		String toUser = "pedro";
+
+		ChatMessage chatMessage = chatMessageFactory.build(fromUser, toUser, "mensagem de teste 1",
+				MessageType.MESSAGE);
+
 		conversationDAO.addChatMessage(chatMessage);
 
-		File file = new File("conversations/" + chatMessage.getId());
+		File file = new File("conversations/1/" + chatMessage.getId());
 		assertThat(file.exists(), is(not(nullValue())));
-		
-		chatMessage = chatMessageFactory.build("maria", "pedro", "mensagem de teste 2", MessageType.MESSAGE);
-		System.out.println("!!!");
-		System.out.println(chatMessage);
+
+		chatMessage = chatMessageFactory.build(fromUser, toUser, "mensagem de teste 2", MessageType.MESSAGE);
 		conversationDAO.addChatMessage(chatMessage);
 
-		file = new File("conversations/" + chatMessage.getId());
-		assertThat(file.exists(), is(not(nullValue())));
-		
-		//conversationDAO.getLastChatMessage(conversationsId);
+		/*
+		 * 
+		 * file = new File("conversations/" + chatMessage.getId());
+		 * assertThat(file.exists(), is(not(nullValue())));
+		 */
+		// conversationDAO.getLastChatMessage(conversationsId);
+	}
+	
+	@Test
+	public void getConversationById() {
+		//conversationDAO.getConversationById(conversationId);
 	}
 }

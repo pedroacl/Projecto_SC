@@ -55,9 +55,6 @@ public class ClientMessageParser {
 				
 				conversationDAO.addChatMessage(chatMessage);
 				
-				Conversation conversation = conversationDAO.getConversationById(1L);
-				System.out.println("Conversa: " + conversation);
-				
 				serverMessage = new ServerMessage(MessageType.OK);
 			}
 			else {

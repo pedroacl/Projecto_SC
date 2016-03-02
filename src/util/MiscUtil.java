@@ -1,8 +1,10 @@
 package util;
 
 import java.io.File;
+import java.io.IOException;
 
 public class MiscUtil {
+
 	public static void delete(File f) {
 		if (f.isDirectory()) {
 			File[] files = f.listFiles();
