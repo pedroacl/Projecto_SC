@@ -33,11 +33,6 @@ public class TestConversationDAO {
 
 	@Before
 	public void setUp() {
-		conversationDAO = ConversationDAO.getInstance();
-		conversationFactory = ConversationFactory.getInstance();
-		chatMessageFactory = ChatMessageFactory.getInstance();
-		authentication = Authentication.getInstance();
-
 		try {
 			FileUtils.deleteDirectory(new File("users"));
 			FileUtils.deleteDirectory(new File("conversations"));
@@ -51,6 +46,11 @@ public class TestConversationDAO {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		conversationDAO = ConversationDAO.getInstance();
+		conversationFactory = ConversationFactory.getInstance();
+		chatMessageFactory = ChatMessageFactory.getInstance();
+		authentication = Authentication.getInstance();
 
 		authentication.addUser("antonio", "my_password");
 	}

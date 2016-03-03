@@ -9,8 +9,6 @@ public interface ConversationDAOInterface {
 
 	public Conversation getConversationById(Long conversationId);
 
-	public Conversation getConversationByUsername(ChatMessage chatMessage);
-
 	public ChatMessage getLastChatMessage(Long conversationId);
 
 }

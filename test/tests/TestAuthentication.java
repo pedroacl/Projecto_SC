@@ -22,8 +22,6 @@ public class TestAuthentication {
 
 	@Before
 	public void setUp() {
-		authentication = Authentication.getInstance();
-
 		try {
 			FileUtils.deleteDirectory(new File("users"));
 			FileUtils.deleteDirectory(new File("conversations"));
@@ -32,6 +30,8 @@ public class TestAuthentication {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		authentication = Authentication.getInstance();
 	}
 
 	@After

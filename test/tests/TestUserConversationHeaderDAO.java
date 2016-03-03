@@ -35,16 +35,6 @@ public class TestUserConversationHeaderDAO {
 
 	@Before
 	public void setUp() {
-		userConversationHeaderDAO = UserConversationHeaderDAO.getInstance();
-
-		conversationFactory = ConversationFactory.getInstance();
-
-		chatMessageFactory = ChatMessageFactory.getInstance();
-
-		conversationDAO = ConversationDAO.getInstance();
-
-		authentication = Authentication.getInstance();
-
 		try {
 			FileUtils.deleteDirectory(new File("users"));
 			FileUtils.deleteDirectory(new File("conversations"));
@@ -58,7 +48,12 @@ public class TestUserConversationHeaderDAO {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		
+		userConversationHeaderDAO = UserConversationHeaderDAO.getInstance();
+		conversationFactory = ConversationFactory.getInstance();
+		chatMessageFactory = ChatMessageFactory.getInstance();
+		conversationDAO = ConversationDAO.getInstance();
+		authentication = Authentication.getInstance();
 		authentication.addUser("antonio", "my_password");
 	}
 

@@ -26,11 +26,12 @@ public class TestGroupDAO {
 
 	@Before
 	public void setUp() {
-		authentication = Authentication.getInstance();
-		groupDAO = GroupDAO.getInstance();
-
 		try {
-			FileUtils.forceDelete(new File("users.txt"));
+			File file = new File("users.txt");
+
+			if (file.exists())
+				FileUtils.forceDelete(file);
+			
 			FileUtils.deleteDirectory(new File("users"));
 			FileUtils.deleteDirectory(new File("conversations"));
 			FileUtils.deleteDirectory(new File("groups"));
@@ -39,6 +40,9 @@ public class TestGroupDAO {
 			e.printStackTrace();
 		}
 
+		authentication = Authentication.getInstance();
+		groupDAO = GroupDAO.getInstance();
+		
 		authentication.addUser("antonio", "1234");
 	}
 
@@ -101,10 +105,13 @@ public class TestGroupDAO {
 		String groupName = "grupo1";
 
 		groupDAO.createGroup(groupName, "jose");
-
+		
 		File file = new File("groups/1");
 		assertThat(file.exists(), is(true));
 			
+		file = new File("users.txt");
+		assertThat(file.exists(), is(true));
+		
 		file = new File("groups/groups");
 		assertThat(file.exists(), is(true));
 		

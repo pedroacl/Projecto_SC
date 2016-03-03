@@ -1,8 +1,7 @@
 package entities;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
 public class Conversation implements Serializable {
 	
@@ -16,12 +15,22 @@ public class Conversation implements Serializable {
 	private String fromUser;
 	
 	private String toUser;
-	
-	private List<ChatMessage> chatMessages;
 
+	private Date createdAt;
+	
+	private Date lastMessageDate;
+
+
+	public Date getLastMessageDate() {
+		return lastMessageDate;
+	}
+
+	public void setLastMessageDate(Date lastMessageDate) {
+		this.lastMessageDate = lastMessageDate;
+	}
 
 	private Conversation() {
-		chatMessages = new ArrayList<ChatMessage>();
+
 	}
 	
 	public Conversation(String fromUser, String toUser) {
@@ -53,17 +62,6 @@ public class Conversation implements Serializable {
 	public void setToUser(String toUser) {
 		this.toUser = toUser;
 	}
-	
-	public List<ChatMessage> getChatMessages() {
-		return chatMessages;
-	}
-
-
-	public void addChatMessage(ChatMessage chatMessage) {
-		System.out.println(chatMessage);
-		chatMessages.add(chatMessage);
-	}
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -79,11 +77,6 @@ public class Conversation implements Serializable {
 		sb.append("Id: " + id + "\n");
 		sb.append("From: " + fromUser + "\n");
 		sb.append("To: " + toUser + "\n");
-
-		for (ChatMessage chatMessage : chatMessages) {
-			sb.append(chatMessage.toString());
-			sb.append("\n");
-		}
 
 		return sb.toString();
 	}
