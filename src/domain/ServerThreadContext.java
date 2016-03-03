@@ -1,6 +1,5 @@
 package domain;
 
-import network.ClientMessage;
 import network.ServerSocketNetwork;
 
 public class ServerThreadContext {

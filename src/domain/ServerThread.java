@@ -1,10 +1,7 @@
 package domain;
 
-import java.io.File;
-
 import interfaces.ServerThreadInterface;
 import network.ClientMessage;
-import network.MessageType;
 import network.ServerMessage;
 import network.ServerSocketNetwork;
 import parsers.ClientMessageParser;

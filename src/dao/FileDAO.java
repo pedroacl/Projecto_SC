@@ -1,7 +1,5 @@
 package dao;
 
-import java.io.File;
-
 import interfaces.dao.FileDAOInterface;
 
 public class FileDAO implements FileDAOInterface {

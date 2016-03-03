@@ -1,5 +1,11 @@
 package dao;
 
+import entities.ChatMessage;
+import entities.Conversation;
+import entities.UserConversationHeader;
+import factories.ConversationFactory;
+import interfaces.dao.ConversationDAOInterface;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,11 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import util.MiscUtil;
-import entities.ChatMessage;
-import entities.Conversation;
-import entities.UserConversationHeader;
-import factories.ConversationFactory;
-import interfaces.dao.ConversationDAOInterface;
 
 public class ConversationDAO implements ConversationDAOInterface {
 

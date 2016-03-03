@@ -1,7 +1,7 @@
 package factories;
 
-import entities.ChatMessage;
 import network.MessageType;
+import entities.ChatMessage;
 
 public class ChatMessageFactory {
 	private Long id;

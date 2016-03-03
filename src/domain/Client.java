@@ -1,6 +1,7 @@
 package domain;
 import network.ClientMessage;
 import network.ClientNetwork;
+import network.MessageType;
 import network.ServerMessage;
 import parsers.ArgsParser;
 
@@ -44,6 +45,14 @@ public class Client{
 
 		//recebe a resposta
 		ServerMessage serverMsg = clientNetwork.receiveMessage();
+		
+		if(serverMsg.getMessageType().equals(MessageType.OK))
+			System.out.println(serverMsg.getMessageType());
+		else {
+			System.out.println(serverMsg.getMessageType());
+			System.out.println(serverMsg.getMessage());
+		}
+		
 		
 		/*
 		Cria e passa a resposta para o Parser que a vai processar

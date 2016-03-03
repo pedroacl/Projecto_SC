@@ -1,5 +1,7 @@
 package dao;
 
+import interfaces.dao.UserConversationHeaderDAOInterface;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,7 +13,6 @@ import java.util.HashMap;
 
 import entities.Conversation;
 import entities.UserConversationHeader;
-import interfaces.dao.UserConversationHeaderDAOInterface;
 
 public class UserConversationHeaderDAO implements UserConversationHeaderDAOInterface {
 

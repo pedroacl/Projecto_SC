@@ -3,9 +3,9 @@ package parsers;
 import java.io.File;
 import java.io.IOException;
 
-import domain.UserInterface;
 import network.ClientNetwork;
 import network.ServerMessage;
+import domain.UserInterface;
 
 public class ServerResponseParser {
 	
