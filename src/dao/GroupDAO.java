@@ -1,24 +1,20 @@
 package dao;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
 import entities.Group;
+import factories.GroupFactory;
 import interfaces.dao.GroupDAOInterface;
 import util.MiscUtil;
 
 public class GroupDAO implements GroupDAOInterface {
 
 	private static GroupDAO groupDAO = new GroupDAO();
+	
+	private static GroupFactory groupFactory;
 
 	private GroupDAO() {
-
+		groupFactory = GroupFactory.getInstance();
 	}
 
 	public static GroupDAO getInstance() {
@@ -33,7 +29,7 @@ public class GroupDAO implements GroupDAOInterface {
 	@Override
 	public Group getGroupByName(String groupName) {
 		HashMap<String, Group> groups = (HashMap<String, Group>) MiscUtil.readObject("groups/groups");
-		
+
 		if (groups != null) {
 			return groups.get(groupName);
 		}
@@ -48,80 +44,78 @@ public class GroupDAO implements GroupDAOInterface {
 	 * @param username
 	 */
 	@Override
-	public void addUserToGroup(String groupName, String username) {
+	public void addUserToGroup(Group group, String username) {
+		
+		MiscUtil.createDir("groups/" + group.getId());
+		MiscUtil.createFile("groups/groups");
+		MiscUtil.createFile("groups/" + group.getId() + "/group");
+
 		HashMap<String, Group> groups = getGroups();
 		
-		MiscUtil.createFile("groups/groups");
-		MiscUtil.createFile("groups/" + groupName + "/group");
+		if (groups == null)
+			groups = new HashMap<String, Group>();
 		
-		Group group = null;
-
-		group = getGroupByName(groupName);
-
-		// utilizador já adicionado ao grupo
-		if (group.getUsers().contains(username))
-			return;
-
-		// adicionar utilizador ao grupo
+		// atualizar dados
 		group.addUser(username);
-
-		// atualizar ficheiro
-		MiscUtil.writeObject(group, "groups/groups");
+		groups.put(group.getName(), group);
+		MiscUtil.writeObject(groups, "groups/groups");
 	}
 
+	/**
+	 * Função que permite obter o ID de um determinado grupo
+	 */
 	@Override
 	public Long getGroupId(String groupName) {
-		File file = new File("groups/groups");
+		HashMap<String, Group> groups = getGroups();
 
-		if (!file.exists())
+		if (groups != null)
 			return null;
 
-		try {
-			FileInputStream fileInputStream = new FileInputStream(file);
-			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+		Group group = groups.get(groupName);
 
-			HashMap<String, Group> groups = (HashMap<String, Group>) objectInputStream.readObject();
+		if (group == null)
+			return null;
 
-			if (groups == null)
-				return null;
-
-			Group group = groups.get(groupName);
-
-			return group.getId();
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-
-		return null;
+		return group.getId();
 	}
 
+	/**
+	 * Função que permite obter um hashmap com todos os grupos registados
+	 */
 	@Override
 	public HashMap<String, Group> getGroups() {
-		File file = new File("groups/groups");
-		HashMap<String, Group> groups = null;	
-		
-		try {
-			FileInputStream fileInputStream = new FileInputStream(file);
-			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-			
-			groups = (HashMap<String, Group>) objectInputStream.readObject();
-			
-			objectInputStream.close();
-			fileInputStream.close();
-			
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+		return (HashMap<String, Group>) MiscUtil.readObject("groups/groups");
+	}
+
+	/**
+	 * Função que permite criar um grupo
+	 */
+	@Override
+	public Long createGroup(String groupName, String admin) {
+		HashMap<String, Group> groups = getGroups();
+		Group group = null;
+
+		//nao existem grupos adicionados
+		if (groups == null) {
+			groups = new HashMap<String, Group>();
+			group = groupFactory.build(groupName, admin);
+			groups.put(groupName, group);
+
+		} else {
+			group = groups.get(groupName);
+
+			if (group == null) {
+				group = groupFactory.build(groupName, admin);
+				groups.put(groupName, group);
+			} else {
+				return group.getId();
+			}
 		}
 		
-		return groups;
+		MiscUtil.createFile("groups/groups");
+		MiscUtil.createDir("groups/" + group.getId());
+		MiscUtil.writeObject(groups, "groups/groups");
+		
+		return group.getId();
 	}
 }

@@ -28,6 +28,7 @@ public class TestAuthentication {
 			FileUtils.deleteDirectory(new File("users"));
 			FileUtils.deleteDirectory(new File("conversations"));
 			FileUtils.forceDelete(new File("users.txt"));
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

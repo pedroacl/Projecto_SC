@@ -41,6 +41,7 @@ public class TestConversationDAO {
 		try {
 			FileUtils.deleteDirectory(new File("users"));
 			FileUtils.deleteDirectory(new File("conversations"));
+			FileUtils.deleteDirectory(new File("groups"));
 
 			File file = new File("users.txt");
 
@@ -69,14 +70,14 @@ public class TestConversationDAO {
 
 		conversationDAO.addChatMessage(chatMessage);
 
-		File file = new File("conversations/1/" + chatMessage.getId());
+		File file = new File("conversations/1/messages/" + chatMessage.getId());
 		assertThat(file.exists(), is(not(nullValue())));
 
 		chatMessage = chatMessageFactory.build(fromUser, toUser, "mensagem de teste 2", MessageType.MESSAGE);
 		conversationDAO.addChatMessage(chatMessage);
 		
-		file = new File("conversations/1/" + chatMessage.getId());
-		assertThat(file.exists(), is(not(nullValue())));
+		file = new File("conversations/1/messages/" + chatMessage.getId());
+		assertThat(file.exists(), is(true));
 
 	}
 	
@@ -90,11 +91,11 @@ public class TestConversationDAO {
 				MessageType.MESSAGE);
 		
 		conversationDAO.addChatMessage(chatMessage);
+	
+		File file = new File("conversations/1/messages");
+		assertThat(file.exists(), is(true));
+	
 		Conversation conversation = conversationDAO.getConversationById(conversationId);
-	
-		File file = new File("conversations/1/conversation");
-		assertThat(file.exists(), is(not(nullValue())));
-	
 		assertThat(conversation, is(not(nullValue())));
 	}
 }

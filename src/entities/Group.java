@@ -1,26 +1,39 @@
 package entities;
-import java.util.List;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-public class Group {
+public class Group implements Serializable {
 	
-	public Group() {
-		
-	}
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3719430979913465539L;
 
 	private Long id;
 	
 	private String name;
 	
-	private User owner;
+	private String admin;
 	
 	private Date createdAt;
 	
 	private List<String> users;
 	
 	
+	public Group(String name, String admin) {
+		this.name = name;
+		this.admin = admin;
+		this.createdAt = new Date();
+		
+		users = new ArrayList<String>();
+		users.add(admin);
+	}
+	
 	public void addUser(String username) {
-		users.add(username);
+		if (!users.contains(username))
+			users.add(username);
 	} 
 	
 	public String getName() {
@@ -31,31 +44,23 @@ public class Group {
 		this.name = name;
 	}
 	
-	public User getOwner() {
-		return owner;
+	public String getAdmin() {
+		return admin;
 	}
 
-	public void setOwner(User owner) {
-		this.owner = owner;
-	}
-	
 	public Date getCreatedAt() {
 		return createdAt;
-	}
-
-	public void setCreatedAt(Date createdAt) {
-		this.createdAt = createdAt;
 	}
 
 	public List<String> getUsers() {
 		return users;
 	}
 
-	public void setUsers(List<String> users) {
-		this.users = users;
-	}
-
 	public Long getId() {
 		return id;
+	}
+	
+	public void setId(Long id) {
+		this.id = id;
 	}
 }

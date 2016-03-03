@@ -34,7 +34,8 @@ public class MiscUtil {
 
 		// ficheiro nao existe
 		if (!file.exists()) {
-			file.getParentFile().mkdirs();
+			if (file.getParentFile() != null)
+				file.getParentFile().mkdirs();			
 
 			try {
 				file.createNewFile();
@@ -43,17 +44,25 @@ public class MiscUtil {
 			}
 		}
 	}
+	
+	public static void createDir(String path) {
+		File file = new File(path);
 
+		// ficheiro nao existe
+		if (!file.exists())
+			file.mkdirs();
+	}
+	
 	public static void writeObject(Object obj, String filePath) {
 		File file = new File(filePath);
 
 		try {
 			FileOutputStream fileOutputStream = new FileOutputStream(file);
 			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+			objectOutputStream.writeObject(obj);
 
 			objectOutputStream.close();
 			fileOutputStream.close();
-			objectOutputStream.writeObject(obj);
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -64,6 +73,10 @@ public class MiscUtil {
 	
 	public static Object readObject(String filePath) {
 		File file = new File(filePath);
+
+		if (!file.exists())
+			return null;
+
 		Object obj = null;
 		
 		try {

@@ -13,6 +13,7 @@ import domain.Authentication;
 import entities.User;
 import factories.ConversationFactory;
 import interfaces.dao.UserDAOInterface;
+import util.MiscUtil;
 
 /**
  * 
@@ -44,19 +45,10 @@ public class UserDAO implements UserDAOInterface {
 		String line;
 		BufferedReader br;
 
-		//criar ficheiro users
-		File file = new File("users.txt");
-		
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		MiscUtil.createFile("users.txt");
 		
 		//carregar utilizadores
-		file = new File("users.txt");
+		File file = new File("users.txt");
 	
 		//nao existe ficheiro
 		if (!file.exists()) {
@@ -76,11 +68,8 @@ public class UserDAO implements UserDAOInterface {
 				System.out.println(username + " " + password);
 		
 				//criar pasta para o user
-				file = new File("users/" + username);
-
-				if (!(file.exists() && file.isDirectory())) {
-					file.mkdir();
-				}	
+				MiscUtil.createDir("users/" + username);
+				
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -110,14 +99,8 @@ public class UserDAO implements UserDAOInterface {
 			fw.close();
 		
 			//criar directorias
-			File file = new File("users/" + username + "/files");
-			file.getParentFile().mkdirs();
-			file.createNewFile();
-			
-			//cirar ficheiro de conversas
-			file = new File("users/" + username + "/conversations");
-			file.getParentFile().mkdirs();
-			file.createNewFile();
+			MiscUtil.createDir("users/" + username + "/files");
+			MiscUtil.createFile("users/" + username + "/conversations");
 
 		} catch (IOException e) {
 			e.printStackTrace();
