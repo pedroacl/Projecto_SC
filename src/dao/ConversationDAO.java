@@ -40,10 +40,10 @@ public class ConversationDAO implements ConversationDAOInterface {
 		Conversation conversation = null;
 		HashMap<String, Long> userConversations = null;
 
-		String filePath = "users/" + chatMessage.getFromUser();
+		String filePath = "users/" + chatMessage.getFromUser() + "/conversations";
 		File file = new File(filePath);
 
-		if (!file.exists()) {
+		if (!file.exists() || file.length() == 0) {
 			userConversations = new HashMap<String, Long>();
 		} else {
 			userConversations = (HashMap<String, Long>) MiscUtil.readObject(filePath);
@@ -88,7 +88,8 @@ public class ConversationDAO implements ConversationDAOInterface {
 		String pathToTxt = "conversations/" + conversation.getId() + 
 				"/messages/" + chatMessage.getCreatedAt() + ".txt";
 		MiscUtil.createFile(pathToTxt);
-		MiscUtil.writeStringToFile(chatMessage.getContent(), pathToTxt);
+		MiscUtil.writeStringToFile(chatMessage.getFromUser() + "\n" + chatMessage.getDestination()
+				+ "\n"+ chatMessage.getContent(), pathToTxt);
 
 		return conversationId;
 	}
@@ -98,7 +99,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 		String filePath = "users/" + username + "/conversations";
 		File file = new File(filePath);
 
-		if (file.exists()) {
+		if (file.exists() && file.length() != 0) {
 			userConversations = (HashMap<String, Long>) MiscUtil.readObject(filePath);
 
 		} else {

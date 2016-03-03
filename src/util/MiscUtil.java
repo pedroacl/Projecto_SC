@@ -76,7 +76,7 @@ public class MiscUtil {
 	public static Object readObject(String filePath) {
 		File file = new File(filePath);
 
-		if (!file.exists())
+		if (!file.exists() || file.length() == 0)
 			return null;
 
 		Object obj = null;
