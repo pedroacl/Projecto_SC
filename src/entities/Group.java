@@ -8,6 +8,7 @@ public class Group {
 		
 	}
 
+	private Long id;
 	
 	private String name;
 	
@@ -52,5 +53,9 @@ public class Group {
 
 	public void setUsers(List<String> users) {
 		this.users = users;
+	}
+
+	public Long getId() {
+		return id;
 	}
 }

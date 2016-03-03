@@ -74,17 +74,27 @@ public class TestConversationDAO {
 
 		chatMessage = chatMessageFactory.build(fromUser, toUser, "mensagem de teste 2", MessageType.MESSAGE);
 		conversationDAO.addChatMessage(chatMessage);
+		
+		file = new File("conversations/1/" + chatMessage.getId());
+		assertThat(file.exists(), is(not(nullValue())));
 
-		/*
-		 * 
-		 * file = new File("conversations/" + chatMessage.getId());
-		 * assertThat(file.exists(), is(not(nullValue())));
-		 */
-		// conversationDAO.getLastChatMessage(conversationsId);
 	}
 	
 	@Test
 	public void getConversationById() {
-		//conversationDAO.getConversationById(conversationId);
+		String fromUser = "maria";
+		String toUser = "pedro";
+		Long conversationId = 1L;
+
+		ChatMessage chatMessage = chatMessageFactory.build(fromUser, toUser, "mensagem de teste 1",
+				MessageType.MESSAGE);
+		
+		conversationDAO.addChatMessage(chatMessage);
+		Conversation conversation = conversationDAO.getConversationById(conversationId);
+	
+		File file = new File("conversations/1/conversation");
+		assertThat(file.exists(), is(not(nullValue())));
+	
+		assertThat(conversation, is(not(nullValue())));
 	}
 }
