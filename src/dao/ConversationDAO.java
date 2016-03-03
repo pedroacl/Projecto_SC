@@ -28,7 +28,6 @@ public class ConversationDAO implements ConversationDAOInterface {
 
 	private ConversationDAO() {
 		conversationDAO = ConversationDAO.getInstance();
-		userConversationHeaderDAO = UserConversationHeaderDAO.getInstance();
 		conversationFactory = ConversationFactory.getInstance();
 	}
 
