@@ -5,7 +5,7 @@ import entities.Conversation;
 
 public interface ConversationDAOInterface {
 	
-	public void addChatMessage(ChatMessage chatMessage);
+	public Long addChatMessage(ChatMessage chatMessage);
 
 	public Conversation getConversationById(Long conversationId);
 

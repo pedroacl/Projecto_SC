@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import util.MiscUtil;
 import entities.ChatMessage;
 import entities.Conversation;
 import entities.UserConversationHeader;
@@ -37,7 +38,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 *            Mensagem a ser guardada
 	 */
 	@Override
-	public void addChatMessage(ChatMessage chatMessage) {
+	public Long addChatMessage(ChatMessage chatMessage) {
 
 		Long conversationId = userConversationHeaderDAO.getConversationId(chatMessage.getFromUser(),
 				chatMessage.getDestination());
@@ -50,29 +51,15 @@ public class ConversationDAO implements ConversationDAOInterface {
 			System.out.println("[ConversationDAO] Conversa nao existe");
 
 			conversation = conversationFactory.build(chatMessage.getFromUser(), chatMessage.getDestination());
+			
+			conversationId = conversation.getId();
 
-			File file = new File("conversations/" + conversation.getId() + "/conversation");
-
-			// criar conversa
-			if (!file.exists()) {
-				// criar ficheiro
-				try {
-					System.out.println("Criar ficheiro " + file.getAbsolutePath());
-					file.getParentFile().mkdirs();
-					file.createNewFile();
-
-					FileOutputStream fileOutputStream = new FileOutputStream(file);
-					ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-
-					objectOutputStream.writeObject(conversation);
-					fileOutputStream.close();
-
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-
+			MiscUtil.createFile("conversations/" + conversationId + "/conversation");
+			
+			MiscUtil.writeObject(conversation, "conversations/" + conversationId + "/conversation");
+			
 			userConversationHeaderDAO.addUsersConversationHeaders(conversation);
+			
 
 		} else {
 			System.out.println("[ConversationDAO] Conversa jah existe");
@@ -83,18 +70,14 @@ public class ConversationDAO implements ConversationDAOInterface {
 		try {
 			// carregar ficheiro
 			File file = new File("conversations/" + conversation.getId() + "/messages/message_" + chatMessage.getId());
-
+			
 			// ficheiro nao existe
 			if (!file.exists()) {
 				file.getParentFile().mkdirs();
 				file.createNewFile();
-
-				FileOutputStream fileOutputStream = new FileOutputStream(file);
-				ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-				objectOutputStream.writeObject(conversation);
 				
-				objectOutputStream.close();
-				fileOutputStream.close();
+				MiscUtil.writeObject(conversation, "conversations/" + 
+						conversation.getId() + "/messages/message_" + chatMessage.getId());
 
 				// ficheiro ja existe
 			} else {
@@ -137,6 +120,8 @@ public class ConversationDAO implements ConversationDAOInterface {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+		
+		return conversationId;
 	}
 
 	/**
@@ -147,7 +132,8 @@ public class ConversationDAO implements ConversationDAOInterface {
 	@Override
 	public Conversation getConversationByUsername(ChatMessage chatMessage) {
 
-		File file = new File("users/" + chatMessage.getFromUser() + "/conversations");
+		File file = new File("users/" + chatMessage.getFromUser()
+				+ "/conversations");
 
 		if (!file.exists()) {
 			return null;
@@ -159,7 +145,8 @@ public class ConversationDAO implements ConversationDAOInterface {
 		try {
 			FileInputStream fin = new FileInputStream(file);
 			ObjectInputStream ois = new ObjectInputStream(fin);
-			conversationHeaders = (List<UserConversationHeader>) ois.readObject();
+			conversationHeaders = (List<UserConversationHeader>) ois
+					.readObject();
 
 			ois.close();
 			fin.close();
@@ -206,8 +193,9 @@ public class ConversationDAO implements ConversationDAOInterface {
 				maxId = messageId;
 		}
 
-		file = new File("conversations/" + conversationId + "/messages/message_" + maxId);
-		
+		file = new File("conversations/" + conversationId
+				+ "/messages/message_" + maxId);
+
 		if (!file.exists()) {
 			return null;
 		}
@@ -215,7 +203,8 @@ public class ConversationDAO implements ConversationDAOInterface {
 		// ler ficheiro
 		try {
 			FileInputStream fileInputStream = new FileInputStream(file);
-			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+			ObjectInputStream objectInputStream = new ObjectInputStream(
+					fileInputStream);
 			chatMessage = (ChatMessage) objectInputStream.readObject();
 
 			objectInputStream.close();
@@ -234,17 +223,19 @@ public class ConversationDAO implements ConversationDAOInterface {
 
 	@Override
 	public Conversation getConversationById(Long conversationId) {
-		File file = new File("conversations/" + conversationId + "/conversation");
+		File file = new File("conversations/" + conversationId
+				+ "/conversation");
 		Conversation conversation = null;
-		
+
 		if (!file.exists()) {
 			return null;
 		}
-		
+
 		try {
-			FileInputStream	fileInputStream = new FileInputStream(file);
-			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-			
+			FileInputStream fileInputStream = new FileInputStream(file);
+			ObjectInputStream objectInputStream = new ObjectInputStream(
+					fileInputStream);
+
 			conversation = (Conversation) objectInputStream.readObject();
 
 		} catch (FileNotFoundException e) {
@@ -254,15 +245,22 @@ public class ConversationDAO implements ConversationDAOInterface {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		
+
 		return conversation;
 	}
-	
+
 	public static ConversationDAO getInstance() {
 		return conversationDAO;
 	}
 
-	public String getFilePath(String username, String destination, String message) {
-		return null;
+	public String getFilePath(String fileName, Long conversationId) {
+		String filesDirectory = "conversations/" + conversationId + "/files";
+		File file = new File (filesDirectory);
+		if(file.exists())
+			return "conversations/" + conversationId + "/files/fileName";
+		else {
+			MiscUtil.createFile("conversations/" + conversationId + "/files");
+			return "conversations/" + conversationId + "/files/fileName";
+		}
 	}
 }

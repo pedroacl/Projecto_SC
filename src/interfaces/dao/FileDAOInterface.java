@@ -4,5 +4,6 @@ import java.io.File;
 
 public interface FileDAOInterface {
 	
-	public void saveFile(File file);
+	public String getFilePath(String username, String destination, String message);
+	
 }

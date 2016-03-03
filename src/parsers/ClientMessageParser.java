@@ -75,10 +75,6 @@ public class ClientMessageParser {
 			if (isAuthenticated && authentication.exists(clientMessage.getDestination()) && 
 					clientMessage.getFileSize() < MAX_FILE_SIZE) {
 
-				String path = conversationDAO.getFilePath(clientMessage.getUsername(),
-						clientMessage.getDestination(), clientMessage.getMessage());
-				
-				File file = ssn.receiveFile(clientMessage.getFileSize(), path);
 				
 				ChatMessage chatMessage = new ChatMessage(
 						clientMessage.getUsername(),
@@ -86,7 +82,14 @@ public class ClientMessageParser {
 						clientMessage.getMessage(), 
 						MessageType.FILE);
 
-				conversationDAO.addChatMessage(chatMessage);
+				Long conversationID= conversationDAO.addChatMessage(chatMessage);
+				
+				String fileName = extractName(clientMessage.getMessage());
+				String path = conversationDAO.getFilePath(fileName, conversationID);
+				
+				File file = ssn.receiveFile(clientMessage.getFileSize(), path);
+				
+				
 				serverMessage = new ServerMessage(MessageType.OK);
 			}
 			else {
@@ -180,5 +183,10 @@ public class ClientMessageParser {
 		}
 		
 		return serverMessage;
+	}
+
+	private String extractName(String absolutePath) {
+		String [] splitName = absolutePath.split("/");
+		return splitName[splitName.length - 1] ;
 	}
 }
