@@ -94,7 +94,6 @@ public class TestGroupDAO {
 		groupDAO.addUserToGroup(group, user2);
 		assertThat(group.getUsers().size(), is(2));
 		
-		//groupDAO.addUserToGroup(group, user2);
 	}
 	
 	@Test

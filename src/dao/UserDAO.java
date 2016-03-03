@@ -9,9 +9,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
-import domain.Authentication;
-import entities.User;
-import factories.ConversationFactory;
 import interfaces.dao.UserDAOInterface;
 import util.MiscUtil;
 
@@ -51,9 +48,8 @@ public class UserDAO implements UserDAOInterface {
 		File file = new File("users.txt");
 	
 		//nao existe ficheiro
-		if (!file.exists()) {
+		if (!file.exists())
 			System.out.println("Nao existem utilizadores adicionados.");
-		}
 
 		try {
 			FileReader fr = new FileReader(file);
