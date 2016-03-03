@@ -5,8 +5,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import entities.ChatMessage;
 import entities.Conversation;
@@ -45,28 +48,47 @@ public class ConversationDAO implements ConversationDAOInterface {
 		} else {
 			userConversations = (HashMap<String, Long>) MiscUtil.readObject(filePath);
 		}
-
+		
+		//obtem Id de Conversação a partir do do username
 		Long conversationId = userConversations.get(chatMessage.getFromUser());
 
-		// nao existe conversa
+		// nao existe conversa -> criar uma conversa entre os dois comunicantes
 		if (conversationId == null) {
 			conversation = conversationFactory.build(chatMessage.getFromUser(), chatMessage.getDestination());
+			MiscUtil.createDir("conversations/" + conversation.getId());
+			MiscUtil.createDir("conversations/" + conversation.getId() + "/messages");
+			MiscUtil.createFile("conversations/" + conversation.getId() + "conversation");
+			
 		} else {
 			conversation = getConversationById(conversationId);
 		}
-
-		MiscUtil.createDir("conversations/" + conversation.getId());
-		MiscUtil.createDir("conversations/" + conversation.getId() + "/messages");
-		MiscUtil.createFile("conversations/" + conversation.getId() + "conversation");
-
+		
+		//actualiza ficheiro conversaçoes acrescentado esta nova entrada
 		updateUserConversations(chatMessage.getFromUser(), chatMessage.getDestination(), conversation.getId());
 		updateUserConversations(chatMessage.getDestination(), chatMessage.getFromUser(), conversation.getId());
 
 		filePath = "conversations/" + conversation.getId() + "/conversation";
 		file = new File(filePath);
-
+		
+		//pode ser null
 		Conversation auxConversation = (Conversation) MiscUtil.readObject(filePath);
-		auxConversation.setLastMessageDate(new Date());
+		
+		
+		//caso ficheiro esteja vazio
+		if(auxConversation == null) {
+			conversation.setLastMessageDate(chatMessage.getCreatedAt());
+			MiscUtil.writeObject(conversation, filePath);
+		}
+		else {
+			auxConversation.setLastMessageDate(chatMessage.getCreatedAt());
+			MiscUtil.writeObject(auxConversation, filePath);
+		}
+		
+		//persiste mensagem
+		String pathToTxt = "conversations/" + conversation.getId() + 
+				"/messages/" + chatMessage.getCreatedAt() + ".txt";
+		MiscUtil.createFile(pathToTxt);
+		MiscUtil.writeStringToFile(chatMessage.getContent(), pathToTxt);
 
 		return conversationId;
 	}
@@ -141,5 +163,17 @@ public class ConversationDAO implements ConversationDAOInterface {
 			MiscUtil.createFile("conversations/" + conversationId + "/files");
 			return "conversations/" + conversationId + "/files/fileName";
 		}
+	}
+	
+	/**
+	 * Devolve uma lista de Ids de conversaçoes que um dado user mantem
+	 * @param Username- nome do utilizador de quem se pretende as conversas
+	 * @return uma lista de ids das conversacoes ou null caso nao exista este utilizador
+	 */
+	public List<Long> getAllConversationsFrom(String userName) {
+		String path ="/users/" + userName + "/conversations"; 
+		HashMap<String,Long> conversations = (HashMap<String,Long>) MiscUtil.readObject(path);
+		Collection<Long> collection = conversations.values();
+		return new ArrayList<Long> (collection);
 	}
 }

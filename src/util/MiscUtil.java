@@ -1,9 +1,11 @@
 package util;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -96,5 +98,20 @@ public class MiscUtil {
 		}	
 		
 		return obj;
+	}
+	
+	public static void writeStringToFile (String content, String path) {
+		
+		try {
+			BufferedWriter outF = new BufferedWriter( new FileWriter(path) );
+			outF.write(content);
+			outF.flush();
+			outF.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
 	}
 }
