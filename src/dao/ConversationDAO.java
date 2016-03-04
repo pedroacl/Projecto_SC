@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import network.MessageType;
 import entities.ChatMessage;
 import entities.Conversation;
 import factories.ConversationFactory;
@@ -89,7 +90,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 				"/messages/" + chatMessage.getCreatedAt() + ".txt";
 		MiscUtil.createFile(pathToTxt);
 		MiscUtil.writeStringToFile(chatMessage.getFromUser() + "\n" + chatMessage.getDestination()
-				+ "\n"+ chatMessage.getContent(), pathToTxt);
+				+ "\n" + chatMessage.getMessageType() + "\n"+ chatMessage.getContent(), pathToTxt);
 
 		return conversationId;
 	}
@@ -120,13 +121,22 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 * @return Lista das ultimas mensagens
 	 */
 	@Override
-	public ChatMessage getLastChatMessage(Long conversationId) {
-		// TODO
-		return null;
+	public ChatMessage getLastChatMessage(long conversationId) {
+		String path = "/conversations/" + conversationId;
+		Conversation lastConversation = (Conversation) MiscUtil.readObject(path + "/conversation");
+		if(lastConversation == null)
+			return null;
+		else {
+			String date = lastConversation.getLastMessageDate().toString();
+			ArrayList<String> texto =(ArrayList<String>) MiscUtil.readFromFile(path + "/date");
+			ChatMessage lastMessage = makeChatMessage(texto);
+			lastMessage.setCreatedAt(lastConversation.getLastMessageDate());
+			return lastMessage;
+		}
 	}
 
 	@Override
-	public Conversation getConversationById(Long conversationId) {
+	public Conversation getConversationById(long conversationId) {
 		File file = new File("conversations/" + conversationId + "/conversation");
 		Conversation conversation = null;
 
@@ -155,7 +165,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 		return conversationDAO;
 	}
 
-	public String getFilePath(String fileName, Long conversationId) {
+	public String getFilePath(String fileName, long conversationId) {
 		String filesDirectory = "conversations/" + conversationId + "/files";
 		File file = new File(filesDirectory);
 		if (file.exists())
@@ -177,4 +187,42 @@ public class ConversationDAO implements ConversationDAOInterface {
 		Collection<Long> collection = conversations.values();
 		return new ArrayList<Long> (collection);
 	}
+	
+	public List<ChatMessage> getAllMessagesFromConversation (long conversationId) {
+		String path = "/conversations/" + conversationId + "/messages";
+		ArrayList<ChatMessage> allMessages = new ArrayList<ChatMessage>(); 
+		File file = new File(path);
+		String[] filesIn = file.list();
+		for(int i = 0; i < filesIn.length; i++) {
+			ArrayList<String> texto = (ArrayList<String>) MiscUtil.readFromFile(filesIn[i]);
+			ChatMessage k = makeChatMessage(texto);
+			k.setCreatedAt(null);//como converter string num Date??????????
+			allMessages.add(k);
+		}
+		
+		return allMessages;
+		
+		
+	}
+
+	private ChatMessage makeChatMessage(ArrayList<String> texto) {
+		String from= null;
+		String to = null;
+		String type = null;
+		
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < texto.size(); i++) {
+			if(i == 0) 
+				from = texto.get(i);
+			if(i == 1)
+				to = texto.get(i);
+			if(i == 2)
+				type = texto.get(i);
+			else
+				sb.append(texto.get(i));	
+		}
+		ChatMessage message = new ChatMessage(from, to, sb.toString(), MessageType.valueOf(type));
+		return message;
+	}
+	
 }

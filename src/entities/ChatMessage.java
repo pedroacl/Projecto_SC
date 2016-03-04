@@ -28,6 +28,11 @@ public class ChatMessage implements Serializable {
 	private Date createdAt;
 	
 
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
+
+
 	public ChatMessage( String from, String destination, String message, MessageType type ) {
 		this.fromUser = from;
 		this.destination = destination;
@@ -55,6 +60,10 @@ public class ChatMessage implements Serializable {
 
 	public String getContent() {
 		return content;
+	}
+	
+	public MessageType getMessageType() {
+		return type;
 	}
 	
 	public void setId(Long id) {

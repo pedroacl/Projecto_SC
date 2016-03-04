@@ -1,14 +1,18 @@
 package util;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import entities.Group;
 
@@ -112,6 +116,27 @@ public class MiscUtil {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public static List<String> readFromFile (String path) {
+		ArrayList<String> txt = new ArrayList<String>();
+		try {
+			BufferedReader inF = new BufferedReader( new FileReader(path) );
+			String reader;
+			while( (reader = inF.readLine())!= null) {
+				txt.add(reader);
+				
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return txt;
+		
 		
 	}
+	
+	
 }

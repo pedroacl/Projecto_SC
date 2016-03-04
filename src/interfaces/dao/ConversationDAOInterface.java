@@ -9,12 +9,12 @@ public interface ConversationDAOInterface {
 	
 	public Long addChatMessage(ChatMessage chatMessage);
 
-	public Conversation getConversationById(Long conversationId);
+	public Conversation getConversationById(long conversationId);
 
-	public ChatMessage getLastChatMessage(Long conversationId);
+	public ChatMessage getLastChatMessage(long conversationId);
 	
 	public List<Long> getAllConversationsFrom(String userName);
 	
-	public String getFilePath(String fileName, Long conversationId);
+	public String getFilePath(String fileName, long conversationId);
 
 }
