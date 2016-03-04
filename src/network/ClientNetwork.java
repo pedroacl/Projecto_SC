@@ -117,7 +117,7 @@ public class ClientNetwork {
 		send(message);
 		
 		ServerMessage sm = receiveMessage();
-		System.out.println("Mensagem é: " + sm.getMessageType().toString());
+		System.out.println("[receiveFile]: Mensagem é: " + sm.getMessageType());
 		
 		if(sm.getMessageType().equals(MessageType.OK)) {
 			isValid = true;

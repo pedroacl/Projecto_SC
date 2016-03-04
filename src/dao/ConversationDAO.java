@@ -50,15 +50,15 @@ public class ConversationDAO implements ConversationDAOInterface {
 			userConversations = (HashMap<String, Long>) MiscUtil.readObject(filePath);
 		}
 		
-		//obtem Id de Conversação a partir do do username
-		Long conversationId = userConversations.get(chatMessage.getFromUser());
+		//obtem Id de Conversação a partir do username
+		Long conversationId = userConversations.get(chatMessage.getDestination());
 
-		// nao existe conversa -> criar uma conversa entre os dois comunicantes
+		// nao existe conversa -> cria uma conversa entre os dois comunicantes
 		if (conversationId == null) {
 			conversation = conversationFactory.build(chatMessage.getFromUser(), chatMessage.getDestination());
 			MiscUtil.createDir("conversations/" + conversation.getId());
 			MiscUtil.createDir("conversations/" + conversation.getId() + "/messages");
-			MiscUtil.createFile("conversations/" + conversation.getId() + "conversation");
+			MiscUtil.createFile("conversations/" + conversation.getId() + "/conversation");
 			
 		} else {
 			conversation = getConversationById(conversationId);
@@ -85,6 +85,15 @@ public class ConversationDAO implements ConversationDAOInterface {
 			MiscUtil.writeObject(auxConversation, filePath);
 		}
 		
+		//caso seja um mensagem com File
+		if(chatMessage.getMessageType().equals(MessageType.FILE)) {
+			//verifica se existe a pasta files na directoria da conversa
+			File fileDirectory = new File("conversations/" + conversation.getId() + "/files");
+			if(!fileDirectory.exists())
+				MiscUtil.createDir("conversations/" + conversation.getId() + "/files");
+		}
+				
+
 		//persiste mensagem
 		String pathToTxt = "conversations/" + conversation.getId() + 
 				"/messages/" + chatMessage.getCreatedAt().getTime() + ".txt";
@@ -92,7 +101,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 		MiscUtil.writeStringToFile(chatMessage.getFromUser() + "\n" + chatMessage.getDestination()
 				+ "\n" + chatMessage.getMessageType() + "\n"+ chatMessage.getContent(), pathToTxt);
 
-		return conversationId;
+		return conversation.getId();
 	}
 
 	private void updateUserConversations(String username, String toUser, Long conversationId) {
@@ -157,10 +166,10 @@ public class ConversationDAO implements ConversationDAOInterface {
 		String filesDirectory = "conversations/" + conversationId + "/files";
 		File file = new File(filesDirectory);
 		if (file.exists())
-			return "conversations/" + conversationId + "/files/fileName";
+			return "conversations/" + conversationId + "/files/" + fileName;
 		else {
 			MiscUtil.createFile("conversations/" + conversationId + "/files");
-			return "conversations/" + conversationId + "/files/fileName";
+			return "conversations/" + conversationId + "/files/" + fileName;
 		}
 	}
 	

@@ -2,6 +2,9 @@ package parsers;
 
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 import network.ClientMessage;
@@ -82,15 +85,35 @@ public class ClientMessageParser {
 						clientMessage.getMessage(), 
 						MessageType.FILE);
 
-				Long conversationID= conversationDAO.addChatMessage(chatMessage);
+				Long conversationID = conversationDAO.addChatMessage(chatMessage);
 				
 				String fileName = extractName(clientMessage.getMessage());
+				System.out.println("[ProcessRequest]: extractName = " + fileName);
 				String path = conversationDAO.getFilePath(fileName, conversationID);
+				System.out.println("[ProcessRequest]: pathParaFile = " + path);
+				
+				serverMessage = new ServerMessage(MessageType.OK);
+				ssn.sendMessage(serverMessage);
 				
 				File file = ssn.receiveFile(clientMessage.getFileSize(), path);
 				
+				if(file.length() == clientMessage.getFileSize() )
+					serverMessage = new ServerMessage(MessageType.OK);
+				else {
+					serverMessage = new ServerMessage(MessageType.NOK);
+					
+					//Apagar ficheiro corrumpido???
+					Path pathFile = file.toPath();
+					try {
+						Files.deleteIfExists(pathFile);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
+					
 				
-				serverMessage = new ServerMessage(MessageType.OK);
 			}
 			else {
 				serverMessage = new ServerMessage(MessageType.NOK);

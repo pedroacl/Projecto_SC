@@ -147,11 +147,17 @@ public class ServerSocketNetwork {
 				
 				fileOut.write(bfile,0,numThisTime);
 				currentLength += lido;
-				fileOut.close();
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
+			
+		}
+		try {
+			fileOut.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		System.out.println("li no total2: "+ currentLength );

@@ -127,6 +127,7 @@ public class MiscUtil {
 				txt.add(reader);
 				
 			}
+			inF.close();
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
