@@ -21,17 +21,23 @@ public class ServerMessage implements Serializable  {
 	private String content;
 	
 
+	public ServerMessage(MessageType type) {
+		messageType = type;
+	}
+	
+	
 	public String getContent() {
 		return content;
 	}
-
+	
+	public void setSizeFile(int sizeFile) {
+		this.sizeFile = sizeFile;
+	}
+	
 	public void setContent(String content) {
 		this.content = content;
 	}
 
-	public ServerMessage(MessageType type) {
-		messageType = type;
-	}
 	
 	public MessageType getMessageType() {
 		return messageType;

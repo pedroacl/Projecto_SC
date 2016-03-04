@@ -2,6 +2,7 @@ package parsers;
 
 
 import java.io.File;
+import java.util.ArrayList;
 
 import network.ClientMessage;
 import network.MessageType;
@@ -108,12 +109,14 @@ public class ClientMessageParser {
 			case "recent":
 				 if(authentication.authenticateUser(clientMessage.getUsername(), 
 						clientMessage.getPassword())){
-				//obtem a mensagem mais recente de todas as suas conversas
-					//ir a sua pasta /users/getFrom()
-					//Ir ao ficheiro conversations e retirar os ids de todas as conversas
-					//ir a pasta das conversas /consersation e por cada id retirar a mensagem mais recente
-				//colocar essa lista no serverMessagem serverNetwork.setMessages(List)
+					 
+					 ArrayList<Long> ids = conversationDAO.getAllConversationsFrom(clientMessage.getUsername());
+					 ArrayList<ChatMessage> recent = new ArrayList<ChatMessage>();
+					 for(long id: ids) {
+						 recent.add(conversationDAO.getLastChatMessage(id));
+					 }
 					 serverMessage = new ServerMessage(MessageType.OK);
+					 serverMessage.setMessages(recent);
 				 }
 				 else {
 					 serverMessage = new ServerMessage(MessageType.NOK);
@@ -129,11 +132,21 @@ public class ClientMessageParser {
 				}
 				else {
 					if(authentication.exists(clientMessage.getDestination())) {
-						//ir buscar todas os ids de conversas deste utilizador
-						// sacar aquele que tem com getDestination()
-						//ir buscar toda a conversação
-						serverMessage = new ServerMessage(MessageType.OK);
-						//serverMessage.setMessages(list);
+						Long conversationId = conversationDAO.getConversationInCommom
+								(clientMessage.getUsername() , clientMessage.getDestination());
+						//se existir conversa em comum
+						if(conversationId != -1) {
+							ArrayList<ChatMessage> messages = (ArrayList<ChatMessage>) 
+								conversationDAO.getAllMessagesFromConversation(conversationId);
+						
+							serverMessage = new ServerMessage(MessageType.OK);
+							serverMessage.setMessages(messages);
+						}
+						else {
+							serverMessage = new ServerMessage(MessageType.NOK);
+							serverMessage.setContent("Não há registos desta conversa");
+						}
+						
 					}
 					else {
 						serverMessage = new ServerMessage(MessageType.NOK);
@@ -149,25 +162,29 @@ public class ClientMessageParser {
 						serverMessage.setContent("Password errada");
 					}
 					else {
-						if(authentication.exists(clientMessage.getDestination())
-								/*&& conversationDAO.existFile(clientMessage.getMessage())*/) {
-							/*
-							File file = new File (conversationDAO.getPath())
-							serverMessage = new ServerMessage(MessageType.File);
-							serverMessage.setFileSize(file.length())
-							serverMessage.setMessage(conversationDAO.getPath())
-							ssn.sendFile(ServerMessage);
+						if(authentication.exists(clientMessage.getDestination())) {
+							String path = conversationDAO.existFile(clientMessage.getUsername()
+									,clientMessage.getDestination(),clientMessage.getMessage());
 							
+							//se exitir o path
+							if(path != null) {
 							
-							*/
+							File file = new File (path);
+							serverMessage = new ServerMessage(MessageType.FILE);
+							serverMessage.setSizeFile((int) file.length());
+							serverMessage.setContent(path);
+							ssn.sendFile(serverMessage);
+							}
+							else {
+								serverMessage = new ServerMessage(MessageType.NOK);
+								serverMessage.setContent("Não há registos desta conversa");
+							}
 						}
 						else {
 							serverMessage = new ServerMessage(MessageType.NOK);
 							serverMessage.setContent("Não existe esse contact");
 						}
-					}
-					
-					
+					}	
 			}
 			break;
 		case ADDUSER:
