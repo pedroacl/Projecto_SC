@@ -76,14 +76,17 @@ public class ServerSocketNetwork {
 	public boolean sendFile(ServerMessage message) {
 		boolean isValid = false;
 		
+		String filePath = message.getContent();
+		message.setContent(extractName(filePath));
+		
 		send(message);
 		
-		ClientMessage cm = getClientMessage();
+		//ClientMessage cm = getClientMessage();
 		
-		if(cm.getMessageType().equals(MessageType.OK)) {
+		if(true) {//cm.getMessageType().equals(MessageType.OK)) {
 			isValid = true;
 			try {
-				sendByteFile(message.getMessage(), message.getFileSize());
+				sendByteFile(filePath, message.getFileSize());
 			} catch (IOException e) {
 				e.printStackTrace();
 				isValid = false;
@@ -111,6 +114,7 @@ public class ServerSocketNetwork {
 			currentLength += lido;
 			out.write(bfile,0,bfile.length);
 		}
+		out.flush();
 		fileInputStream.close();	
 	}
 	
@@ -164,5 +168,10 @@ public class ServerSocketNetwork {
 		
 		return file;
 					
+	}
+	
+	private String extractName(String absolutePath) {
+		String [] splitName = absolutePath.split("/");
+		return splitName[splitName.length - 1] ;
 	}
 }

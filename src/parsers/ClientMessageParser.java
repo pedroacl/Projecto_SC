@@ -193,11 +193,13 @@ public class ClientMessageParser {
 							//se exitir o path
 							if(path != null) {
 							
-							File file = new File (path);
-							serverMessage = new ServerMessage(MessageType.FILE);
-							serverMessage.setSizeFile((int) file.length());
-							serverMessage.setContent(path);
-							ssn.sendFile(serverMessage);
+								File file = new File (path);
+								serverMessage = new ServerMessage(MessageType.FILE);
+								serverMessage.setSizeFile((int) file.length());
+								System.out.print("[ProcessRequest] -r file:");
+								System.out.println("file: " + path + "size = " + file.length() );
+								serverMessage.setContent(path);
+								boolean sended = ssn.sendFile(serverMessage);						
 							}
 							else {
 								serverMessage = new ServerMessage(MessageType.NOK);

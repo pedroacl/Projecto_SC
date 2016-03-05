@@ -37,6 +37,7 @@ public class ServerResponseParser {
 			break;
 			
 		case FILE:
+			
 			try {
 				File file = clientNetwork.receiveFile(serverMessage.getFileSize(), serverMessage.getMessage());
 			} catch (IOException e) {

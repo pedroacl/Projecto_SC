@@ -156,9 +156,11 @@ public class ClientNetwork {
 	}
 	
 	public File receiveFile( int sizeFile, String name ) throws IOException {
+		System.out.println("O nome do ficheiro é: " + name);
 		File file = new File(name);
 		FileOutputStream fileOut =  new FileOutputStream(file);
 		System.out.println("O tamnho do ficheiro é :" + sizeFile);
+		System.out.println(file.getAbsolutePath());
 		int packageSize = 1024;
 		int currentLength = 0;
 		byte [] bfile = new byte [packageSize];
@@ -166,12 +168,10 @@ public class ClientNetwork {
 		while(currentLength < sizeFile) {
 			int resto = sizeFile-currentLength;
 			int numThisTime = resto < packageSize ? resto : bfile.length;
-			System.out.println("Avaliable: "+in.available());
 			lido = in.read(bfile, 0, numThisTime);
 			if(lido == -1) {
 				break;
 			}
-			System.out.println("li: "+ lido );	
 			
 			fileOut.write(bfile,0,numThisTime);
 			currentLength += lido;
