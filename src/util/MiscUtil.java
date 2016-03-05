@@ -80,8 +80,10 @@ public class MiscUtil {
 	public static Object readObject(String filePath) {
 		File file = new File(filePath);
 
-		if (!file.exists() || file.length() == 0)
+		if (!file.exists() || file.length() == 0) {
+			System.out.println("[readObject]: saí antes de ler o object "+ filePath );
 			return null;
+		}
 
 		Object obj = null;
 		
@@ -124,6 +126,7 @@ public class MiscUtil {
 			BufferedReader inF = new BufferedReader( new FileReader(path) );
 			String reader;
 			while( (reader = inF.readLine())!= null) {
+				System.out.println("[readFromFile]: " + reader);
 				txt.add(reader);
 				
 			}

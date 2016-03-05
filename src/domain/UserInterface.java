@@ -22,7 +22,21 @@ public class UserInterface {
 		
 	}
 	
-	public void printMessages(List<ChatMessage> list){
+	public void printMessages(List<ChatMessage> list, String username){
+		for(ChatMessage cm : list)
+			printChatMessage(cm, username);
+		
+	}
+	
+	private void printChatMessage (ChatMessage chatMessage, String username) {
+		StringBuilder sb = new StringBuilder();
+		String contact = (! chatMessage.getFromUser().equals(username)) ? chatMessage.getFromUser() : chatMessage.getDestination();
+		sb.append("Contact: " + contact + "\n");
+		sb.append("from: " + chatMessage.getFromUser() + "\n");
+		sb.append(chatMessage.getMessageType() + ": " + chatMessage.getContent() + "\n");
+		sb.append("Date: " + chatMessage.getCreatedAt());
+		
+		System.out.println(sb);
 		
 	}
 	

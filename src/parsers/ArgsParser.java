@@ -10,7 +10,7 @@ import network.MessageType;
 public class ArgsParser {
 	
 	private String username;
-	
+
 	private String [] args;
 	
 	private String password;
@@ -106,7 +106,11 @@ public class ArgsParser {
 		case "-m":
 			pedido = new ClientMessage(username, password, MessageType.MESSAGE);
 			pedido.setDestination(act[1]);
-			pedido.setMessage(act[2]);
+			StringBuilder sb = new StringBuilder();
+			for(int i = 2; i < act.length; i++) {
+				sb.append(act[i] + " ");
+			}
+			pedido.setMessage(sb.toString());
 			break;
 		case "-f":
 			pedido = new ClientMessage(username, password, MessageType.FILE);
@@ -233,6 +237,10 @@ public class ArgsParser {
 		
 		return res;
 		
+	}
+	
+	public String getUsername() {
+		return username;
 	}
 	
 	//PAra REMOVER

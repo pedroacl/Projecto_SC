@@ -4,6 +4,7 @@ import network.ClientNetwork;
 import network.MessageType;
 import network.ServerMessage;
 import parsers.ArgsParser;
+import parsers.ServerResponseParser;
 
 
 public class Client{
@@ -46,12 +47,25 @@ public class Client{
 		//recebe a resposta
 		ServerMessage serverMsg = clientNetwork.receiveMessage();
 		
+		//para debbug
+		System.out.println("Recebeu ultima Resposta: " + serverMsg.getMessageType());
+		
+		//passa resposta ao parser para ser processada
+		ServerResponseParser srp = new ServerResponseParser(userInterface, clientNetwork, argsParser.getUsername());
+		srp.ProcessMessage(serverMsg);
+		
+		//fecha a ligaçao ao servidor
+		clientNetwork.disconnetc(); 
+		
+		
+		/*
 		if(serverMsg.getMessageType().equals(MessageType.OK))
 			System.out.println(serverMsg.getMessageType());
 		else {
 			System.out.println(serverMsg.getMessageType());
 			System.out.println(serverMsg.getMessage());
 		}
+		*/
 		
 		
 		/*
@@ -60,7 +74,7 @@ public class Client{
 		serverResponseParser.processResponse(serverMsg);
 		
 		Fecha a ligação
-		ClientNetWork.disconect();
+		
 		*/
 	}
 }

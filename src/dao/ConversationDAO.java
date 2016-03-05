@@ -96,7 +96,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 
 		//persiste mensagem
 		String pathToTxt = "conversations/" + conversation.getId() + 
-				"/messages/" + chatMessage.getCreatedAt().getTime() + ".txt";
+				"/messages/" + chatMessage.getCreatedAt().getTime();
 		MiscUtil.createFile(pathToTxt);
 		MiscUtil.writeStringToFile(chatMessage.getFromUser() + "\n" + chatMessage.getDestination()
 				+ "\n" + chatMessage.getMessageType() + "\n"+ chatMessage.getContent(), pathToTxt);
@@ -131,13 +131,13 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 */
 	@Override
 	public ChatMessage getLastChatMessage(Long conversationId) {
-		String path = "/conversations/" + conversationId;
+		String path = "conversations/" + conversationId;
 		Conversation lastConversation = (Conversation) MiscUtil.readObject(path + "/conversation");
 		if(lastConversation == null)
 			return null;
 		else {
-			String date = lastConversation.getLastMessageDate().toString();
-			ArrayList<String> texto =(ArrayList<String>) MiscUtil.readFromFile(path + "/date");
+			long date = lastConversation.getLastMessageDate().getTime();
+			ArrayList<String> texto =(ArrayList<String>) MiscUtil.readFromFile(path + "/messages/"+ date + ".txt");
 			ChatMessage lastMessage = makeChatMessage(texto);
 			lastMessage.setCreatedAt(lastConversation.getLastMessageDate());
 			return lastMessage;
@@ -179,19 +179,23 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 * @return uma lista de ids das conversacoes ou null caso nao exista este utilizador
 	 */
 	public ArrayList<Long> getAllConversationsFrom(String userName) {
-		String path ="/users/" + userName + "/conversations"; 
+		String path ="users/" + userName + "/conversations"; 
+		//Debug
+		System.out.println("[getAllConversationFrom]: " + path );
 		HashMap<String,Long> conversations = (HashMap<String,Long>) MiscUtil.readObject(path);
+		if(conversations == null)
+			System.out.println("[getAllConversationFrom]: Conversation esta a null");	
 		Collection<Long> collection = conversations.values();
 		return new ArrayList<Long> (collection);
 	}
 	
 	public List<ChatMessage> getAllMessagesFromConversation (Long conversationId) {
-		String path = "/conversations/" + conversationId + "/messages";
+		String path = "conversations/" + conversationId + "/messages";
 		ArrayList<ChatMessage> allMessages = new ArrayList<ChatMessage>(); 
 		File file = new File(path);
 		String[] filesIn = file.list();
 		for(int i = 0; i < filesIn.length; i++) {
-			ArrayList<String> texto = (ArrayList<String>) MiscUtil.readFromFile(filesIn[i]);
+			ArrayList<String> texto = (ArrayList<String>) MiscUtil.readFromFile(path + "/" + filesIn[i]);
 			ChatMessage k = makeChatMessage(texto);
 			k.setCreatedAt(new Date(Long.parseLong(filesIn[i])));
 			allMessages.add(k);
@@ -203,40 +207,29 @@ public class ConversationDAO implements ConversationDAOInterface {
 	}
 
 	private ChatMessage makeChatMessage(ArrayList<String> texto) {
-		String from= null;
-		String to = null;
-		String type = null;
 		
 		StringBuilder sb = new StringBuilder();
 		for(int i = 0; i < texto.size(); i++) {
-			if(i == 0) 
-				from = texto.get(i);
-			if(i == 1)
-				to = texto.get(i);
-			if(i == 2)
-				type = texto.get(i);
-			else
+			if(i > 2) 
 				sb.append(texto.get(i));	
 		}
-		ChatMessage message = new ChatMessage(from, to, sb.toString(), MessageType.valueOf(type));
+		ChatMessage message = new ChatMessage(texto.get(0), texto.get(1), 
+				sb.toString(), MessageType.valueOf(texto.get(2)));
 		return message;
 	}
 	
 	public Long getConversationInCommom(String user1, String user2) {
-		ArrayList<Long> conversationsUser1 = getAllConversationsFrom(user1);
-		ArrayList<Long> conversationsUser2 = getAllConversationsFrom(user2);
+		//vai as conversaçoes do user1 
+		String path = "users/" + user1 + "/conversations";
+		HashMap<String,Long> conversations = (HashMap<String,Long>) MiscUtil.readObject(path);
 		
-		int min = conversationsUser1.size() <= conversationsUser2.size() ? 
-				conversationsUser1.size() :conversationsUser2.size();
-		int i = 0;
-		long id = -1;
-		while(i < min) {
-			if(conversationsUser1.get(i).equals(conversationsUser2.get(i)))
-				id = conversationsUser1.get(i);
-			break;
-		}
+		if(conversations == null)
+			return (long)-1;
 		
-		return id;
+		//verifica se existe uma conversaçao com o user2
+		Long id = conversations.get(user2);
+		System.out.println("[getConversationInCommom]: id em comum = " + id  );
+		return id == null ? (long) -1 : id;
 	}
 	
 	public String existFile(String fromUser, String toUser, String fileName) {
@@ -245,7 +238,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 			return null;
 		}
 		else {
-			String path ="/conversations/" + id + "/files/" + fileName;
+			String path ="conversations/" + id + "/files/" + fileName;
 			File f = new File(path);
 			return f.exists() ? path : null;
 		}

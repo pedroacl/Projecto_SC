@@ -12,11 +12,13 @@ public class ServerResponseParser {
 	
 	private UserInterface userInterface;
 	private ClientNetwork clientNetwork;
+	private String username;
 	
 
-	public ServerResponseParser (UserInterface userInterface, ClientNetwork clientNetwork) {
+	public ServerResponseParser (UserInterface userInterface, ClientNetwork clientNetwork, String username) {
 		this.userInterface = userInterface;
 		this.clientNetwork = clientNetwork;
+		this.username = username;
 	}
 	
 	
@@ -31,7 +33,7 @@ public class ServerResponseParser {
 			break;
 			
 		case CONVERSATION:
-			//userInterface.printConversation(serverMessage.getList());
+			userInterface.printMessages(serverMessage.getMessageList(), username);
 			break;
 			
 		case FILE:

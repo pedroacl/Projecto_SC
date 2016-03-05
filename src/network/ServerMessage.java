@@ -60,4 +60,8 @@ public class ServerMessage implements Serializable  {
 		this.messages = list;
 	}
 	
+	public ArrayList<ChatMessage> getMessageList() {
+		return this.messages;
+	}
+	
 }

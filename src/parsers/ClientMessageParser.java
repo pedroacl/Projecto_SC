@@ -46,6 +46,7 @@ public class ClientMessageParser {
 					clientMessage.getPassword());
 
 			if(isAuthenticated && authentication.exists(clientMessage.getDestination())) {
+				System.out.println("[ProcessRequest-CMParser]: "+ clientMessage.getMessage());
 				ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(),
 					clientMessage.getDestination(), 
 					clientMessage.getMessage(), 
@@ -138,7 +139,7 @@ public class ClientMessageParser {
 					 for(long id: ids) {
 						 recent.add(conversationDAO.getLastChatMessage(id));
 					 }
-					 serverMessage = new ServerMessage(MessageType.OK);
+					 serverMessage = new ServerMessage(MessageType.CONVERSATION);
 					 serverMessage.setMessages(recent);
 				 }
 				 else {
@@ -162,7 +163,7 @@ public class ClientMessageParser {
 							ArrayList<ChatMessage> messages = (ArrayList<ChatMessage>) 
 								conversationDAO.getAllMessagesFromConversation(conversationId);
 						
-							serverMessage = new ServerMessage(MessageType.OK);
+							serverMessage = new ServerMessage(MessageType.CONVERSATION);
 							serverMessage.setMessages(messages);
 						}
 						else {
