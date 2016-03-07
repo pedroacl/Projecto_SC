@@ -81,8 +81,6 @@ public class TestGroupDAO {
 		assertThat(file.exists(), is(true));
 		assertThat(file.isDirectory(), is(true));
 
-		HashMap<String, Group> groups = groupDAO.getGroups();
-		assertThat(groups, is(not(nullValue())));
 	}
 
 	@Test
@@ -102,9 +100,6 @@ public class TestGroupDAO {
 		String user = "jose";
 	
 		groupDAO.createGroup(groupName, user);
-
-		Long groupId = groupDAO.getGroupId(groupName);
-		assertThat(groupId, is(not(nullValue())));
 	}
 
 	@Test

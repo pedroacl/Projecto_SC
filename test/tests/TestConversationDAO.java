@@ -123,14 +123,23 @@ public class TestConversationDAO {
 	public void testGetAllMessagesFromConversation() {
 		String fromUser = "maria";
 		String toUser = "pedro";
+		Long conversationId = 1L;
 
 		ChatMessage chatMessage1 = new ChatMessage(fromUser, toUser, "mensagem de teste 1",
 				MessageType.MESSAGE);
 		conversationDAO.addChatMessage(chatMessage1);
+		
+		List<ChatMessage> chatMessages = conversationDAO.getAllMessagesFromConversation(conversationId);
+		assertThat(chatMessages, is(not(nullValue())));
+		assertThat(chatMessages.size(), is(1));
 
 		ChatMessage chatMessage2 = new ChatMessage(fromUser, toUser, "mensagem de teste 2",
 				MessageType.MESSAGE);
 		conversationDAO.addChatMessage(chatMessage2);
+		
+		chatMessages = conversationDAO.getAllMessagesFromConversation(conversationId);
+		assertThat(chatMessages, is(not(nullValue())));
+		assertThat(chatMessages.size(), is(2));
 	}	
 
 	@Test

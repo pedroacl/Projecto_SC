@@ -41,38 +41,6 @@ public class TestAuthentication {
 
 	@Test
 	public void testAuthenticatedUser() {
-		User user = authentication.getUser("pedro");
-		assertThat(user, is(not(nullValue())));
-	}
-
-	@Test
-	public void testAddUser() {
-		String username1 = "pedro";
-		String username2 = "jose";
-
-		// adicionar primeiro user
-		User user1 = authentication.getUser(username1);
-		assertThat("Utilizador ja existe", user1, is(nullValue()));
-
-		authentication.addUser(username1, "1234");
-		user1 = authentication.getUser(username1);
-		assertThat("User nao existe", user1, is(not(nullValue())));
-
-		// adicionar segundo user
-		User user2 = authentication.getUser(username2);
-		assertThat("Utilizador ja existe", user2, is(nullValue()));
-
-		authentication.addUser(username2, "1234");
-		user2 = authentication.getUser(username2);
-		assertThat("User nao existe", user2, is(not(nullValue())));
-
-		File file = new File("users.txt");
-		assertThat(file.exists(), is(true));
-
-		file = new File("users/pedro");
-		assertThat("Ficheiro nao existe", file.exists(), is(true));
-
-		file = new File("users/pedro/conversations");
-		assertThat("Ficheiro nao existe", file.exists(), is(true));
+		
 	}
 }

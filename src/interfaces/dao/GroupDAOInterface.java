@@ -10,10 +10,8 @@ public interface GroupDAOInterface {
 	
 	public Group getGroupByName(String groupName);
 	
-	public Long getGroupId(String groupName);
+	public HashMap<String, String> getGroups();
 
 	public void addUserToGroup(Group group, String username);
 	
-	public HashMap<String, Group> getGroups();
-
 }

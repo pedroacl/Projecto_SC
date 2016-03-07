@@ -2,47 +2,54 @@ package domain;
 
 import java.util.HashMap;
 
+import dao.GroupDAO;
 import dao.UserDAO;
-import entities.User;
+import interfaces.AuthenticationInterface;
 
-public class Authentication {
-	
+public class Authentication implements AuthenticationInterface {
+
 	private static Authentication authentication = new Authentication();
 
 	private static UserDAO userDAO;
 
+	private static GroupDAO groupDAO;
+
 	private HashMap<String, String> users;
-	
+
+	// groupName:owner
+	private HashMap<String, String> groups;
 
 	private Authentication() {
 		userDAO = UserDAO.getInstance();
-		users = userDAO.getUsers();
+		groupDAO = GroupDAO.getInstance();
 		
+		users = userDAO.getUsers();
+		groups = groupDAO.getGroups();
+
 		System.out.println("[Authentication.java]" + users);
 	}
-	
-	
+
 	public static Authentication getInstance() {
 		return authentication;
 	}
 
-	
 	/**
 	 * 
 	 * @param username
 	 * @param password
 	 * @return
 	 */
+	@Override
 	public boolean authenticateUser(String username, String password) {
-		
+
 		String userPassword = users.get(username);
-	
-		//user nao existe
+
+		// user nao existe
 		if (userPassword == null) {
 			userDAO.addUser(username, password);
 			users.put(username, password);
 		}
-		//user existe e a password eh invalida
+		// user existe e a password eh invalida
 		else if (!userPassword.equals(password)) {
 			return false;
 		}
@@ -50,52 +57,44 @@ public class Authentication {
 		return true;
 	}
 
-	
 	/**
 	 * 
 	 * @param username
 	 * @return
 	 */
-	public boolean exists(String username) {
+	@Override
+	public boolean existsUser(String username) {
 		return users.get(username) != null;
 	}
 
+	/**
+	 * 
+	 * @param groupName
+	 * @return
+	 */
+	@Override
+	public boolean existsGroup(String groupName) {
+		return groups.get(groupName) != null;
+	}
 
 	/**
 	 * 
 	 * @param username
 	 * @param password
 	 */
+	@Override
 	public void addUser(String username, String password) {
 		if (users.get(username) == null) {
 			users.put(username, password);
 			userDAO.addUser(username, password);
 		}
 	}
-	
-	
+
 	/**
 	 * 
-	 * @param username
 	 */
-	public void deleteUser(String username) {
-		if (users.remove(username) != null) {
-			userDAO.deleteUser(username);
-		}
-	}
-	
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public User getUser(String username) {
-		User user = null;
-		String password = users.get(username);
-		
-		if (password != null)
-			user = new User(username, password);
-		
-		return user;
+	@Override
+	public void addGroup(String groupName, String ownerName) {
+		// TODO Auto-generated method stub
 	}
 }

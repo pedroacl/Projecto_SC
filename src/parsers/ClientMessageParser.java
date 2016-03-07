@@ -45,7 +45,7 @@ public class ClientMessageParser {
 			isAuthenticated = authentication.authenticateUser(clientMessage.getUsername(), 
 					clientMessage.getPassword());
 
-			if(isAuthenticated && authentication.exists(clientMessage.getDestination())) {
+			if(isAuthenticated && authentication.existsUser(clientMessage.getDestination())) {
 				System.out.println("[ProcessRequest-CMParser]: "+ clientMessage.getMessage());
 				ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(),
 					clientMessage.getDestination(), 
@@ -76,7 +76,7 @@ public class ClientMessageParser {
 			isAuthenticated = authentication.authenticateUser(clientMessage.getUsername(), 
 					clientMessage.getPassword());
 
-			if (isAuthenticated && authentication.exists(clientMessage.getDestination()) && 
+			if (isAuthenticated && authentication.existsUser(clientMessage.getDestination()) && 
 					clientMessage.getFileSize() < MAX_FILE_SIZE) {
 
 				
@@ -155,7 +155,7 @@ public class ClientMessageParser {
 					serverMessage.setContent("Password errada");
 				}
 				else {
-					if(authentication.exists(clientMessage.getDestination())) {
+					if(authentication.existsUser(clientMessage.getDestination())) {
 						Long conversationId = conversationDAO.getConversationInCommom
 								(clientMessage.getUsername() , clientMessage.getDestination());
 						//se existir conversa em comum
@@ -186,7 +186,7 @@ public class ClientMessageParser {
 						serverMessage.setContent("Password errada");
 					}
 					else {
-						if(authentication.exists(clientMessage.getDestination())) {
+						if(authentication.existsUser(clientMessage.getDestination())) {
 							String path = conversationDAO.existFile(clientMessage.getUsername()
 									,clientMessage.getDestination(),clientMessage.getMessage());
 							
