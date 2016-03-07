@@ -107,7 +107,10 @@ public class Authentication implements AuthenticationInterface {
 	 */
 	@Override
 	public void addGroup(String groupName, String ownerName) {
-		// TODO Auto-generated method stub
+		if(groups.get(groupName) == null) {
+			groups.put(groupName, ownerName);
+			groupDAO.createGroup(groupName,ownerName);
+		}
 	}
 
 	/**
@@ -120,8 +123,7 @@ public class Authentication implements AuthenticationInterface {
 	}
 
 	@Override
-	public boolean addUserToGroup(String destination, Group group) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean addUserToGroup(String destination, String groupName) {
+		return groupDAO.addUserToGroup(destination, groupName);
 	}
 }

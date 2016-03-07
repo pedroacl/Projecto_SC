@@ -38,14 +38,20 @@ public class ClientMessageParser {
 
 	public ServerMessage processRequest() {
 		ServerMessage serverMessage = null;
-
-		boolean isAuthenticated = false;
+		
+		if(!authentication.authenticateUser(clientMessage.getUsername(),
+				clientMessage.getPassword())) {
+			
+			serverMessage = new ServerMessage(MessageType.NOK);
+			serverMessage.setContent("password Errada");	
+			
+			return serverMessage;
+		}
 
 		switch (clientMessage.getMessageType()) {
 		case MESSAGE:
-			isAuthenticated = authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword());
 
-			if (isAuthenticated && authentication.exists(clientMessage.getDestination())) {
+			if (authentication.exists(clientMessage.getDestination())) {
 				System.out.println("[ProcessRequest-CMParser]: " + clientMessage.getMessage());
 				ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(), clientMessage.getDestination(),
 						clientMessage.getMessage(), MessageType.MESSAGE);
@@ -60,19 +66,13 @@ public class ClientMessageParser {
 				serverMessage = new ServerMessage(MessageType.OK);
 			} else {
 				serverMessage = new ServerMessage(MessageType.NOK);
-				if (!isAuthenticated) {
-					serverMessage.setContent("Password errada");
-				} else
-					serverMessage.setContent("Não existe esse contact");
-
+				serverMessage.setContent("Não existe esse contact");
 			}
 
 			break;
 
 		case FILE:
-			isAuthenticated = authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword());
-
-			if (isAuthenticated && authentication.exists(clientMessage.getDestination())
+			if (authentication.exists(clientMessage.getDestination())
 					&& clientMessage.getFileSize() < MAX_FILE_SIZE) {
 
 				ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(), clientMessage.getDestination(),
@@ -106,11 +106,7 @@ public class ClientMessageParser {
 				}
 			} else {
 				serverMessage = new ServerMessage(MessageType.NOK);
-
-				if (!isAuthenticated) {
-					serverMessage.setContent("Password errada");
-				} else
-					serverMessage.setContent("Não existe esse contact");
+				serverMessage.setContent("Não existe esse contact");
 			}
 
 			break;
@@ -119,8 +115,7 @@ public class ClientMessageParser {
 			switch (clientMessage.getMessage()) {
 
 			case "recent":
-				if (authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword())) {
-
+				
 					ArrayList<Long> ids = conversationDAO.getAllConversationsFrom(clientMessage.getUsername());
 					ArrayList<ChatMessage> recent = new ArrayList<ChatMessage>();
 					for (long id : ids) {
@@ -128,72 +123,62 @@ public class ClientMessageParser {
 					}
 					serverMessage = new ServerMessage(MessageType.CONVERSATION);
 					serverMessage.setMessages(recent);
-				} else {
-					serverMessage = new ServerMessage(MessageType.NOK);
-					serverMessage.setContent("Password errada");
-				}
+				
 				break;
+				
 			case "all":
-				if (!authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword())) {
+				if (authentication.exists(clientMessage.getDestination())) {
+					Long conversationId = conversationDAO.getConversationInCommom(clientMessage.getUsername(),
+							clientMessage.getDestination());
+					// se existir conversa em comum
+					if (conversationId != -1) {
+						ArrayList<ChatMessage> messages = (ArrayList<ChatMessage>) conversationDAO
+								.getAllMessagesFromConversation(conversationId);
 
-					serverMessage = new ServerMessage(MessageType.NOK);
-					serverMessage.setContent("Password errada");
-				} else {
-					if (authentication.exists(clientMessage.getDestination())) {
-						Long conversationId = conversationDAO.getConversationInCommom(clientMessage.getUsername(),
-								clientMessage.getDestination());
-						// se existir conversa em comum
-						if (conversationId != -1) {
-							ArrayList<ChatMessage> messages = (ArrayList<ChatMessage>) conversationDAO
-									.getAllMessagesFromConversation(conversationId);
-
-							serverMessage = new ServerMessage(MessageType.CONVERSATION);
-							serverMessage.setMessages(messages);
-						} else {
-							serverMessage = new ServerMessage(MessageType.NOK);
-							serverMessage.setContent("Não há registos desta conversa");
-						}
-
+						serverMessage = new ServerMessage(MessageType.CONVERSATION);
+						serverMessage.setMessages(messages);
 					} else {
 						serverMessage = new ServerMessage(MessageType.NOK);
-						serverMessage.setContent("Não existe esse contact");
+						serverMessage.setContent("Não há registos desta conversa");
 					}
+
+				} else {
+					serverMessage = new ServerMessage(MessageType.NOK);
+					serverMessage.setContent("Não existe esse contact");
 				}
 				break;
 			default:
-				if (!authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword())) {
+				if (authentication.exists(clientMessage.getDestination())) {
+					String path = conversationDAO.existFile(clientMessage.getUsername(),
+							clientMessage.getDestination(), clientMessage.getMessage());
 
-					serverMessage = new ServerMessage(MessageType.NOK);
-					serverMessage.setContent("Password errada");
-				} else {
-					if (authentication.exists(clientMessage.getDestination())) {
-						String path = conversationDAO.existFile(clientMessage.getUsername(),
-								clientMessage.getDestination(), clientMessage.getMessage());
+					// se exitir o path
+					if (path != null) {
 
-						// se exitir o path
-						if (path != null) {
-
-							File file = new File(path);
-							serverMessage = new ServerMessage(MessageType.FILE);
-							serverMessage.setSizeFile((int) file.length());
-							System.out.print("[ProcessRequest] -r file:");
-							System.out.println("file: " + path + "size = " + file.length());
-							serverMessage.setContent(path);
-							boolean sended = ssn.sendFile(serverMessage);
-						} else {
-							serverMessage = new ServerMessage(MessageType.NOK);
-							serverMessage.setContent("Não há registos desta conversa");
-						}
+						File file = new File(path);
+						serverMessage = new ServerMessage(MessageType.FILE);
+						serverMessage.setSizeFile((int) file.length());
+						System.out.print("[ProcessRequest] -r file:");
+						System.out.println("file: " + path + "size = " + file.length());
+						serverMessage.setContent(path);
+						boolean sended = ssn.sendFile(serverMessage);
 					} else {
 						serverMessage = new ServerMessage(MessageType.NOK);
-						serverMessage.setContent("Não existe esse contact");
+						serverMessage.setContent("Não há registos desta conversa");
 					}
+				} else {
+					serverMessage = new ServerMessage(MessageType.NOK);
+					serverMessage.setContent("Não existe esse contact");
 				}
 			}
+			
 			break;
 		case ADDUSER:
+			serverMessage = addUserToGroup();
 			break;
+			
 		case REMOVEUSER:
+			serverMessage = removeUserToGroup();
 			break;
 
 		default:
@@ -204,21 +189,15 @@ public class ClientMessageParser {
 
 		return serverMessage;
 	}
-
-	private String extractName(String absolutePath) {
-		String[] splitName = absolutePath.split("/");
-		return splitName[splitName.length - 1];
-	}
-
+	
 	/**
-	 * Função que permite adicionar um utilizador a um determinado grupo
+	 * Função que remove um utilizador de um grupo
+	 * @return
 	 */
-	private void addUserToGroup() {
-		boolean isAuthenticated = authentication.authenticateUser(clientMessage.getUsername(),
-				clientMessage.getPassword());
-
-		// utilizador esta autenticado e o utilizador a ser adicionado existe
-		if (isAuthenticated && authentication.existsUser(clientMessage.getDestination())) {
+	private ServerMessage removeUserToGroup() {
+		ServerMessage serverMessage = new ServerMessage(MessageType.OK);
+		// utilizador a ser adicionado existe
+		if (authentication.existsUser(clientMessage.getDestination())) {
 			String groupName = clientMessage.getMessage();
 
 			// existe grupo e o utilizador eh owner
@@ -229,16 +208,78 @@ public class ClientMessageParser {
 				String filePath = "groups/" + groupName + "/group";
 				Group group = (Group) MiscUtil.readObject(filePath);
 
-				// adicionou utilizador ao grupo
-				if (authentication.addUserToGroup(clientMessage.getDestination(), group)) {
+				// adiciona utilizador ao grupo se ainda não estiver lá
+				if (authentication.addUserToGroup(clientMessage.getDestination(), clientMessage.getMessage())) {
+
 					conversationDAO.addConversationToUser(clientMessage.getDestination(),
 							clientMessage.getMessage(), group.getConversationId());
 				}
-			} else {
-				// TODO criar grupo
+				else {
+					serverMessage = new ServerMessage(MessageType.NOK);
+					serverMessage.setContent("Esse utilizador ja pertence ao grupo");
+				}		
+			} 
+			//criar grupo
+			else {
+				authentication.addGroup(clientMessage.getMessage(), clientMessage.getUsername());
 			}
-		} else {
 
+		} 
+		else {
+			serverMessage = new ServerMessage(MessageType.NOK);
+			serverMessage.setContent("Não existe esse utilizador");
 		}
+
+		return serverMessage;
+		
+		
+	}
+
+	private String extractName(String absolutePath) {
+		String[] splitName = absolutePath.split("/");
+		return splitName[splitName.length - 1];
+	}
+
+	/**
+	 * Função que permite adicionar um utilizador a um determinado grupo
+	 */
+	private ServerMessage addUserToGroup() {
+		ServerMessage serverMessage = new ServerMessage(MessageType.OK);
+
+		// utilizador a ser adicionado existe
+		if (authentication.existsUser(clientMessage.getDestination())) {
+			String groupName = clientMessage.getMessage();
+
+			// existe grupo e o utilizador eh owner
+			if (authentication.existsGroup(groupName)
+					&& authentication.getGroupOwner(groupName).equals(clientMessage.getUsername())) {
+
+				// ler ficheiro
+				String filePath = "groups/" + groupName + "/group";
+				Group group = (Group) MiscUtil.readObject(filePath);
+
+				// adiciona utilizador ao grupo se ainda não estiver lá
+				if (authentication.addUserToGroup(clientMessage.getDestination(), clientMessage.getMessage())) {
+					
+						conversationDAO.addConversationToUser(clientMessage.getDestination(),
+								clientMessage.getMessage(), group.getConversationId());
+				}
+				else {
+					serverMessage = new ServerMessage(MessageType.NOK);
+					serverMessage.setContent("Esse utilizador ja pertence ao grupo");
+				}		
+			} 
+			//criar grupo
+			else {
+				authentication.addGroup(clientMessage.getMessage(), clientMessage.getUsername());
+			}
+			
+		} 
+		else {
+			serverMessage = new ServerMessage(MessageType.NOK);
+			serverMessage.setContent("Não existe esse utilizador");
+		}
+		
+		return serverMessage;
 	}
 }

@@ -60,13 +60,15 @@ public class ConversationDAO implements ConversationDAOInterface {
 			MiscUtil.createDir("conversations/" + conversation.getId() + "/messages");
 			MiscUtil.createFile("conversations/" + conversation.getId() + "/conversation");
 			
+			//actualiza ficheiro conversaçoes acrescentado esta nova entrada
+			addConversationToUser(chatMessage.getFromUser(), chatMessage.getDestination(), conversation.getId());
+			addConversationToUser(chatMessage.getDestination(), chatMessage.getFromUser(), conversation.getId());
+			
 		} else {
 			conversation = getConversationById(conversationId);
 		}
 		
-		//actualiza ficheiro conversaçoes acrescentado esta nova entrada
-		addConversationToUser(chatMessage.getFromUser(), chatMessage.getDestination(), conversation.getId());
-		addConversationToUser(chatMessage.getDestination(), chatMessage.getFromUser(), conversation.getId());
+		
 
 		filePath = "conversations/" + conversation.getId() + "/conversation";
 		file = new File(filePath);

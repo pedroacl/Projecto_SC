@@ -18,5 +18,5 @@ public interface AuthenticationInterface {
 	
 	public String getGroupOwner(String groupName);
 
-	public boolean addUserToGroup(String destination, Group group);
+	public boolean addUserToGroup(String destination, String groupName);
 }

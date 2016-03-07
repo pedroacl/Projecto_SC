@@ -30,4 +30,11 @@ public class ConversationFactory {
 		
 		return conversation;
 	}
+	
+	public long generateID() {
+		long id = conversationId;
+		conversationId++;
+		return id;
+		
+	}
 }
