@@ -15,8 +15,6 @@ public class ChatMessage implements Serializable {
 	 */
 	private static final long serialVersionUID = 8053113085617628635L;
 
-	private Long id;
-	
 	private String content;
 	
 	private String fromUser;
@@ -41,11 +39,6 @@ public class ChatMessage implements Serializable {
 		createdAt = new Date();
 	}
 	
-	
-	public Long getId() {
-		return id;
-	}
-
 	public Date getCreatedAt() {
 		return createdAt;
 	}
@@ -66,15 +59,20 @@ public class ChatMessage implements Serializable {
 		return type;
 	}
 	
-	public void setId(Long id) {
-		this.id = id;
+	@Override
+	public boolean equals(Object obj) {
+		ChatMessage chatMessage = (ChatMessage) obj;
+
+		return chatMessage.content.equals(this.content) &&
+				chatMessage.fromUser.equals(this.fromUser) &&
+				chatMessage.destination.equals(this.destination) &&
+				chatMessage.type.equals(this.type) &&
+				chatMessage.createdAt.equals(this.createdAt);
 	}
-	
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("ID: " + id + "\n");
 		sb.append("From: " + fromUser + "\n");
 		sb.append("To: " + destination + "\n");
 		sb.append("Content: " + content + "\n");

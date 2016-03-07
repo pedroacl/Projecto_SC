@@ -8,11 +8,15 @@ public class GroupFactory {
 	private static Long groupId;
 	
 	private GroupFactory() {
-		groupId = 1L;
+		reset();
 	}
 
 	public static GroupFactory getInstance() {
 		return groupFactory;
+	}
+	
+	public void reset() {
+		groupId = 1L;
 	}
 	
 	public Group build(String groupName, String admin) {

@@ -9,6 +9,11 @@ public class ConversationFactory {
 	
 	
 	private ConversationFactory() {
+		reset();
+	}
+	
+
+	public void reset() {
 		conversationId = 1L;
 	}
 	

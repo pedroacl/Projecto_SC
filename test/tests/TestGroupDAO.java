@@ -41,6 +41,7 @@ public class TestGroupDAO {
 		}
 
 		authentication = Authentication.getInstance();
+
 		groupDAO = GroupDAO.getInstance();
 		
 		authentication.addUser("antonio", "1234");
@@ -49,6 +50,17 @@ public class TestGroupDAO {
 	@After
 	public void tearDown() {
 
+	}
+	
+	@Test
+	public void testCreateGroup() {
+		String groupName = "grupo1";
+		String admin = "maria";
+
+		Long groupId = groupDAO.createGroup(groupName, admin);
+
+		File file = new File("groups/" + groupId);
+		assertThat(file.exists(), is(true));
 	}
 	
 	@Test
@@ -75,12 +87,24 @@ public class TestGroupDAO {
 
 	@Test
 	public void testGetGroupByName() {
-		
+		String groupName = "grupo1";
+		String user = "jose";
+	
+		groupDAO.createGroup(groupName, user);
+
+		Group group = groupDAO.getGroupByName(groupName);
+		assertThat(group, is(not(nullValue())));
 	}
 	
 	@Test
 	public void testGetGroupId() {
-		
+		String groupName = "grupo1";
+		String user = "jose";
+	
+		groupDAO.createGroup(groupName, user);
+
+		Long groupId = groupDAO.getGroupId(groupName);
+		assertThat(groupId, is(not(nullValue())));
 	}
 
 	@Test
@@ -89,7 +113,7 @@ public class TestGroupDAO {
 		String user2 = "pedro";
 		String groupName = "grupo1";
 
-		groupDAO.createGroup(groupName, user1);
+		Long groupId = groupDAO.createGroup(groupName, user1);
 		Group group = groupDAO.getGroupByName(groupName);
 		
 		assertThat(group, is(not(nullValue())));
@@ -97,23 +121,6 @@ public class TestGroupDAO {
 		
 		groupDAO.addUserToGroup(group, user2);
 		assertThat(group.getUsers().size(), is(2));
-		
-	}
-	
-	@Test
-	public void testCreateGroup() {
-		String groupName = "grupo1";
-
-		groupDAO.createGroup(groupName, "jose");
-		
-		File file = new File("groups/1");
-		assertThat(file.exists(), is(true));
-			
-		file = new File("users.txt");
-		assertThat(file.exists(), is(true));
-		
-		file = new File("groups/groups");
-		assertThat(file.exists(), is(true));
 		
 	}
 }

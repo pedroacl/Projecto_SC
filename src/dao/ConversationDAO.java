@@ -137,7 +137,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 			return null;
 		else {
 			long date = lastConversation.getLastMessageDate().getTime();
-			ArrayList<String> texto =(ArrayList<String>) MiscUtil.readFromFile(path + "/messages/"+ date + ".txt");
+			ArrayList<String> texto =(ArrayList<String>) MiscUtil.readFromFile(path + "/messages/"+ date);
 			ChatMessage lastMessage = makeChatMessage(texto);
 			lastMessage.setCreatedAt(lastConversation.getLastMessageDate());
 			return lastMessage;
