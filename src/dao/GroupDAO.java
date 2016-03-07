@@ -1,8 +1,8 @@
 package dao;
 
+import java.io.File;
 import java.util.HashMap;
 
-import domain.Authentication;
 import entities.Group;
 import factories.GroupFactory;
 import interfaces.dao.GroupDAOInterface;
@@ -41,13 +41,18 @@ public class GroupDAO implements GroupDAOInterface {
 	 * @param username
 	 */
 	@Override
-	public void addUserToGroup(Group group, String username) {
+	public boolean addUserToGroup(String username, String groupName) {
+		String filePath = "groups/" + groupName + "/group";
 		
-		MiscUtil.createDir("groups/" + group.getId());
-		MiscUtil.createFile("groups/groups");
-		MiscUtil.createFile("groups/" + group.getId() + "/group");
-
-		//TODO persistir grupo
+		Group group = (Group) MiscUtil.readObject(filePath);
+		
+		if (group.addUser(username)){
+			MiscUtil.writeObject(group, filePath);
+		} else {
+			return false;
+		}
+		
+		return true;
 	}
 
 	/**

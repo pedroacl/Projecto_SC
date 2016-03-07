@@ -18,5 +18,7 @@ public interface ConversationDAOInterface {
 	public String getFilePath(String fileName, Long conversationId);
 	
 	public Long getConversationInCommom(String user1, String user2);
+	
+	public void addConversationToUser(String username, String toUser, Long conversationId);
 
 }

@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import dao.GroupDAO;
 import dao.UserDAO;
+import entities.Group;
 import interfaces.AuthenticationInterface;
 
 public class Authentication implements AuthenticationInterface {
@@ -16,8 +17,7 @@ public class Authentication implements AuthenticationInterface {
 
 	private HashMap<String, String> users;
 
-	// groupName:owner
-	private HashMap<String, String> groups;
+	private HashMap<String, String> groups;	 // groupName:owner
 
 	private Authentication() {
 		userDAO = UserDAO.getInstance();
@@ -53,10 +53,20 @@ public class Authentication implements AuthenticationInterface {
 		else if (!userPassword.equals(password)) {
 			return false;
 		}
-
+		
 		return true;
 	}
 
+	/**
+	 * 
+	 * @param username
+	 * @return
+	 */
+	@Override
+	public boolean exists(String name) {
+		return existsUser(name) || existsGroup(name);
+	}
+	
 	/**
 	 * 
 	 * @param username
@@ -92,9 +102,26 @@ public class Authentication implements AuthenticationInterface {
 
 	/**
 	 * 
+	 * @param groupName
+	 * @param ownerName
 	 */
 	@Override
 	public void addGroup(String groupName, String ownerName) {
 		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * 
+	 * @param groupName
+	 * @return
+	 */
+	public String getGroupOwner(String groupName) {
+		return groups.get(groupName);
+	}
+
+	@Override
+	public boolean addUserToGroup(String destination, Group group) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

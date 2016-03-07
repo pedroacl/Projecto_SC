@@ -11,7 +11,7 @@ public class Group implements Serializable {
 	 */
 	private static final long serialVersionUID = 3719430979913465539L;
 
-	private Long id;
+	private Long conversationId;
 	
 	private String name;
 	
@@ -22,18 +22,23 @@ public class Group implements Serializable {
 	private List<String> users;
 	
 	
-	public Group(String name, String admin) {
+	public Group(String name, String admin, Long conversationId) {
 		this.name = name;
 		this.admin = admin;
 		this.createdAt = new Date();
+		this.conversationId = conversationId;
 		
 		users = new ArrayList<String>();
 		users.add(admin);
 	}
 	
-	public void addUser(String username) {
-		if (!users.contains(username))
+	public boolean addUser(String username) {
+		if (!users.contains(username)) {
 			users.add(username);
+			return true;
+		}
+		
+		return false;
 	} 
 	
 	public String getName() {
@@ -56,11 +61,7 @@ public class Group implements Serializable {
 		return users;
 	}
 
-	public Long getId() {
-		return id;
-	}
-	
-	public void setId(Long id) {
-		this.id = id;
+	public Long getConversationId() {
+		return conversationId;
 	}
 }

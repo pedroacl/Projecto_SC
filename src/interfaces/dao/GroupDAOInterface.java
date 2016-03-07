@@ -12,6 +12,6 @@ public interface GroupDAOInterface {
 	
 	public HashMap<String, String> getGroups();
 
-	public void addUserToGroup(Group group, String username);
-	
+	public boolean addUserToGroup(String username, String groupName);
+
 }

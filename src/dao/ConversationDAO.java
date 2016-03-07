@@ -65,8 +65,8 @@ public class ConversationDAO implements ConversationDAOInterface {
 		}
 		
 		//actualiza ficheiro conversaçoes acrescentado esta nova entrada
-		updateUserConversations(chatMessage.getFromUser(), chatMessage.getDestination(), conversation.getId());
-		updateUserConversations(chatMessage.getDestination(), chatMessage.getFromUser(), conversation.getId());
+		addConversationToUser(chatMessage.getFromUser(), chatMessage.getDestination(), conversation.getId());
+		addConversationToUser(chatMessage.getDestination(), chatMessage.getFromUser(), conversation.getId());
 
 		filePath = "conversations/" + conversation.getId() + "/conversation";
 		file = new File(filePath);
@@ -104,7 +104,11 @@ public class ConversationDAO implements ConversationDAOInterface {
 		return conversation.getId();
 	}
 
-	private void updateUserConversations(String username, String toUser, Long conversationId) {
+	/**
+	 * 
+	 */
+	@Override
+	public void addConversationToUser(String username, String toUser, Long conversationId) {
 		HashMap<String, Long> userConversations = null;
 		String filePath = "users/" + username + "/conversations";
 		File file = new File(filePath);
@@ -165,6 +169,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 	public String getFilePath(String fileName, Long conversationId) {
 		String filesDirectory = "conversations/" + conversationId + "/files";
 		File file = new File(filesDirectory);
+
 		if (file.exists())
 			return "conversations/" + conversationId + "/files/" + fileName;
 		else {
@@ -183,8 +188,10 @@ public class ConversationDAO implements ConversationDAOInterface {
 		//Debug
 		System.out.println("[getAllConversationFrom]: " + path );
 		HashMap<String,Long> conversations = (HashMap<String,Long>) MiscUtil.readObject(path);
+
 		if(conversations == null)
 			System.out.println("[getAllConversationFrom]: Conversation esta a null");	
+
 		Collection<Long> collection = conversations.values();
 		return new ArrayList<Long> (collection);
 	}
@@ -194,9 +201,11 @@ public class ConversationDAO implements ConversationDAOInterface {
 		ArrayList<ChatMessage> allMessages = new ArrayList<ChatMessage>(); 
 		File file = new File(path);
 		String[] filesIn = file.list();
+
 		for(int i = 0; i < filesIn.length; i++) {
 			ArrayList<String> texto = (ArrayList<String>) MiscUtil.readFromFile(path + "/" + filesIn[i]);
 			ChatMessage k = makeChatMessage(texto);
+			
 			k.setCreatedAt(new Date(Long.parseLong(filesIn[i])));
 			allMessages.add(k);
 		}
@@ -244,5 +253,4 @@ public class ConversationDAO implements ConversationDAOInterface {
 		}
 		
 	}
-	
 }
