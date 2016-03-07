@@ -208,22 +208,29 @@ public class ClientMessageParser {
 				String filePath = "groups/" + groupName + "/group";
 				Group group = (Group) MiscUtil.readObject(filePath);
 
-				// adiciona utilizador ao grupo se ainda não estiver lá
-				if (authentication.addUserToGroup(clientMessage.getDestination(), clientMessage.getMessage())) {
-
-					conversationDAO.addConversationToUser(clientMessage.getDestination(),
-							clientMessage.getMessage(), group.getConversationId());
+				// caso user seja o dono do grupo
+				if (authentication.getGroupOwner(groupName).equals(clientMessage.getDestination())) {
+					
+					//Apaga a informaçao da conversa correspondente ao grupo em cada elemento
+					ArrayList<String> members = (ArrayList<String>) group.getUsers();
+					for(String user : members) {
+						conversationDAO.removeConversationsFromUser(user);
+					}
+					//Apaga conversa da pasta conversations
+					conversationDAO.removeConversation(group.getConversationId());
+					//Apaga o group do "disco"
+					authentication.removeGroup(clientMessage.getMessage());
 				}
+				//apaga membro do grupo
 				else {
-					serverMessage = new ServerMessage(MessageType.NOK);
-					serverMessage.setContent("Esse utilizador ja pertence ao grupo");
+					conversationDAO.removeConversationsFromUser(clientMessage.getDestination());	
 				}		
 			} 
-			//criar grupo
+			
 			else {
-				authentication.addGroup(clientMessage.getMessage(), clientMessage.getUsername());
+				serverMessage = new ServerMessage(MessageType.NOK);
+				serverMessage.setContent("Não é possivel remover o grupo");
 			}
-
 		} 
 		else {
 			serverMessage = new ServerMessage(MessageType.NOK);

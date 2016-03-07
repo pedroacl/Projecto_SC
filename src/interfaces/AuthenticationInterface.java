@@ -19,4 +19,6 @@ public interface AuthenticationInterface {
 	public String getGroupOwner(String groupName);
 
 	public boolean addUserToGroup(String destination, String groupName);
+
+	public void removeGroup(String groupName);
 }

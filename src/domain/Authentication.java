@@ -126,4 +126,11 @@ public class Authentication implements AuthenticationInterface {
 	public boolean addUserToGroup(String destination, String groupName) {
 		return groupDAO.addUserToGroup(destination, groupName);
 	}
+	@Override
+	public void removeGroup(String groupName) {
+		if(groups.get(groupName) == null) {
+			groups.remove(groupName);
+			groupDAO.deleteGroup(groupName);
+		}
+	}
 }

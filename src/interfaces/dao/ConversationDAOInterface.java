@@ -21,4 +21,8 @@ public interface ConversationDAOInterface {
 	
 	public void addConversationToUser(String username, String toUser, Long conversationId);
 
+	void removeConversationsFromUser(String user);
+
+	void removeConversation(Long conversationId);
+
 }
