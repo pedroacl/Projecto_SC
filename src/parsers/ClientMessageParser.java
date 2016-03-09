@@ -266,7 +266,8 @@ public class ClientMessageParser {
 				Group group = (Group) MiscUtil.readObject(filePath);
 
 				// adiciona utilizador ao grupo se ainda não estiver lá
-				if (authentication.addUserToGroup(clientMessage.getDestination(), clientMessage.getMessage())) {
+				if (authentication.addUserToGroup(clientMessage.getDestination(), 
+						clientMessage.getMessage())) {
 					
 						conversationDAO.addConversationToUser(clientMessage.getDestination(),
 								clientMessage.getMessage(), group.getConversationId());
@@ -276,9 +277,20 @@ public class ClientMessageParser {
 					serverMessage.setContent("Esse utilizador ja pertence ao grupo");
 				}		
 			} 
-			//criar grupo
+			//É um novo grupo
 			else {
-				authentication.addGroup(clientMessage.getMessage(), clientMessage.getUsername());
+				//cria grupo
+				long conversationId = authentication.addGroup(clientMessage.getMessage(),
+						clientMessage.getUsername());
+				
+				//adiciona user ao grupo
+				authentication.addUserToGroup(clientMessage.getDestination(), clientMessage.getMessage());
+				
+				//adiciona a nova conversa no dono do grupo e no user a ser adicionado
+				conversationDAO.addConversationToUser(clientMessage.getUsername(),
+						clientMessage.getMessage(), conversationId);
+				conversationDAO.addConversationToUser(clientMessage.getUsername(),
+						clientMessage.getMessage(), conversationId);		
 			}
 			
 		} 

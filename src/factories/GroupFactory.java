@@ -18,7 +18,7 @@ public class GroupFactory {
 	public void reset() {
 		groupId = 1L;
 	}
-	
+	/*
 	public Group build(String groupName, String admin) {
 		Group group = new Group(groupName, admin);
 		group.setId(groupId);
@@ -26,4 +26,5 @@ public class GroupFactory {
 		
 		return group;
 	}
+	*/
 }

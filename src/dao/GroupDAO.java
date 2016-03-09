@@ -112,7 +112,7 @@ public class GroupDAO implements GroupDAOInterface {
 		
 		//adiciona uma entrada no ficheiro groups.txt
 		try {
-		FileWriter fw = new FileWriter("users.txt", true);
+		FileWriter fw = new FileWriter("groups.txt", true);
 		fw.write(groupName+ ":" + admin + "\n");
 		fw.close();
 		}catch (IOException e) {
@@ -120,7 +120,7 @@ public class GroupDAO implements GroupDAOInterface {
 		}	
 		
 		//cria directoria groups se não existir ainda
-		MiscUtil.createDir("groups/groups");
+		MiscUtil.createDir("groups");
 		
 		//cria group
 		long conversationId = conversationFactory.generateID();

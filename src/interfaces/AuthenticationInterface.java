@@ -14,7 +14,7 @@ public interface AuthenticationInterface {
 
 	public void addUser(String username, String password);
 	
-	public void addGroup(String groupName, String ownerName);
+	public Long addGroup(String groupName, String ownerName);
 	
 	public String getGroupOwner(String groupName);
 

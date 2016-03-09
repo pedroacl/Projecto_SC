@@ -69,9 +69,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 		}
 		
 		
-
 		filePath = "conversations/" + conversation.getId() + "/conversation";
-		file = new File(filePath);
 		
 		//pode ser null
 		Conversation auxConversation = (Conversation) MiscUtil.readObject(filePath);

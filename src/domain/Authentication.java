@@ -106,11 +106,12 @@ public class Authentication implements AuthenticationInterface {
 	 * @param ownerName
 	 */
 	@Override
-	public void addGroup(String groupName, String ownerName) {
+	public Long addGroup(String groupName, String ownerName) {
 		if(groups.get(groupName) == null) {
 			groups.put(groupName, ownerName);
-			groupDAO.createGroup(groupName,ownerName);
+			return groupDAO.createGroup(groupName,ownerName);
 		}
+		return (long) -1;
 	}
 
 	/**
