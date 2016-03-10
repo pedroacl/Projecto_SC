@@ -17,8 +17,8 @@ public class GroupService implements GroupServiceInterface {
 	private HashMap<String, String> groups; // groupName:owner
 
 	public GroupService() {
-		groups = groupDAO.getGroups();
 		groupDAO = GroupDAO.getInstance();
+		groups = groupDAO.getGroups();
 		conversationService = new ConversationService();
 	}
 
@@ -35,6 +35,7 @@ public class GroupService implements GroupServiceInterface {
 			// ler ficheiro
 			String filePath = "groups/" + groupName + "/group";
 			Group group = (Group) MiscUtil.readObject(filePath);
+			System.out.println("[GroupService]" + group.getConversationId());
 
 			// utilizador nao adicionado ao grupo
 			if (!group.getUsers().contains(userToAdd)) {
@@ -108,8 +109,17 @@ public class GroupService implements GroupServiceInterface {
 	 * @param groupName
 	 * @return
 	 */
+	@Override
 	public String getGroupOwner(String groupName) {
 		return groups.get(groupName);
 	}
 
+	/**
+	 * 
+	 */
+	@Override
+	public Long createGroup(String groupName, String admin) {
+		groups.put(groupName, admin);
+		return groupDAO.createGroup(groupName, admin);
+	}
 }

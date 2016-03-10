@@ -114,6 +114,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 		}
 
 		userConversations.put(toUser, conversationId);
+		System.out.println("ConversationDAO: " + userConversations);
 		MiscUtil.writeObject(userConversations, filePath);
 	}
 

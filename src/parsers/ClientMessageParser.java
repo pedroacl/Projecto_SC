@@ -32,7 +32,10 @@ public class ClientMessageParser {
 	public ClientMessageParser(ClientMessage clientMessage, ServerSocketNetwork serverSocketNetwork) {
 		this.clientMessage = clientMessage;
 		authentication = Authentication.getInstance();
+
 		conversationService = new ConversationService();
+		groupService = new GroupService();
+
 		this.ssn = serverSocketNetwork;
 	}
 

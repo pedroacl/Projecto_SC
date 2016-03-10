@@ -25,13 +25,24 @@ public class TestAuthentication {
 		try {
 			FileUtils.deleteDirectory(new File("users"));
 			FileUtils.deleteDirectory(new File("conversations"));
-			FileUtils.forceDelete(new File("users.txt"));
+			
+			File file = new File("users.txt");
+			
+			if (file.exists())
+				FileUtils.forceDelete(file);
+			
+			file = new File("groups.txt");
+
+			if (file.exists())
+				FileUtils.forceDelete(file);
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		authentication = Authentication.getInstance();
+		authentication.addUser("antonio", "1234");
+		authentication.addUser("jose", "4321");
 	}
 
 	@After
