@@ -91,12 +91,11 @@ public class ClientMessageParser {
 				else {
 					serverMessage = new ServerMessage(MessageType.NOK);
 
-					// Apagar ficheiro corrumpido???
+					// Apagar ficheiro corrompido???
 					Path pathFile = file.toPath();
 					try {
 						Files.deleteIfExists(pathFile);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -145,7 +144,7 @@ public class ClientMessageParser {
 				break;
 			default:
 				if (authentication.existsUser(clientMessage.getDestination())) {
-					String path = conversationService.existFile(clientMessage.getUsername(), clientMessage.getDestination(),
+					String path = conversationService.existsFile(clientMessage.getUsername(), clientMessage.getDestination(),
 							clientMessage.getMessage());
 
 					// se exitir o path

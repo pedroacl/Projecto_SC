@@ -1,6 +1,6 @@
 package interfaces.service;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import entities.ChatMessage;
 
@@ -15,13 +15,13 @@ public interface ConversationServiceInterface {
 
 	public String getFilePath(String fileName, Long conversationId);
 
-	public ArrayList<Long> getAllConversationsFrom(String username);
+	public List<Long> getAllConversationsFrom(String username);
 	
 	public ChatMessage getLastChatMessage(long id);
 
 	public Long getConversationInCommom(String username, String destination);
 
-	public ArrayList<ChatMessage> getAllMessagesFromConversation(Long conversationId);
+	public List<ChatMessage> getAllMessagesFromConversation(Long conversationId);
 	
-	public String existFile(String username, String destination, String message);
+	public String existsFile(String username, String destination, String message);
 }

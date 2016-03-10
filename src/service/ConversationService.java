@@ -2,6 +2,7 @@ package service;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import dao.ConversationDAO;
 import entities.ChatMessage;
@@ -27,9 +28,8 @@ public class ConversationService implements ConversationServiceInterface {
 	}
 
 	@Override
-	public void addConversationToUser(String userToAdd, String groupName, Long conversationId) {
-		// TODO Auto-generated method stub
-		
+	public void addConversationToUser(String username, String toUser, Long conversationId) {
+		conversationDAO.addConversationToUser(username, toUser, conversationId);
 	}
 
 	@Override
@@ -53,30 +53,26 @@ public class ConversationService implements ConversationServiceInterface {
 
 	@Override
 	public ArrayList<Long> getAllConversationsFrom(String username) {
-		// TODO Auto-generated method stub
-		return null;
+		return conversationDAO.getAllConversationsFrom(username);
 	}
 
 	@Override
-	public ChatMessage getLastChatMessage(long id) {
-		// TODO Auto-generated method stub
-		return null;
+	public ChatMessage getLastChatMessage(long conversationId) {
+		return conversationDAO.getLastChatMessage(conversationId);
 	}
 
 	@Override
 	public Long getConversationInCommom(String username, String destination) {
-		// TODO Auto-generated method stub
-		return null;
+		return conversationDAO.getConversationInCommom(username, destination);
 	}
 
 	@Override
-	public ArrayList<ChatMessage> getAllMessagesFromConversation(Long conversationId) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<ChatMessage> getAllMessagesFromConversation(Long conversationId) {
+		return conversationDAO.getAllMessagesFromConversation(conversationId);
 	}
 
 	@Override
-	public String existFile(String username, String destination, String message) {
+	public String existsFile(String username, String destination, String message) {
 		// TODO Auto-generated method stub
 		return null;
 	}
