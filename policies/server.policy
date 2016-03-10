@@ -1,0 +1,12 @@
+//permission java.io.FilePermission "<<ALL FILES>>", "read,write,delete,execute";
+//permission java.io.FilePermission "${user.home}/-", "read";
+
+grant {
+	permission java.net.SocketPermission "*:1024-", "accept";
+	permission java.net.SocketPermission "localhost:23456", "listen, resolve";
+	
+	permission java.io.FilePermission "users.txt", "read, delete, write";
+	permission java.io.FilePermission "groups.txt", "read, delete, write";
+	permission java.io.FilePermission "users/*", "read, delete";
+	
+};

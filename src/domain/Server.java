@@ -10,9 +10,11 @@ public class Server {
 	
 	private static ServerNetwork serverNetwork;
 	
-	private static final int serverPort = 23456;
+	//TODO receber IP por argumentos
 
 	public static void main(String[] args) {
+		String portString = args[0];
+		int serverPort = Integer.parseInt(portString);
 		
 		authentication = Authentication.getInstance();
 		
