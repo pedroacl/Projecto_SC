@@ -51,11 +51,14 @@ public class ConversationDAO implements ConversationDAOInterface {
 
 		// nao existe conversa -> cria uma conversa entre os dois comunicantes
 		if (conversationId == null) {
+			
+			//cria conversa e respectivas pastas
 			conversation = conversationFactory.build(chatMessage.getFromUser(), chatMessage.getDestination());
 			MiscUtil.createDir("conversations/" + conversation.getId());
 			MiscUtil.createDir("conversations/" + conversation.getId() + "/messages");
 			MiscUtil.createFile("conversations/" + conversation.getId() + "/conversation");
-
+			conversationId= conversation.getId();
+			
 			// actualiza ficheiro conversaçoes acrescentado esta nova entrada
 			addConversationToUser(chatMessage.getFromUser(), chatMessage.getDestination(), conversation.getId());
 			addConversationToUser(chatMessage.getDestination(), chatMessage.getFromUser(), conversation.getId());
@@ -64,13 +67,15 @@ public class ConversationDAO implements ConversationDAOInterface {
 			conversation = getConversationById(conversationId);
 		}
 
-		filePath = "conversations/" + conversation.getId() + "/conversation";
+		filePath = "conversations/" + conversationId + "/conversation";
 
 		// pode ser null
 		Conversation auxConversation = (Conversation) MiscUtil.readObject(filePath);
 
 		// caso ficheiro esteja vazio
 		if (auxConversation == null) {
+			conversation = new Conversation(chatMessage.getFromUser(), chatMessage.getDestination());
+			conversation.setId(conversationId);
 			conversation.setLastMessageDate(chatMessage.getCreatedAt());
 			MiscUtil.writeObject(conversation, filePath);
 		} else {
@@ -114,7 +119,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 		}
 
 		userConversations.put(toUser, conversationId);
-		System.out.println("ConversationDAO: " + userConversations);
+		System.out.println("ConversationDAO: " + username + ": " + userConversations);
 		MiscUtil.writeObject(userConversations, filePath);
 	}
 

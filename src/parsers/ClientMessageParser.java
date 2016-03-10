@@ -53,7 +53,8 @@ public class ClientMessageParser {
 		switch (clientMessage.getMessageType()) {
 		case MESSAGE:
 
-			if (authentication.existsUser(clientMessage.getDestination())) {
+			if (authentication.existsUser(clientMessage.getDestination()) || 
+					groupService.existsGroup(clientMessage.getDestination())) {
 				System.out.println("[ProcessRequest-CMParser]: " + clientMessage.getMessage());
 				ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(), clientMessage.getDestination(),
 						clientMessage.getMessage(), MessageType.MESSAGE);
@@ -72,7 +73,9 @@ public class ClientMessageParser {
 			break;
 
 		case FILE:
-			if (authentication.existsUser(clientMessage.getDestination()) && clientMessage.getFileSize() < MAX_FILE_SIZE) {
+			if ( (authentication.existsUser(clientMessage.getDestination()) || 
+					groupService.existsGroup(clientMessage.getDestination())) 
+					&& clientMessage.getFileSize() < MAX_FILE_SIZE) {
 
 				ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(), clientMessage.getDestination(),
 						clientMessage.getMessage(), MessageType.FILE);
@@ -125,7 +128,8 @@ public class ClientMessageParser {
 				break;
 
 			case "all":
-				if (authentication.existsUser(clientMessage.getDestination())) {
+				if (authentication.existsUser(clientMessage.getDestination()) || 
+						groupService.existsGroup(clientMessage.getDestination())) {
 					Long conversationId = conversationService.getConversationInCommom(clientMessage.getUsername(),
 							clientMessage.getDestination());
 					// se existir conversa em comum
@@ -146,9 +150,14 @@ public class ClientMessageParser {
 				}
 				break;
 			default:
-				if (authentication.existsUser(clientMessage.getDestination())) {
+				System.out.println("Print toUser:" + clientMessage.getDestination());
+				if (authentication.existsUser(clientMessage.getDestination()) || 
+						groupService.existsGroup(clientMessage.getDestination())) {
+					//verifica se exite o path
 					String path = conversationService.existsFile(clientMessage.getUsername(), clientMessage.getDestination(),
 							clientMessage.getMessage());
+					
+					System.out.println("[CASE RECEIVER file]: " + path);
 
 					// se exitir o path
 					if (path != null) {
@@ -156,15 +165,18 @@ public class ClientMessageParser {
 						File file = new File(path);
 						serverMessage = new ServerMessage(MessageType.FILE);
 						serverMessage.setSizeFile((int) file.length());
-						System.out.print("[ProcessRequest] -r file:");
-						System.out.println("file: " + path + "size = " + file.length());
-						serverMessage.setContent(path);
-						boolean sended = ssn.sendFile(serverMessage);
-					} else {
+						System.out.print("[ProcessRequest] -r ");
+						System.out.println("file: " + path + " size = " + file.length());
+						serverMessage.setContent(path);	
+							
+					} 
+					else {
 						serverMessage = new ServerMessage(MessageType.NOK);
 						serverMessage.setContent("Não há registos desta conversa");
 					}
-				} else {
+					
+				} 
+				else {
 					serverMessage = new ServerMessage(MessageType.NOK);
 					serverMessage.setContent("Não existe esse contact");
 				}

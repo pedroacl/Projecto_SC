@@ -34,7 +34,7 @@ public class ConversationService implements ConversationServiceInterface {
 
 	@Override
 	public void removeConversation(Long conversationId) {
-		// TODO Auto-generated method stub
+		conversationDAO.removeConversation(conversationId);
 		
 	}
 
@@ -72,8 +72,7 @@ public class ConversationService implements ConversationServiceInterface {
 	}
 
 	@Override
-	public String existsFile(String username, String destination, String message) {
-		// TODO Auto-generated method stub
-		return null;
+	public String existsFile(String username, String destination, String fileName) {
+		return conversationDAO.existFile(username, destination, fileName);
 	}
 }

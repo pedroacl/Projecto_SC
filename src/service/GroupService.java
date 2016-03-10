@@ -99,8 +99,9 @@ public class GroupService implements GroupServiceInterface {
 
 		return false;
 	}
-
-	private boolean existsGroup(String groupName) {
+	
+	@Override
+	public boolean existsGroup(String groupName) {
 		return groups.get(groupName) != null;
 	}
 

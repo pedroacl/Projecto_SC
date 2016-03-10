@@ -26,6 +26,7 @@ public class ConversationFactory {
 	public Conversation build(String fromUser, String toUser) {
 		Conversation conversation = new Conversation(fromUser, toUser);
 		conversation.setId(conversationId);
+		System.out.println("[CONVERSATIOFACTORY)]: "+ conversationId);
 		conversationId++;
 		
 		return conversation;
@@ -33,6 +34,7 @@ public class ConversationFactory {
 	
 	public long generateID() {
 		long id = conversationId;
+		System.out.println("[CONVERSATIOFACTORY)]: "+ conversationId);
 		conversationId++;
 		return id;
 		

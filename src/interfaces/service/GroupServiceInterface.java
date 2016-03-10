@@ -9,4 +9,6 @@ public interface GroupServiceInterface {
 	public boolean removeUserFromGroup(String username, String userToAdd, String groupName);
 
 	public String getGroupOwner(String groupName);
+
+	boolean existsGroup(String groupName);
 }

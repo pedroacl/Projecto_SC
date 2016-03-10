@@ -100,6 +100,8 @@ public class ServerSocketNetwork {
 	}
 	
 	private void sendByteFile(String name,int fileSize) throws IOException {
+		
+		System.out.println("[SERVERSOCKETNETWORK]- sendByteFile: File " + name);
 		int packageSize = 1024;
 		
 		FileInputStream fileInputStream = new FileInputStream(name);

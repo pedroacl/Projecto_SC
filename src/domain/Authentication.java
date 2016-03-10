@@ -68,6 +68,8 @@ public class Authentication implements AuthenticationInterface {
 	 */
 	@Override
 	public boolean existsUser(String username) {
+		System.out.println("[Authentication]"+ users);
+		System.out.println("[Authentication]: TRue? "+ (users.get(username) != null));
 		return users.get(username) != null;
 	}
 
