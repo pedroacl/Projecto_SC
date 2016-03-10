@@ -1,21 +1,17 @@
 package dao;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import network.MessageType;
 import entities.ChatMessage;
 import entities.Conversation;
 import factories.ConversationFactory;
 import interfaces.dao.ConversationDAOInterface;
+import network.MessageType;
 import util.MiscUtil;
 
 public class ConversationDAO implements ConversationDAOInterface {
@@ -166,17 +162,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 		return conversationDAO;
 	}
 
-	public String getFilePath(String fileName, Long conversationId) {
-		String filesDirectory = "conversations/" + conversationId + "/files";
-		File file = new File(filesDirectory);
 
-		if (file.exists())
-			return "conversations/" + conversationId + "/files/" + fileName;
-		else {
-			MiscUtil.createFile("conversations/" + conversationId + "/files");
-			return "conversations/" + conversationId + "/files/" + fileName;
-		}
-	}
 	
 	/**
 	 * Devolve uma lista de Ids de conversaçoes que um dado user mantem

@@ -6,16 +6,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
-import dao.ConversationDAO;
-import dao.GroupDAO;
 import domain.Authentication;
 import entities.ChatMessage;
-import entities.Group;
 import network.ClientMessage;
 import network.MessageType;
 import network.ServerMessage;
 import network.ServerSocketNetwork;
-import util.MiscUtil;
+import service.ConversationService;
+import service.GroupService;
 
 public class ClientMessageParser {
 
@@ -23,7 +21,9 @@ public class ClientMessageParser {
 
 	private Authentication authentication;
 
-	private ConversationDAO conversationDAO;
+	private GroupService groupService;
+	
+	private ConversationService conversationService;
 
 	private ServerSocketNetwork ssn;
 
@@ -32,26 +32,25 @@ public class ClientMessageParser {
 	public ClientMessageParser(ClientMessage clientMessage, ServerSocketNetwork serverSocketNetwork) {
 		this.clientMessage = clientMessage;
 		authentication = Authentication.getInstance();
-		conversationDAO = ConversationDAO.getInstance();
+		conversationService = new ConversationService();
 		this.ssn = serverSocketNetwork;
 	}
 
 	public ServerMessage processRequest() {
 		ServerMessage serverMessage = null;
-		
-		if(!authentication.authenticateUser(clientMessage.getUsername(),
-				clientMessage.getPassword())) {
-			
+
+		if (!authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword())) {
+
 			serverMessage = new ServerMessage(MessageType.NOK);
-			serverMessage.setContent("password Errada");	
-			
+			serverMessage.setContent("password Errada");
+
 			return serverMessage;
 		}
 
 		switch (clientMessage.getMessageType()) {
 		case MESSAGE:
 
-			if (authentication.exists(clientMessage.getDestination())) {
+			if (authentication.existsUser(clientMessage.getDestination())) {
 				System.out.println("[ProcessRequest-CMParser]: " + clientMessage.getMessage());
 				ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(), clientMessage.getDestination(),
 						clientMessage.getMessage(), MessageType.MESSAGE);
@@ -59,9 +58,7 @@ public class ClientMessageParser {
 				System.out.println("[ClientMessageParser.java] Adicionar chat message");
 				System.out.println(chatMessage.getFromUser());
 
-				System.out.println("[ClientMessageParser.java] " + (conversationDAO == null));
-
-				conversationDAO.addChatMessage(chatMessage);
+				conversationService.addChatMessage(chatMessage);
 
 				serverMessage = new ServerMessage(MessageType.OK);
 			} else {
@@ -72,17 +69,16 @@ public class ClientMessageParser {
 			break;
 
 		case FILE:
-			if (authentication.exists(clientMessage.getDestination())
-					&& clientMessage.getFileSize() < MAX_FILE_SIZE) {
+			if (authentication.existsUser(clientMessage.getDestination()) && clientMessage.getFileSize() < MAX_FILE_SIZE) {
 
 				ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(), clientMessage.getDestination(),
 						clientMessage.getMessage(), MessageType.FILE);
 
-				Long conversationID = conversationDAO.addChatMessage(chatMessage);
+				Long conversationID = conversationService.addChatMessage(chatMessage);
 
 				String fileName = extractName(clientMessage.getMessage());
 				System.out.println("[ProcessRequest]: extractName = " + fileName);
-				String path = conversationDAO.getFilePath(fileName, conversationID);
+				String path = conversationService.getFilePath(fileName, conversationID);
 				System.out.println("[ProcessRequest]: pathParaFile = " + path);
 
 				serverMessage = new ServerMessage(MessageType.OK);
@@ -115,24 +111,24 @@ public class ClientMessageParser {
 			switch (clientMessage.getMessage()) {
 
 			case "recent":
-				
-					ArrayList<Long> ids = conversationDAO.getAllConversationsFrom(clientMessage.getUsername());
-					ArrayList<ChatMessage> recent = new ArrayList<ChatMessage>();
-					for (long id : ids) {
-						recent.add(conversationDAO.getLastChatMessage(id));
-					}
-					serverMessage = new ServerMessage(MessageType.CONVERSATION);
-					serverMessage.setMessages(recent);
-				
+
+				ArrayList<Long> ids = conversationService.getAllConversationsFrom(clientMessage.getUsername());
+				ArrayList<ChatMessage> recent = new ArrayList<ChatMessage>();
+				for (long id : ids) {
+					recent.add(conversationService.getLastChatMessage(id));
+				}
+				serverMessage = new ServerMessage(MessageType.CONVERSATION);
+				serverMessage.setMessages(recent);
+
 				break;
-				
+
 			case "all":
-				if (authentication.exists(clientMessage.getDestination())) {
-					Long conversationId = conversationDAO.getConversationInCommom(clientMessage.getUsername(),
+				if (authentication.existsUser(clientMessage.getDestination())) {
+					Long conversationId = conversationService.getConversationInCommom(clientMessage.getUsername(),
 							clientMessage.getDestination());
 					// se existir conversa em comum
 					if (conversationId != -1) {
-						ArrayList<ChatMessage> messages = (ArrayList<ChatMessage>) conversationDAO
+						ArrayList<ChatMessage> messages = (ArrayList<ChatMessage>) conversationService
 								.getAllMessagesFromConversation(conversationId);
 
 						serverMessage = new ServerMessage(MessageType.CONVERSATION);
@@ -148,9 +144,9 @@ public class ClientMessageParser {
 				}
 				break;
 			default:
-				if (authentication.exists(clientMessage.getDestination())) {
-					String path = conversationDAO.existFile(clientMessage.getUsername(),
-							clientMessage.getDestination(), clientMessage.getMessage());
+				if (authentication.existsUser(clientMessage.getDestination())) {
+					String path = conversationService.existFile(clientMessage.getUsername(), clientMessage.getDestination(),
+							clientMessage.getMessage());
 
 					// se exitir o path
 					if (path != null) {
@@ -171,14 +167,14 @@ public class ClientMessageParser {
 					serverMessage.setContent("Não existe esse contact");
 				}
 			}
-			
+
 			break;
 		case ADDUSER:
 			serverMessage = addUserToGroup();
 			break;
-			
+
 		case REMOVEUSER:
-			serverMessage = removeUserToGroup();
+			serverMessage = removeUserFromGroup();
 			break;
 
 		default:
@@ -189,57 +185,28 @@ public class ClientMessageParser {
 
 		return serverMessage;
 	}
-	
+
 	/**
 	 * Função que remove um utilizador de um grupo
+	 * 
 	 * @return
 	 */
-	private ServerMessage removeUserToGroup() {
+	private ServerMessage removeUserFromGroup() {
 		ServerMessage serverMessage = new ServerMessage(MessageType.OK);
+
 		// utilizador a ser adicionado existe
 		if (authentication.existsUser(clientMessage.getDestination())) {
-			String groupName = clientMessage.getMessage();
 
-			// existe grupo e o utilizador eh owner
-			if (authentication.existsGroup(groupName)
-					&& authentication.getGroupOwner(groupName).equals(clientMessage.getUsername())) {
+			groupService.removeUserFromGroup(clientMessage.getUsername(), clientMessage.getDestination(),
+					clientMessage.getMessage());
 
-				// ler ficheiro
-				String filePath = "groups/" + groupName + "/group";
-				Group group = (Group) MiscUtil.readObject(filePath);
-
-				// caso user seja o dono do grupo
-				if (authentication.getGroupOwner(groupName).equals(clientMessage.getDestination())) {
-					
-					//Apaga a informaçao da conversa correspondente ao grupo em cada elemento
-					ArrayList<String> members = (ArrayList<String>) group.getUsers();
-					for(String user : members) {
-						conversationDAO.removeConversationsFromUser(user);
-					}
-					//Apaga conversa da pasta conversations
-					conversationDAO.removeConversation(group.getConversationId());
-					//Apaga o group do "disco"
-					authentication.removeGroup(clientMessage.getMessage());
-				}
-				//apaga membro do grupo
-				else {
-					conversationDAO.removeConversationsFromUser(clientMessage.getDestination());	
-				}		
-			} 
-			
-			else {
-				serverMessage = new ServerMessage(MessageType.NOK);
-				serverMessage.setContent("Não é possivel remover o grupo");
-			}
-		} 
-		else {
+		} else {
 			serverMessage = new ServerMessage(MessageType.NOK);
 			serverMessage.setContent("Não existe esse utilizador");
 		}
 
 		return serverMessage;
-		
-		
+
 	}
 
 	private String extractName(String absolutePath) {
@@ -253,52 +220,14 @@ public class ClientMessageParser {
 	private ServerMessage addUserToGroup() {
 		ServerMessage serverMessage = new ServerMessage(MessageType.OK);
 
-		// utilizador a ser adicionado existe
-		if (authentication.existsUser(clientMessage.getDestination())) {
-			String groupName = clientMessage.getMessage();
+		if (authentication.existsUser(clientMessage.getDestination()) && groupService.addUserToGroup(
+				clientMessage.getUsername(), clientMessage.getDestination(), clientMessage.getMessage())) {
 
-			// existe grupo e o utilizador eh owner
-			if (authentication.existsGroup(groupName)
-					&& authentication.getGroupOwner(groupName).equals(clientMessage.getUsername())) {
-
-				// ler ficheiro
-				String filePath = "groups/" + groupName + "/group";
-				Group group = (Group) MiscUtil.readObject(filePath);
-
-				// adiciona utilizador ao grupo se ainda não estiver lá
-				if (authentication.addUserToGroup(clientMessage.getDestination(), 
-						clientMessage.getMessage())) {
-					
-						conversationDAO.addConversationToUser(clientMessage.getDestination(),
-								clientMessage.getMessage(), group.getConversationId());
-				}
-				else {
-					serverMessage = new ServerMessage(MessageType.NOK);
-					serverMessage.setContent("Esse utilizador ja pertence ao grupo");
-				}		
-			} 
-			//É um novo grupo
-			else {
-				//cria grupo
-				long conversationId = authentication.addGroup(clientMessage.getMessage(),
-						clientMessage.getUsername());
-				
-				//adiciona user ao grupo
-				authentication.addUserToGroup(clientMessage.getDestination(), clientMessage.getMessage());
-				
-				//adiciona a nova conversa no dono do grupo e no user a ser adicionado
-				conversationDAO.addConversationToUser(clientMessage.getUsername(),
-						clientMessage.getMessage(), conversationId);
-				conversationDAO.addConversationToUser(clientMessage.getUsername(),
-						clientMessage.getMessage(), conversationId);		
-			}
-			
-		} 
-		else {
+		} else {
 			serverMessage = new ServerMessage(MessageType.NOK);
-			serverMessage.setContent("Não existe esse utilizador");
+			serverMessage.setContent("Não foi possivel adicionar utilizador ao grupo");
 		}
-		
+
 		return serverMessage;
 	}
 }

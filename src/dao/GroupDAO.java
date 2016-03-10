@@ -9,16 +9,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
+import domain.Authentication;
 import entities.Group;
 import factories.ConversationFactory;
-import factories.GroupFactory;
 import interfaces.dao.GroupDAOInterface;
 import util.MiscUtil;
 
 public class GroupDAO implements GroupDAOInterface {
 
 	private static GroupDAO groupDAO = new GroupDAO();
-	
+
 	private static ConversationFactory conversationFactory;
 
 	private GroupDAO() {
@@ -36,7 +36,7 @@ public class GroupDAO implements GroupDAOInterface {
 	 */
 	@Override
 	public Group getGroupByName(String groupName) {
-		//TODO
+		// TODO
 
 		return null;
 	}
@@ -50,15 +50,15 @@ public class GroupDAO implements GroupDAOInterface {
 	@Override
 	public boolean addUserToGroup(String username, String groupName) {
 		String filePath = "groups/" + groupName + "/group";
-		
+
 		Group group = (Group) MiscUtil.readObject(filePath);
-		
-		if (group.addUser(username)){
+
+		if (group.addUser(username)) {
 			MiscUtil.writeObject(group, filePath);
 		} else {
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -68,96 +68,99 @@ public class GroupDAO implements GroupDAOInterface {
 	@Override
 	public HashMap<String, String> getGroups() {
 		HashMap<String, String> groups = new HashMap<String, String>();
-		
+
 		String line;
 		BufferedReader br;
 
 		MiscUtil.createFile("groups.txt");
-		
-		//carregar utilizadores
+
+		// carregar utilizadores
 		File file = new File("groups.txt");
-	
-		//nao existe ficheiro
+
+		// nao existe ficheiro
 		if (!file.exists())
 			System.out.println("Nao existem grupos adicionados.");
 
 		try {
 			FileReader fr = new FileReader(file);
 			br = new BufferedReader(fr);
-			
+
 			while ((line = br.readLine()) != null) {
 				String[] args = line.split(":");
 				String groupname = args[0];
 				String owner = args[1];
-				
+
 				groups.put(groupname, owner);
 				System.out.println(groupname + " " + owner);
-				
+
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return groups;
 
 	}
 
 	/**
 	 * Função que permite criar um grupo
+	 * 
+	 * @return Devolve o id da conversação associada ao grupo
 	 */
 	@Override
 	public Long createGroup(String groupName, String admin) {
 		
-		//adiciona uma entrada no ficheiro groups.txt
+		// adiciona uma entrada no ficheiro groups.txt
 		try {
-		FileWriter fw = new FileWriter("groups.txt", true);
-		fw.write(groupName+ ":" + admin + "\n");
-		fw.close();
-		}catch (IOException e) {
+			FileWriter fw = new FileWriter("groups.txt", true);
+			fw.write(groupName + ":" + admin + "\n");
+			fw.close();
+		} catch (IOException e) {
 			e.printStackTrace();
-		}	
-		
-		//cria directoria groups se não existir ainda
+		}
+
+		// cria directoria groups se não existir ainda
 		MiscUtil.createDir("groups");
-		
-		//cria group
+
+		// cria group
 		long conversationId = conversationFactory.generateID();
 		Group novoGrupo = new Group(groupName, admin, conversationId);
-		
-		//Persiste grupo na directoria groups
+
+		// Persiste grupo na directoria groups
 		MiscUtil.createDir("groups/" + groupName);
 		MiscUtil.writeObject(novoGrupo, "groups/" + groupName + "/group");
-		
-		//Cria directoria da convresaçao com o respectivo id na pasta de conversaçoes
+
+		// Cria directoria da convresaçao com o respectivo id na pasta de
+		// conversaçoes
 		MiscUtil.createDir("conversations/" + conversationId);
 		MiscUtil.createDir("conversations/" + conversationId + "/messages");
 		MiscUtil.createFile("conversations/" + conversationId + "/conversation");
-		
+
 		return conversationId;
 	}
 
 	public void deleteGroup(String groupName) {
-		//apaga entrada no ficheiro groups.txt
+		// apaga entrada no ficheiro groups.txt
 		File file = new File("groups.txt");
 		File tempFile = new File("tempGroups.txt");
-		
+
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
-			
+
 			String line;
-			
-			//copiar todos os users para o ficheiro temp
-			while((line = reader.readLine()) != null) {
+
+			// copiar todos os users para o ficheiro temp
+			while ((line = reader.readLine()) != null) {
 				String currentUsername = line.split(":")[0];
 
-				//nao copiar user
+				// nao copiar user
 				if (currentUsername.equals(groupName))
 					continue;
-					
-			    writer.write(line);
+
+				writer.write(line);
 			}
 			writer.close();
 			reader.close();
@@ -166,19 +169,20 @@ public class GroupDAO implements GroupDAOInterface {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		//Apaga ficheiro antigo
-		if (!file.delete()) {
-	        System.out.println("Could not delete file");
-	        return;
-	      }
-		if (!tempFile.renameTo(file))
-	        System.out.println("Could not rename file");
 
-		//eliminar pasta do group
+		// Apaga ficheiro antigo
+		if (!file.delete()) {
+			System.out.println("Could not delete file");
+			return;
+		}
+		if (!tempFile.renameTo(file))
+			System.out.println("Could not rename file");
+
+		// eliminar pasta do group
 		file = new File("groups/" + groupName);
-		if(!file.delete());
-			System.out.println("não foi possivel apagar pasta do grupo");
-		
+		if (!file.delete())
+			;
+		System.out.println("não foi possivel apagar pasta do grupo");
+
 	}
 }

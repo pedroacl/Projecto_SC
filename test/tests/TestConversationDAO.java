@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import dao.ConversationDAO;
+import dao.GroupDAO;
 import domain.Authentication;
 import entities.ChatMessage;
 import factories.ConversationFactory;
@@ -24,6 +25,8 @@ import network.MessageType;
 public class TestConversationDAO {
 
 	private static ConversationDAO conversationDAO;
+
+	private static GroupDAO groupDAO;
 
 	private static ConversationFactory conversationFactory;
 
@@ -41,6 +44,11 @@ public class TestConversationDAO {
 			if (file.exists()) {
 				FileUtils.forceDelete(file);
 			}
+			
+			file = new File("groups.txt");
+
+			if (file.exists())
+				FileUtils.forceDelete(file);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -49,6 +57,7 @@ public class TestConversationDAO {
 		conversationFactory.reset();
 
 		conversationDAO = ConversationDAO.getInstance();
+		groupDAO = GroupDAO.getInstance();
 		authentication = Authentication.getInstance();
 
 		authentication.addUser("antonio", "my_password");
@@ -64,8 +73,7 @@ public class TestConversationDAO {
 		String fromUser = "maria";
 		String toUser = "pedro";
 
-		ChatMessage chatMessage = new ChatMessage(fromUser, toUser, "mensagem de teste 1",
-				MessageType.MESSAGE);
+		ChatMessage chatMessage = new ChatMessage(fromUser, toUser, "mensagem de teste 1", MessageType.MESSAGE);
 
 		conversationDAO.addChatMessage(chatMessage);
 
@@ -80,17 +88,32 @@ public class TestConversationDAO {
 	}
 
 	@Test
+	public void testAddGroupMessage() {
+		String groupName = "grupo1";
+		String admin = "maria";
+		String fromUser = "maria";
+
+		Long conversationId = authentication.addGroup(groupName, admin);
+		File file = new File("groups/" + groupName);
+		assertThat(file.exists(), is(true));
+		
+		ChatMessage chatMessage = new ChatMessage(fromUser, groupName, "mensagem de teste 1", MessageType.MESSAGE);
+		conversationDAO.addChatMessage(chatMessage);
+
+		file = new File("conversations/" + conversationId + "/messages/" + chatMessage.getCreatedAt().getTime());
+		assertThat(file.exists(), is(true));
+	}
+
+	@Test
 	public void testGetLastChatMessage() {
 		String fromUser = "maria";
 		String toUser = "pedro";
 		Long conversationId = 1L;
 
-		ChatMessage chatMessage1 = new ChatMessage(fromUser, toUser, "mensagem de teste 1",
-				MessageType.MESSAGE);
+		ChatMessage chatMessage1 = new ChatMessage(fromUser, toUser, "mensagem de teste 1", MessageType.MESSAGE);
 		conversationDAO.addChatMessage(chatMessage1);
 
-		ChatMessage chatMessage2 = new ChatMessage(fromUser, toUser, "mensagem de teste 2",
-				MessageType.MESSAGE);
+		ChatMessage chatMessage2 = new ChatMessage(fromUser, toUser, "mensagem de teste 2", MessageType.MESSAGE);
 		conversationDAO.addChatMessage(chatMessage2);
 
 		ChatMessage lastChatMessage = conversationDAO.getLastChatMessage(conversationId);
@@ -105,12 +128,10 @@ public class TestConversationDAO {
 		String toUser1 = "pedro";
 		String toUser2 = "jose";
 
-		ChatMessage chatMessage1 = new ChatMessage(fromUser, toUser1, "mensagem de teste 1",
-				MessageType.MESSAGE);
+		ChatMessage chatMessage1 = new ChatMessage(fromUser, toUser1, "mensagem de teste 1", MessageType.MESSAGE);
 		conversationDAO.addChatMessage(chatMessage1);
 
-		ChatMessage chatMessage2 = new ChatMessage(fromUser, toUser2, "mensagem de teste 2",
-				MessageType.MESSAGE);
+		ChatMessage chatMessage2 = new ChatMessage(fromUser, toUser2, "mensagem de teste 2", MessageType.MESSAGE);
 		conversationDAO.addChatMessage(chatMessage2);
 
 		List<Long> conversationsIds = conversationDAO.getAllConversationsFrom(fromUser);
@@ -118,37 +139,34 @@ public class TestConversationDAO {
 		assertThat(conversationsIds, is(not(nullValue())));
 		assertTrue(conversationsIds.size() > 1);
 	}
-	
+
 	@Test
 	public void testGetAllMessagesFromConversation() {
 		String fromUser = "maria";
 		String toUser = "pedro";
 		Long conversationId = 1L;
 
-		ChatMessage chatMessage1 = new ChatMessage(fromUser, toUser, "mensagem de teste 1",
-				MessageType.MESSAGE);
+		ChatMessage chatMessage1 = new ChatMessage(fromUser, toUser, "mensagem de teste 1", MessageType.MESSAGE);
 		conversationDAO.addChatMessage(chatMessage1);
-		
+
 		List<ChatMessage> chatMessages = conversationDAO.getAllMessagesFromConversation(conversationId);
 		assertThat(chatMessages, is(not(nullValue())));
 		assertThat(chatMessages.size(), is(1));
 
-		ChatMessage chatMessage2 = new ChatMessage(fromUser, toUser, "mensagem de teste 2",
-				MessageType.MESSAGE);
+		ChatMessage chatMessage2 = new ChatMessage(fromUser, toUser, "mensagem de teste 2", MessageType.MESSAGE);
 		conversationDAO.addChatMessage(chatMessage2);
-		
+
 		chatMessages = conversationDAO.getAllMessagesFromConversation(conversationId);
 		assertThat(chatMessages, is(not(nullValue())));
 		assertThat(chatMessages.size(), is(2));
-	}	
+	}
 
 	@Test
 	public void testGetFilePath() {
 		String fromUser = "maria";
 		String toUser = "pedro";
 
-		ChatMessage chatMessage = new ChatMessage(fromUser, toUser, "mensagem de teste 1",
-				MessageType.MESSAGE);
+		ChatMessage chatMessage = new ChatMessage(fromUser, toUser, "mensagem de teste 1", MessageType.MESSAGE);
 		conversationDAO.addChatMessage(chatMessage);
 
 		String filePath = conversationDAO.getFilePath(chatMessage.getCreatedAt() + ".txt", 1L);

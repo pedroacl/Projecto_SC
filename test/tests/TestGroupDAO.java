@@ -32,6 +32,11 @@ public class TestGroupDAO {
 			if (file.exists())
 				FileUtils.forceDelete(file);
 			
+			file = new File("groups.txt");
+
+			if (file.exists())
+				FileUtils.forceDelete(file);
+
 			FileUtils.deleteDirectory(new File("users"));
 			FileUtils.deleteDirectory(new File("conversations"));
 			FileUtils.deleteDirectory(new File("groups"));
@@ -57,9 +62,12 @@ public class TestGroupDAO {
 		String groupName = "grupo1";
 		String admin = "maria";
 
-		Long groupId = groupDAO.createGroup(groupName, admin);
+		Long conversationId = authentication.addGroup(groupName, admin);
 
-		File file = new File("groups/" + groupId);
+		File file = new File("groups/" + groupName);
+		assertThat(file.exists(), is(true));
+		
+		file = new File("conversations/" + conversationId);
 		assertThat(file.exists(), is(true));
 	}
 	
@@ -77,7 +85,6 @@ public class TestGroupDAO {
 		file = new File("groups/1");
 		assertThat(file.exists(), is(true));
 		assertThat(file.isDirectory(), is(true));
-
 	}
 
 	@Test

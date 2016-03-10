@@ -15,14 +15,12 @@ public interface ConversationDAOInterface {
 	
 	public List<ChatMessage> getAllMessagesFromConversation (Long conversationId);
 	
-	public String getFilePath(String fileName, Long conversationId);
-	
 	public Long getConversationInCommom(String user1, String user2);
 	
 	public void addConversationToUser(String username, String toUser, Long conversationId);
 
-	void removeConversationsFromUser(String user);
+	public void removeConversation(Long conversationId);
 
-	void removeConversation(Long conversationId);
+	void removeConversationsFromUser(String user);
 
 }
