@@ -28,6 +28,7 @@ public class MiscUtil {
 			} else {
 				for (File c : files)
 					delete(c);
+				f.delete();
 			}
 		} else {
 			System.out.println("Delete file " + f.getAbsolutePath());

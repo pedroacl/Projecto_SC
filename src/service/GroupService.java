@@ -54,6 +54,7 @@ public class GroupService implements GroupServiceInterface {
 			groupDAO.addUserToGroup(userToAdd, groupName);
 			conversationService.addConversationToUser(username, groupName, conversationId);
 			conversationService.addConversationToUser(userToAdd, groupName, conversationId);
+			groups.put(groupName, username);
 
 			return true;
 		}

@@ -208,7 +208,7 @@ public class ClientMessageParser {
 	private ServerMessage removeUserFromGroup() {
 		ServerMessage serverMessage = new ServerMessage(MessageType.OK);
 
-		// utilizador a ser adicionado existe
+		// utilizador a ser removido existe
 		if (authentication.existsUser(clientMessage.getDestination())) {
 
 			groupService.removeUserFromGroup(clientMessage.getUsername(), clientMessage.getDestination(),

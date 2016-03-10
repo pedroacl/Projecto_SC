@@ -180,6 +180,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 
 		if (conversations == null)
 			System.out.println("[getAllConversationFrom]: Conversation esta a null");
+		System.out.println("[GETALLCONVERSATIONSFROM]: " + conversations);
 
 		Collection<Long> collection = conversations.values();
 		return new ArrayList<Long>(collection);

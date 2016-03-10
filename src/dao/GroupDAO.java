@@ -180,9 +180,7 @@ public class GroupDAO implements GroupDAOInterface {
 
 		// eliminar pasta do group
 		file = new File("groups/" + groupName);
-		if (!file.delete())
-			;
-		System.out.println("não foi possivel apagar pasta do grupo");
+		MiscUtil.delete(file);
 
 	}
 }
