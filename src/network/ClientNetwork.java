@@ -76,23 +76,27 @@ public class ClientNetwork {
 		return null;
 	}
 
-	private void send(ClientMessage message) {
+	private boolean send(ClientMessage message) {
+		boolean sended = true;
 		try {
 			out.writeObject(message);
 		} catch (IOException e) {
 			e.printStackTrace();
+			sended = false;
 		}
+		
+		return sended;
 	}
 
 	/**
 	 * 
 	 * @param message
 	 */
-	public void sendMessage(ClientMessage message) {
+	public boolean sendMessage(ClientMessage message) {
 		if (message.getMessageType().equals(MessageType.FILE))
-			sendFile(message);
+			return sendFile(message);
 		else
-			send(message);
+			return send(message);
 	}
 
 	/**

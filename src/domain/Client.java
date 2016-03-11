@@ -42,40 +42,26 @@ public class Client{
 		System.out.println("[Client.java] message: " + clientMessage);
 		
 		//envia a mensagem
-		clientNetwork.sendMessage(clientMessage);
+		Boolean sended = clientNetwork.sendMessage(clientMessage);
 
-		//recebe a resposta
-		ServerMessage serverMsg = clientNetwork.receiveMessage();
 		
-		//para debbug
-		System.out.println("[Client] Recebeu ultima Resposta: " + serverMsg.getMessageType());
+		if(sended) {
+			//recebe a resposta
+			ServerMessage serverMsg = clientNetwork.receiveMessage();
 		
-		//passa resposta ao parser para ser processada
-		ServerResponseParser srp = new ServerResponseParser(userInterface, clientNetwork, argsParser.getUsername());
-		srp.ProcessMessage(serverMsg);
+			//para debbug
+			System.out.println("[Client] Recebeu ultima Resposta: " + serverMsg.getMessageType());
+			
+			//passa resposta ao parser para ser processada
+			ServerResponseParser srp = new ServerResponseParser(userInterface, clientNetwork, argsParser.getUsername());
+			srp.ProcessMessage(serverMsg);
+			
+			//fecha a ligaçao ao servidor
+		}
 		
-		//fecha a ligaçao ao servidor
 		clientNetwork.disconnetc(); 
 		
 		
-		/*
-		if(serverMsg.getMessageType().equals(MessageType.OK))
-			System.out.println(serverMsg.getMessageType());
-		else {
-			System.out.println(serverMsg.getMessageType());
-			System.out.println(serverMsg.getMessage());
-		}
-		*/
-		
-		
-		/*
-		Cria e passa a resposta para o Parser que a vai processar
-		ServerResponseParser serverResponseParser = new ServerResponseParser(userInterface,clientNetwork);
-		serverResponseParser.processResponse(serverMsg);
-		
-		Fecha a ligação
-		
-		*/
 	}
 }
 

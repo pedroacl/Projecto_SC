@@ -18,11 +18,15 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 	
 	public void run() {
 		ServerSocketNetwork serverSocketNetwork = serverThreadContext.getServerSocketNetwork();
-		ClientMessage clientMessage = serverSocketNetwork.getClientMessage();
-		ClientMessageParser clientMessageParser = new ClientMessageParser(clientMessage, serverSocketNetwork);
 		
+		//recebe Mensagem do cliente
+		ClientMessage clientMessage = serverSocketNetwork.getClientMessage();
+		
+		//processa a mensagem do cliente e cria mensagem de resposta
+		ClientMessageParser clientMessageParser = new ClientMessageParser(clientMessage, serverSocketNetwork);
 		ServerMessage serverMessage = clientMessageParser.processRequest();
-		System.out.println(serverMessage);
+		
+		//envia resposta ao cliente
 		serverSocketNetwork.sendMessage(serverMessage);
 	
 		/*

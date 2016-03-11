@@ -90,11 +90,13 @@ public class ClientMessageParser {
 				ssn.sendMessage(serverMessage);
 
 				File file = ssn.receiveFile(clientMessage.getFileSize(), path);
+				
 
-				if (file.length() == clientMessage.getFileSize())
+				if (file.length() > clientMessage.getFileSize())
 					serverMessage = new ServerMessage(MessageType.OK);
 				else {
 					serverMessage = new ServerMessage(MessageType.NOK);
+					serverMessage.setContent("Ficheiro com erro");
 
 					// Apagar ficheiro corrompido???
 					Path pathFile = file.toPath();
