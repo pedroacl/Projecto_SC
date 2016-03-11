@@ -42,14 +42,14 @@ public class UserDAO implements UserDAOInterface {
 		String line;
 		BufferedReader br;
 
-		MiscUtil.createFile("users.txt");
-		
 		//carregar utilizadores
 		File file = new File("users.txt");
 	
 		//nao existe ficheiro
-		if (!file.exists())
+		if (!file.exists()) {
 			System.out.println("Nao existem utilizadores adicionados.");
+			return null;
+		}
 
 		try {
 			FileReader fr = new FileReader(file);
@@ -95,7 +95,6 @@ public class UserDAO implements UserDAOInterface {
 			fw.close();
 		
 			//criar directorias
-			MiscUtil.createDir("users/" + username + "/files");
 			MiscUtil.createFile("users/" + username + "/conversations");
 
 		} catch (IOException e) {

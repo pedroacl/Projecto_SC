@@ -9,7 +9,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
-import domain.Authentication;
 import entities.Group;
 import factories.ConversationFactory;
 import interfaces.dao.GroupDAOInterface;
@@ -22,7 +21,7 @@ public class GroupDAO implements GroupDAOInterface {
 	private static ConversationFactory conversationFactory;
 
 	private GroupDAO() {
-		conversationFactory = conversationFactory.getInstance();
+		conversationFactory = ConversationFactory.getInstance();
 	}
 
 	public static GroupDAO getInstance() {

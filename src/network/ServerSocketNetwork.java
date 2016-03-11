@@ -127,7 +127,6 @@ public class ServerSocketNetwork {
 		try {
 			fileOut = new FileOutputStream(file);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -162,7 +161,6 @@ public class ServerSocketNetwork {
 		try {
 			fileOut.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

@@ -52,6 +52,10 @@ public class MiscUtil {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param path
+	 */
 	public static void createDir(String path) {
 		File file = new File(path);
 

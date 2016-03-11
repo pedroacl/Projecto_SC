@@ -122,7 +122,7 @@ public class ClientMessageParser {
 				for (long id : ids) {
 					recent.add(conversationService.getLastChatMessage(id));
 				}
-				serverMessage = new ServerMessage(MessageType.CONVERSATION);
+				serverMessage = new ServerMessage(MessageType.LAST_MESSAGES);
 				serverMessage.setMessages(recent);
 
 				break;

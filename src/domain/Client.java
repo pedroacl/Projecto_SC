@@ -1,10 +1,10 @@
 package domain;
 import network.ClientMessage;
 import network.ClientNetwork;
-import network.MessageType;
 import network.ServerMessage;
 import parsers.ArgsParser;
 import parsers.ServerResponseParser;
+import util.UserUtil;
 
 
 public class Client{
@@ -23,7 +23,7 @@ public class Client{
 		}
 		
 		ArgsParser argsParser = new ArgsParser(args);
-		UserInterface userInterface = new UserInterface();
+		UserUtil userInterface = new UserUtil();
 		
 		//validar input
 		if(!argsParser.validateInput()) {
@@ -48,7 +48,7 @@ public class Client{
 		ServerMessage serverMsg = clientNetwork.receiveMessage();
 		
 		//para debbug
-		System.out.println("Recebeu ultima Resposta: " + serverMsg.getMessageType());
+		System.out.println("[Client] Recebeu ultima Resposta: " + serverMsg.getMessageType());
 		
 		//passa resposta ao parser para ser processada
 		ServerResponseParser srp = new ServerResponseParser(userInterface, clientNetwork, argsParser.getUsername());

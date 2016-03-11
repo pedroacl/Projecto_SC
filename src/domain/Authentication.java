@@ -1,36 +1,17 @@
 package domain;
 
-import java.util.HashMap;
-
-import dao.ConversationDAO;
-import dao.GroupDAO;
-import dao.UserDAO;
 import interfaces.AuthenticationInterface;
+import service.UserService;
 
 public class Authentication implements AuthenticationInterface {
 
 	private static Authentication authentication = new Authentication();
 
-	private static UserDAO userDAO;
-
-	private static GroupDAO groupDAO;
-
-	private static ConversationDAO conversationDAO;
-
-	private HashMap<String, String> users;
-
-	private HashMap<String, String> groups; // groupName:owner
+	private static UserService userService;
 
 	private Authentication() {
-		userDAO = UserDAO.getInstance();
-		groupDAO = GroupDAO.getInstance();
-		conversationDAO = ConversationDAO.getInstance();
-
-		users = userDAO.getUsers();
-		groups = groupDAO.getGroups();
-
-		System.out.println("[Authentication.java] Users: " + users);
-		System.out.println("[Authentication.java] Groups: " + groups);
+		userService = new UserService();
+		System.out.println("[Authentication.java] Users: " + userService.getUsers());
 	}
 
 	public static Authentication getInstance() {
@@ -46,12 +27,11 @@ public class Authentication implements AuthenticationInterface {
 	@Override
 	public boolean authenticateUser(String username, String password) {
 
-		String userPassword = users.get(username);
+		String userPassword = userService.getUserPassword(username);
 
 		// user nao existe
 		if (userPassword == null) {
-			userDAO.addUser(username, password);
-			users.put(username, password);
+			userService.addUser(username, password);
 		}
 		// user existe e a password eh invalida
 		else if (!userPassword.equals(password)) {
@@ -60,7 +40,7 @@ public class Authentication implements AuthenticationInterface {
 
 		return true;
 	}
-	
+
 	/**
 	 * 
 	 * @param username
@@ -68,9 +48,7 @@ public class Authentication implements AuthenticationInterface {
 	 */
 	@Override
 	public boolean existsUser(String username) {
-		System.out.println("[Authentication]"+ users);
-		System.out.println("[Authentication]: TRue? "+ (users.get(username) != null));
-		return users.get(username) != null;
+		return userService.getUserPassword(username) != null;
 	}
 
 	/**
@@ -80,9 +58,8 @@ public class Authentication implements AuthenticationInterface {
 	 */
 	@Override
 	public void addUser(String username, String password) {
-		if (users.get(username) == null) {
-			users.put(username, password);
-			userDAO.addUser(username, password);
+		if (userService.getUserPassword(username) == null) {
+			userService.addUser(username, password);
 		}
 	}
 }

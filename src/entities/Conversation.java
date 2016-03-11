@@ -4,22 +4,19 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class Conversation implements Serializable {
-	
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6123506731411848219L;
-	
+
 	private Long id;
-	
+
 	private String fromUser;
-	
+
 	private String toUser;
 
-	private Date createdAt;
-	
 	private Date lastMessageDate;
-
 
 	public Date getLastMessageDate() {
 		return lastMessageDate;
@@ -32,7 +29,7 @@ public class Conversation implements Serializable {
 	private Conversation() {
 
 	}
-	
+
 	public Conversation(String fromUser, String toUser) {
 		this();
 		this.fromUser = fromUser;
@@ -45,9 +42,9 @@ public class Conversation implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}	
+	}
 
-		public String getFromUser() {
+	public String getFromUser() {
 		return fromUser;
 	}
 
@@ -69,11 +66,10 @@ public class Conversation implements Serializable {
 		return (this.id == conversation.getId());
 	}
 
-
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		
+
 		sb.append("Id: " + id + "\n");
 		sb.append("From: " + fromUser + "\n");
 		sb.append("To: " + toUser + "\n");
