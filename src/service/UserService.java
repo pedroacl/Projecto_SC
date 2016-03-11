@@ -16,15 +16,18 @@ public class UserService implements UserServiceInterface {
 		users = userDAO.getUsers();
 	}
 	
+	@Override
 	public HashMap<String, String> getUsers() {
 		return users;
 	}
 
+	@Override
 	public void addUser(String username, String password) {
 		users.put(username, password);
 		userDAO.addUser(username, password);
 	}
 
+	@Override
 	public String getUserPassword(String username) {
 		return users.get(username);
 	}

@@ -5,7 +5,7 @@ import java.util.List;
 import entities.ChatMessage;
 
 public interface ConversationServiceInterface {
-	public void removeConversationsFromUser(String username);
+	public void removeConversationFromUser(String username, String fromUser);
 	
 	public Long addChatMessage(ChatMessage chatMessage);
 

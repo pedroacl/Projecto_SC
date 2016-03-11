@@ -18,8 +18,8 @@ public class ConversationService implements ConversationServiceInterface {
 	}
 
 	@Override
-	public void removeConversationsFromUser(String username) {
-		conversationDAO.removeConversationsFromUser(username);
+	public void removeConversationFromUser(String username, String fromUser) {
+		conversationDAO.removeConversationFromUser(username, fromUser);
 	}
 
 	@Override

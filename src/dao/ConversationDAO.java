@@ -257,17 +257,16 @@ public class ConversationDAO implements ConversationDAOInterface {
 	}
 
 	@Override
-	public void removeConversationsFromUser(String user) {
+	public void removeConversationFromUser(String username, String fromUser) {
 		HashMap<String, Long> userConversations = null;
-		String filePath = "users/" + user + "/conversations";
+		String filePath = "users/" + username + "/conversations";
 		File file = new File(filePath);
 
 		if (file.exists() && file.length() != 0) {
 			userConversations = (HashMap<String, Long>) MiscUtil.readObject(filePath);
-			userConversations.remove(user);
+			userConversations.remove(fromUser);
 			MiscUtil.writeObject(userConversations, filePath);
 		}
-
 	}
 
 	@Override

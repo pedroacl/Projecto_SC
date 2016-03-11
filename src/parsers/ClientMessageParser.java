@@ -52,7 +52,6 @@ public class ClientMessageParser {
 
 		switch (clientMessage.getMessageType()) {
 		case MESSAGE:
-
 			if (authentication.existsUser(clientMessage.getDestination()) || 
 					groupService.existsGroup(clientMessage.getDestination())) {
 				System.out.println("[ProcessRequest-CMParser]: " + clientMessage.getMessage());

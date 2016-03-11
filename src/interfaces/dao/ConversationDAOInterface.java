@@ -21,6 +21,6 @@ public interface ConversationDAOInterface {
 
 	public void removeConversation(Long conversationId);
 
-	void removeConversationsFromUser(String user);
+	void removeConversationFromUser(String username, String fromUser);
 
 }

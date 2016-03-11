@@ -72,14 +72,14 @@ public class GroupService implements GroupServiceInterface {
 			Group group = (Group) MiscUtil.readObject(filePath);
 
 			// caso user seja o dono do grupo
+			// apagar grupo inteiro
 			if (getGroupOwner(groupName).equals(userToRemove)) {
-
 				// Apaga a informaçao da conversa correspondente ao grupo em
 				// cada elemento
 				ArrayList<String> members = (ArrayList<String>) group.getUsers();
 
 				for (String user : members) {
-					conversationService.removeConversationsFromUser(user);
+					conversationService.removeConversationFromUser(user, groupName);
 				}
 
 				// Apaga conversa da pasta conversations
@@ -93,7 +93,7 @@ public class GroupService implements GroupServiceInterface {
 			}
 			// apaga membro do grupo
 			else {
-				conversationService.removeConversationsFromUser(userToRemove);
+				conversationService.removeConversationFromUser(userToRemove, groupName);
 				return true;
 			}
 		}
