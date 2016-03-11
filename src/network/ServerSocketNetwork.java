@@ -81,21 +81,14 @@ public class ServerSocketNetwork {
 		
 		send(message);
 		
-		//ClientMessage cm = getClientMessage();
-		
-		if(true) {//cm.getMessageType().equals(MessageType.OK)) {
-			isValid = true;
-			try {
-				sendByteFile(filePath, message.getFileSize());
-			} catch (IOException e) {
-				e.printStackTrace();
-				isValid = false;
-			}
-			
-		}
-		else
+		isValid = true;
+		try {
+			sendByteFile(filePath, message.getFileSize());
+		} catch (IOException e) {
+			e.printStackTrace();
 			isValid = false;
-		
+		}
+	
 		return isValid;
 	}
 	
