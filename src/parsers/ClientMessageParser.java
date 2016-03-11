@@ -52,66 +52,13 @@ public class ClientMessageParser {
 
 		switch (clientMessage.getMessageType()) {
 		case MESSAGE:
-			if (authentication.existsUser(clientMessage.getDestination()) || 
-					groupService.existsGroup(clientMessage.getDestination())) {
-				System.out.println("[ProcessRequest-CMParser]: " + clientMessage.getMessage());
-				ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(), clientMessage.getDestination(),
-						clientMessage.getMessage(), MessageType.MESSAGE);
-
-				System.out.println("[ClientMessageParser.java] Adicionar chat message");
-				System.out.println(chatMessage.getFromUser());
-
-				conversationService.addChatMessage(chatMessage);
-
-				serverMessage = new ServerMessage(MessageType.OK);
-			} else {
-				serverMessage = new ServerMessage(MessageType.NOK);
-				serverMessage.setContent("Não existe esse contact");
-			}
-
+			serverMessage = saveMessage();
 			break;
 
 		case FILE:
-			if ( (authentication.existsUser(clientMessage.getDestination()) || 
-					groupService.existsGroup(clientMessage.getDestination())) 
-					&& clientMessage.getFileSize() < MAX_FILE_SIZE) {
-
-				ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(), clientMessage.getDestination(),
-						clientMessage.getMessage(), MessageType.FILE);
-
-				Long conversationID = conversationService.addChatMessage(chatMessage);
-
-				String fileName = extractName(clientMessage.getMessage());
-				System.out.println("[ProcessRequest]: extractName = " + fileName);
-				String path = conversationService.getFilePath(fileName, conversationID);
-				System.out.println("[ProcessRequest]: pathParaFile = " + path);
-
-				serverMessage = new ServerMessage(MessageType.OK);
-				ssn.sendMessage(serverMessage);
-
-				File file = ssn.receiveFile(clientMessage.getFileSize(), path);
-				
-
-				if (file.length() > clientMessage.getFileSize())
-					serverMessage = new ServerMessage(MessageType.OK);
-				else {
-					serverMessage = new ServerMessage(MessageType.NOK);
-					serverMessage.setContent("Ficheiro com erro");
-
-					// Apagar ficheiro corrompido???
-					Path pathFile = file.toPath();
-					try {
-						Files.deleteIfExists(pathFile);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			} else {
-				serverMessage = new ServerMessage(MessageType.NOK);
-				serverMessage.setContent("Não existe esse contact");
-			}
-
+			serverMessage = receiveFile();
 			break;
+			
 		case RECEIVER:
 
 			switch (clientMessage.getMessage()) {
@@ -131,8 +78,10 @@ public class ClientMessageParser {
 			case "all":
 				if (authentication.existsUser(clientMessage.getDestination()) || 
 						groupService.existsGroup(clientMessage.getDestination())) {
+					
 					Long conversationId = conversationService.getConversationInCommom(clientMessage.getUsername(),
 							clientMessage.getDestination());
+					
 					// se existir conversa em comum
 					if (conversationId != -1) {
 						ArrayList<ChatMessage> messages = (ArrayList<ChatMessage>) conversationService
@@ -151,7 +100,7 @@ public class ClientMessageParser {
 				}
 				break;
 			default:
-				System.out.println("Print toUser:" + clientMessage.getDestination());
+				
 				if (authentication.existsUser(clientMessage.getDestination()) || 
 						groupService.existsGroup(clientMessage.getDestination())) {
 					//verifica se exite o path
@@ -204,7 +153,6 @@ public class ClientMessageParser {
 	/**
 	 * Função que remove um utilizador de um grupo
 	 * 
-	 * @return
 	 */
 	private ServerMessage removeUserFromGroup() {
 		ServerMessage serverMessage = new ServerMessage(MessageType.OK);
@@ -245,4 +193,93 @@ public class ClientMessageParser {
 
 		return serverMessage;
 	}
+	
+	/**
+	 * Função que guarda um ficheiro vindo do utilizador
+	 */
+	private ServerMessage receiveFile() {
+		
+		ServerMessage serverMessage;
+		
+		//verifica se o user de destino existe e que o ficheiro tem tamnho válido
+		if ( (authentication.existsUser(clientMessage.getDestination()) || 
+				groupService.existsGroup(clientMessage.getDestination())) 
+				&& clientMessage.getFileSize() < MAX_FILE_SIZE) {
+			
+			//cria chatMessage para persistir 
+			ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(), clientMessage.getDestination(),
+					clientMessage.getMessage(), MessageType.FILE);
+			
+			//persiste chatMessage
+			Long conversationID = conversationService.addChatMessage(chatMessage);
+
+			String fileName = extractName(clientMessage.getMessage());
+			System.out.println("[ProcessRequest]: extractName = " + fileName);
+			String path = conversationService.getFilePath(fileName, conversationID);
+			System.out.println("[ProcessRequest]: pathParaFile = " + path);
+			
+			//confirma ao cliente que é possivel receber o ficheiro
+			serverMessage = new ServerMessage(MessageType.OK);
+			ssn.sendMessage(serverMessage);
+
+			//recebe ficheiro
+			File file = ssn.receiveFile(clientMessage.getFileSize(), path);
+			
+			//verifica se o ficheiro foi bem recebido
+			if (file.length() > clientMessage.getFileSize())
+				serverMessage = new ServerMessage(MessageType.OK);
+			else {
+				serverMessage = new ServerMessage(MessageType.NOK);
+				serverMessage.setContent("Ficheiro com erro");
+
+				// Apagar ficheiro corrompido???
+				Path pathFile = file.toPath();
+				try {
+					Files.deleteIfExists(pathFile);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		} else {
+			serverMessage = new ServerMessage(MessageType.NOK);
+			serverMessage.setContent("Não existe esse contact");
+		}
+		
+		return serverMessage;
+	}
+	
+	/**
+	 * Função que processa e guarda um mensagem do utilizador
+	 */
+	private ServerMessage saveMessage() {
+		
+		ServerMessage serverMessage;
+		
+		//verifica se o user de destino existe
+		if (authentication.existsUser(clientMessage.getDestination()) || 
+				groupService.existsGroup(clientMessage.getDestination())) {
+			
+			System.out.println("[ProcessRequest-CMParser]: " + clientMessage.getMessage());
+			
+			//cria chatMessage a guardar
+			ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(), clientMessage.getDestination(),
+					clientMessage.getMessage(), MessageType.MESSAGE);
+
+			System.out.println("[ClientMessageParser.java] Adicionar chat message");
+			System.out.println(chatMessage.getFromUser());
+			
+			//persiste chatMessage
+			conversationService.addChatMessage(chatMessage);
+			serverMessage = new ServerMessage(MessageType.OK);
+			
+		} else {
+			serverMessage = new ServerMessage(MessageType.NOK);
+			serverMessage.setContent("Não existe esse contact");
+		}
+		
+		return serverMessage;
+		
+	}
+	
+	
 }
