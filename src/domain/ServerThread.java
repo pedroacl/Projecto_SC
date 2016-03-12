@@ -1,9 +1,7 @@
 package domain;
 
-import java.io.IOException;
 import java.net.Socket;
 
-import interfaces.ServerThreadInterface;
 import network.ClientMessage;
 import network.ServerMessage;
 import network.ServerSocketNetwork;
@@ -15,7 +13,7 @@ import parsers.ClientMessageParser;
  * @author Pedro, José, Antonio
  *
  */
-public class ServerThread extends Thread implements ServerThreadInterface {
+public class ServerThread extends Thread {
 
 	private Socket socket;
 
