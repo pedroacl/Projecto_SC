@@ -10,14 +10,14 @@ import util.MiscUtil;
 
 public class GroupService implements GroupServiceInterface {
 
-	private static GroupDAO groupDAO;
+	private GroupDAO groupDAO;
 
 	private static ConversationService conversationService;
 
 	private HashMap<String, String> groups; // groupName:owner
 
 	public GroupService() {
-		groupDAO = GroupDAO.getInstance();
+		groupDAO = new GroupDAO();
 		groups = groupDAO.getGroups();
 		conversationService = new ConversationService();
 	}

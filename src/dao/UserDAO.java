@@ -13,7 +13,6 @@ import interfaces.dao.UserDAOInterface;
 import util.MiscUtil;
 
 /**
- * <<SINGLETON>>
  * Classe que gere os utilizadores e que trata da sua persistencia no disco
  * 
  * @author Pedro, Jose, Antonio
@@ -21,17 +20,9 @@ import util.MiscUtil;
  */
 public class UserDAO implements UserDAOInterface {
 	
-	private static UserDAO userDAO = new UserDAO();
-	
-	private UserDAO() {
+	public UserDAO() {
 
 	}
-	
-	
-	public static UserDAO getInstance() {
-		return userDAO;
-	}
-	
 	
 	/**
 	 * Função que carrega em memória todos os utilizadores registados

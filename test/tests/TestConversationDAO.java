@@ -56,8 +56,8 @@ public class TestConversationDAO {
 		conversationFactory = ConversationFactory.getInstance();
 		conversationFactory.reset();
 
-		conversationDAO = ConversationDAO.getInstance();
-		groupDAO = GroupDAO.getInstance();
+		conversationDAO = new ConversationDAO();
+		groupDAO = new GroupDAO();
 		authentication = Authentication.getInstance();
 
 		authentication.addUser("antonio", "my_password");

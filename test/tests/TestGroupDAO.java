@@ -47,7 +47,7 @@ public class TestGroupDAO {
 
 		authentication = Authentication.getInstance();
 
-		groupDAO = GroupDAO.getInstance();
+		groupDAO = new GroupDAO();
 		
 		authentication.addUser("antonio", "1234");
 	}

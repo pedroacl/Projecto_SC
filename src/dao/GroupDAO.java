@@ -21,16 +21,10 @@ import util.MiscUtil;
 
 public class GroupDAO implements GroupDAOInterface {
 
-	private static GroupDAO groupDAO = new GroupDAO();
-
 	private static ConversationFactory conversationFactory;
 
-	private GroupDAO() {
+	public GroupDAO() {
 		conversationFactory = ConversationFactory.getInstance();
-	}
-
-	public static GroupDAO getInstance() {
-		return groupDAO;
 	}
 
 	/**

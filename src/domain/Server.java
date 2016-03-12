@@ -1,12 +1,8 @@
 package domain;
 
 import java.net.Socket;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import network.ServerNetwork;
 import network.ServerSocketNetwork;
@@ -33,8 +29,8 @@ public class Server {
 		serverNetwork = new ServerNetwork(serverPort);
 
 		// Thread Pool
-		ThreadFactory threadFactory = Executors.defaultThreadFactory();
-		ExecutorService executorService = Executors.newFixedThreadPool(MAX_THREADS, threadFactory);
+		//ThreadFactory threadFactory = Executors.defaultThreadFactory();
+		ExecutorService executorService = Executors.newFixedThreadPool(MAX_THREADS);
 
 		System.out.println("Servidor inicializado e ah espera de pedidos.");
 
@@ -45,11 +41,14 @@ public class Server {
 			ServerSocketNetwork serverSocketNetwork = new ServerSocketNetwork(socket);
 
 			ServerThread serverThread = new ServerThread(serverSocketNetwork);
-			executorService.execute(serverThread);
+			//executorService.execute(serverThread);
+			executorService.submit(serverThread);
 			//serverThread.run();
 
 			serverSocketNetwork.close();
 		}
+		
+        //executorService.shutdown();
 
 	}
 }

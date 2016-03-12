@@ -14,7 +14,7 @@ public class ConversationService implements ConversationServiceInterface {
 	private static ConversationDAO conversationDAO;
 	
 	public ConversationService() {
-		conversationDAO = ConversationDAO.getInstance();
+		conversationDAO = new ConversationDAO();
 	}
 
 	@Override
