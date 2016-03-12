@@ -1,5 +1,12 @@
 package domain;
+
 import java.net.Socket;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import network.ServerNetwork;
 import network.ServerSocketNetwork;
@@ -13,34 +20,36 @@ import network.ServerSocketNetwork;
  */
 
 public class Server {
-	
-	private static Authentication authentication;	
-	
+
 	private static ServerNetwork serverNetwork;
 	
-	//TODO receber IP por argumentos
+	private static final int MAX_THREADS = 5;
 
+	// TODO receber IP por argumentos
 	public static void main(String[] args) {
 		String portString = args[0];
 		int serverPort = Integer.parseInt(portString);
-		
-		authentication = Authentication.getInstance();
-		
+
 		serverNetwork = new ServerNetwork(serverPort);
+
+		// Thread Pool
+		ThreadFactory threadFactory = Executors.defaultThreadFactory();
+		ExecutorService executorService = Executors.newFixedThreadPool(MAX_THREADS, threadFactory);
+
 		System.out.println("Servidor inicializado e ah espera de pedidos.");
 
-		while(true) {
+		while (true) {
 			Socket socket = serverNetwork.getRequest();
 			System.out.println("Cliente ligado!");
 
 			ServerSocketNetwork serverSocketNetwork = new ServerSocketNetwork(socket);
-			ServerThreadContext serverThreadContext = new ServerThreadContext(authentication, serverSocketNetwork);
 
-			ServerThread serverThread = new ServerThread(serverThreadContext);
-			serverThread.run();
-			
+			ServerThread serverThread = new ServerThread(serverSocketNetwork);
+			executorService.execute(serverThread);
+			//serverThread.run();
+
 			serverSocketNetwork.close();
-		}																																																																	
-		
+		}
+
 	}
 }

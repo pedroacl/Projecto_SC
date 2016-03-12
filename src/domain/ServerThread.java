@@ -14,17 +14,14 @@ import parsers.ClientMessageParser;
  */
 public class ServerThread extends Thread implements ServerThreadInterface {
 	
-	private ServerThreadContext serverThreadContext;
+	private ServerSocketNetwork serverSocketNetwork;
 	
-	
-	public ServerThread(ServerThreadContext serverThreadContext) {
-		this.serverThreadContext = serverThreadContext;
+	public ServerThread(ServerSocketNetwork serverSocketNetwork) {
+		this.serverSocketNetwork = serverSocketNetwork;
 	}
 
 	
 	public void run() {
-		ServerSocketNetwork serverSocketNetwork = serverThreadContext.getServerSocketNetwork();
-		
 		//recebe Mensagem do cliente
 		ClientMessage clientMessage = serverSocketNetwork.getClientMessage();
 		
@@ -34,8 +31,5 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 		
 		//envia resposta ao cliente
 		serverSocketNetwork.sendMessage(serverMessage);
-	
 	}
-
-	
 }
