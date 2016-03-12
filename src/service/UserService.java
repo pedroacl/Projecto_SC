@@ -12,7 +12,7 @@ public class UserService implements UserServiceInterface {
 	private HashMap<String, String> users;
 
 	public UserService() {
-		userDAO = UserDAO.getInstance();
+		userDAO = new UserDAO();
 		users = userDAO.getUsers();
 	}
 	

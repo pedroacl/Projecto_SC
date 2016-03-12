@@ -8,32 +8,46 @@ import util.UserUtil;
 
 public class ServerResponseParser {
 
-	private UserUtil userInterface;
+	private UserUtil userUtil;
 	private ClientNetwork clientNetwork;
 	private String username;
 
+	/**
+	 * Construtor
+	 * 
+	 * @param userInterface
+	 * @param clientNetwork
+	 * @param username
+	 */
 	public ServerResponseParser(UserUtil userInterface, ClientNetwork clientNetwork, String username) {
-		this.userInterface = userInterface;
+		this.userUtil = userInterface;
 		this.clientNetwork = clientNetwork;
 		this.username = username;
 	}
 
+	/**
+	 * 
+	 * @param serverMessage
+	 */
 	public void ProcessMessage(ServerMessage serverMessage) {
 		switch (serverMessage.getMessageType()) {
+		// operacao bem sucedida
 		case OK:
-			userInterface.print("OK");
+			userUtil.print("OK");
 			break;
-
+		// mensagem de erro
 		case NOK:
-			userInterface.print(serverMessage.getMessage());
+			userUtil.print(serverMessage.getMessage());
 			break;
 
+		// todas as mensagens de uma conversa
 		case CONVERSATION:
-			userInterface.printChatMessages(serverMessage.getMessageList(), username);
+			userUtil.printChatMessages(serverMessage.getMessageList(), username);
 			break;
-			
+
+		// ultima mensagem de cada conversa em que o utilizador participou
 		case LAST_MESSAGES:
-			userInterface.printContactChatMessages(serverMessage.getMessageList(), username);
+			userUtil.printContactChatMessages(serverMessage.getMessageList(), username);
 			break;
 
 		// receber um ficheiro
@@ -41,13 +55,13 @@ public class ServerResponseParser {
 			try {
 				clientNetwork.receiveFile(serverMessage.getFileSize(), serverMessage.getMessage());
 			} catch (IOException e) {
-				userInterface.print("ERRO a receber o ficheiro");
+				userUtil.print("ERRO a receber o ficheiro");
 				e.printStackTrace();
 			}
 			break;
-
+		// mensagem do servidor mal formatada
 		default:
-			userInterface.print("Mensagem invalida");
+			userUtil.print("Mensagem invalida");
 			break;
 		}
 	}
