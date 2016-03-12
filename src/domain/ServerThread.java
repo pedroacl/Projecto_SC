@@ -5,7 +5,13 @@ import network.ClientMessage;
 import network.ServerMessage;
 import network.ServerSocketNetwork;
 import parsers.ClientMessageParser;
-
+/**
+ * <<THREAD>>
+ * Classe que executa o pedido de um cliente num novo fio de execução
+ * 
+ * @author Pedro, José, Antonio
+ *
+ */
 public class ServerThread extends Thread implements ServerThreadInterface {
 	
 	private ServerThreadContext serverThreadContext;
@@ -29,14 +35,6 @@ public class ServerThread extends Thread implements ServerThreadInterface {
 		//envia resposta ao cliente
 		serverSocketNetwork.sendMessage(serverMessage);
 	
-		/*
-		if(clientMessage.getMessageType().equals(MessageType.FILE))
-			serverSocketNetwork.sendMessage(new ServerMessage(MessageType.OK));
-		File b = serverSocketNetwork.receiveFile(clientMessage.getFileSize(), "teste1.jpeg");
-
-		System.out.println("Mensagem: " + clientMessage);
-		System.out.println("Thread terminada.");
-		 */
 	}
 
 	

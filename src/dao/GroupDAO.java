@@ -1,5 +1,10 @@
 package dao;
 
+/**
+ * <<SINGLETON>>
+ * Classe que gere os grupos, persistindo-os no disco
+ */
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -43,8 +48,10 @@ public class GroupDAO implements GroupDAOInterface {
 	/**
 	 * Adicionar utilizador a um grupo
 	 * 
-	 * @param groupName
-	 * @param username
+	 * @param groupName nome do grupo
+	 * @param username nome do utilizador a ser adicionado
+	 * @return True caso o username tenha sido adicionado a groupName,
+	 * 			false caso contrario
 	 */
 	@Override
 	public boolean addUserToGroup(String username, String groupName) {
@@ -63,6 +70,7 @@ public class GroupDAO implements GroupDAOInterface {
 
 	/**
 	 * Função que permite obter um hashmap com todos os grupos registados
+	 * @return HasMap com todos os grupos registados associados com os seus donos
 	 */
 	@Override
 	public HashMap<String, String> getGroups() {
@@ -105,7 +113,8 @@ public class GroupDAO implements GroupDAOInterface {
 
 	/**
 	 * Função que permite criar um grupo
-	 * 
+	 * @param groupName-nome do grupo a ser criado
+	 * @param admin- Dono do grupo, isto é quem cria o grupo
 	 * @return Devolve o id da conversação associada ao grupo
 	 */
 	@Override
@@ -139,7 +148,10 @@ public class GroupDAO implements GroupDAOInterface {
 
 		return conversationId;
 	}
-
+	/**
+	 * Apaga o registo de um grupo
+	 * @param groupName - nome do grupo a ser apagado do disco
+	 */
 	public void deleteGroup(String groupName) {
 		// apaga entrada no ficheiro groups.txt
 		File file = new File("groups.txt");

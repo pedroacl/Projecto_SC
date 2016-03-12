@@ -13,8 +13,10 @@ import interfaces.dao.UserDAOInterface;
 import util.MiscUtil;
 
 /**
+ * <<SINGLETON>>
+ * Classe que gere os utilizadores e que trata da sua persistencia no disco
  * 
- * @author pedro
+ * @author Pedro, Jose, Antonio
  *
  */
 public class UserDAO implements UserDAOInterface {
@@ -33,7 +35,7 @@ public class UserDAO implements UserDAOInterface {
 	
 	/**
 	 * Função que carrega em memória todos os utilizadores registados
-	 * @return 
+	 * @return HashMap de utilizadores e suas palavra-passes
 	 */
 	@Override
 	public HashMap<String, String> getUsers() {
@@ -104,8 +106,8 @@ public class UserDAO implements UserDAOInterface {
 
 	
 	/**
-	 * 
-	 * @param username
+	 * Apaga um utilizador
+	 * @param username- nome do utilizador a ser apagado
 	 */
 	@Override
 	public void deleteUser(String username) {

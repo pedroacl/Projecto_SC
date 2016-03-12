@@ -1,5 +1,11 @@
 package dao;
 
+/**
+ *  Classe que persiste conversações, isto é, gere as pastas
+ *  das conversações e guarda as mensagens de enviadas
+ *
+ */
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,8 +34,8 @@ public class ConversationDAO implements ConversationDAOInterface {
 	/**
 	 * Função que permite persistir uma determinada mensagem em disco
 	 * 
-	 * @param chatMessage
-	 *            Mensagem a ser guardada
+	 * @param chatMessage-Mensagem a ser guardada     
+	 * @return Long com identificador da conversa onde esta mensagem está guardada     
 	 */
 	@Override
 	public Long addChatMessage(ChatMessage chatMessage) {
@@ -102,6 +108,10 @@ public class ConversationDAO implements ConversationDAOInterface {
 	}
 
 	/**
+	 * Adiciona uma conversaçao ao ficheiros de conversaçoes do user
+	 * @param username - utilizador cuja conversaçao vai ser actulaizada
+	 * @param toUser - nome do utilizador  com o qual se esta a conversar
+	 * @param conversationId- identificador da conversação entre username e toUser 
 	 * 
 	 */
 	@Override
@@ -172,6 +182,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 * @return uma lista de ids das conversacoes ou null caso nao exista este
 	 *         utilizador
 	 */
+	@Override
 	public ArrayList<Long> getAllConversationsFrom(String userName) {
 		String path = "users/" + userName + "/conversations";
 		// Debug
@@ -185,7 +196,13 @@ public class ConversationDAO implements ConversationDAOInterface {
 		Collection<Long> collection = conversations.values();
 		return new ArrayList<Long>(collection);
 	}
-
+	
+	/**
+	 * Obtem todas as mensagens associadas a uma conversação
+	 * @param consersationId - identificador da conversa de onde se quer as mensagens
+	 * @return Lista de todas as mensagens sobre a forma de ChatMessages
+	 */
+	@Override
 	public List<ChatMessage> getAllMessagesFromConversation(Long conversationId) {
 		String path = "conversations/" + conversationId + "/messages";
 		ArrayList<ChatMessage> allMessages = new ArrayList<ChatMessage>();
@@ -205,9 +222,8 @@ public class ConversationDAO implements ConversationDAOInterface {
 	}
 
 	/**
-	 * 
-	 * @param texto
-	 * @return
+	 * Cria uma chatMessage a partir de um ArrayList que contem os varios campos
+	 * que compoeem uma ChatMessagae
 	 */
 	private ChatMessage makeChatMessage(ArrayList<String> texto) {
 
@@ -222,7 +238,10 @@ public class ConversationDAO implements ConversationDAOInterface {
 	}
 
 	/**
-	 * 
+	 * Devolve o identificador da conversa entre dois utilizadores
+	 * @param user1 - utilizador que faz parte da conversa
+	 * @param user2 - utilizador que faz parte da conversa
+	 * @return identificador da conversa ou -1 caso esta não exista
 	 */
 	public Long getConversationInCommom(String user1, String user2) {
 		// vai as conversaçoes do user1
@@ -239,11 +258,11 @@ public class ConversationDAO implements ConversationDAOInterface {
 	}
 
 	/**
-	 * 
-	 * @param fromUser
-	 * @param toUser
-	 * @param fileName
-	 * @return
+	 * Retorna um path caso exista um ficheiro na conversa entre 2 utilizadores
+	 * @param fromUser utilizador participante da conversa
+	 * @param toUser utilizador participante da conversa 
+	 * @param fileName nome do ficheiro que se quer obter o path
+	 * @return uma string com o caminho para o ficheiro ou null caso nao exista
 	 */
 	public String existFile(String fromUser, String toUser, String fileName) {
 		Long id = getConversationInCommom(fromUser, toUser);
@@ -255,7 +274,13 @@ public class ConversationDAO implements ConversationDAOInterface {
 			return f.exists() ? path : null;
 		}
 	}
-
+	
+	/**
+	 * Remove uma conversa das lista de conversaçoes de username
+	 * @param username utilizador que quer ver removida conversa
+	 * @param fromUser nome do utilizador com o qual username  tem uma conversa
+	 * 
+	 */
 	@Override
 	public void removeConversationFromUser(String username, String fromUser) {
 		HashMap<String, Long> userConversations = null;
@@ -268,7 +293,11 @@ public class ConversationDAO implements ConversationDAOInterface {
 			MiscUtil.writeObject(userConversations, filePath);
 		}
 	}
-
+	
+	/**
+	 * Remove uma conversa do disco
+	 * @param conversationId- identificador da conversa a ser removida
+	 */
 	@Override
 	public void removeConversation(Long conversationId) {
 		File file = new File("conversations/" + conversationId);

@@ -5,14 +5,20 @@ import network.ServerMessage;
 import parsers.ArgsParser;
 import parsers.ServerResponseParser;
 import util.UserUtil;
-
+/**
+ * Classe que representa um cliente, isto é responsavel por contactar o servidor
+ * 
+ * @author Pedro, José, Antonio
+ *
+ */
 
 public class Client{
 	
 	private static ClientNetwork clientNetwork;
 	
 	/**
-	 * @param args
+	 * Funçao principal
+	 * @param args - argumentos com o pedido do utilizador
 	 * 
 	 */
 	public static void main(String[] args) {

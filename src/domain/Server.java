@@ -4,6 +4,14 @@ import java.net.Socket;
 import network.ServerNetwork;
 import network.ServerSocketNetwork;
 
+/**
+ * Classe que representa o servidor. Tem a lógica do negocio. Responde perante
+ * os pedidos do cliente
+ * 
+ * @author Pedro, José, Antonio
+ *
+ */
+
 public class Server {
 	
 	private static Authentication authentication;	
@@ -34,6 +42,5 @@ public class Server {
 			serverSocketNetwork.close();
 		}																																																																	
 		
-		//serverNetwork.disconnect();
 	}
 }

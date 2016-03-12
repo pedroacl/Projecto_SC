@@ -2,6 +2,11 @@ package domain;
 
 import network.ServerSocketNetwork;
 
+/**
+ * 
+ * @author Pedro, Jose, Antonio
+ *
+ */
 public class ServerThreadContext {
 
 	private ServerSocketNetwork serverSocketNetwork;

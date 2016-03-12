@@ -2,7 +2,13 @@ package domain;
 
 import interfaces.AuthenticationInterface;
 import service.UserService;
-
+/**
+ * <<SINGLETON>>
+ * Classe que verifica existencia dos utilizadores e que trata da sua autenticaçao
+ * 
+ * @author Pedro, Jose, Antonio
+ *
+ */
 public class Authentication implements AuthenticationInterface {
 
 	private static Authentication authentication = new Authentication();
@@ -13,16 +19,21 @@ public class Authentication implements AuthenticationInterface {
 		userService = new UserService();
 		System.out.println("[Authentication.java] Users: " + userService.getUsers());
 	}
-
+	/**
+	 * Obtem uma instancia desta classe
+	 * @return Authentication
+	 */
 	public static Authentication getInstance() {
 		return authentication;
 	}
 
 	/**
+	 * Adiciona um utilizador ao sistema caso este não exista. Se o utilizador existir
+	 * verifica se a password está correcta
 	 * 
-	 * @param username
-	 * @param password
-	 * @return
+	 * @param username nome do utilizador a autenticar
+	 * @param password palavra passe do utilizador
+	 * @return False caso a password esteja errada
 	 */
 	@Override
 	public boolean authenticateUser(String username, String password) {
@@ -42,9 +53,9 @@ public class Authentication implements AuthenticationInterface {
 	}
 
 	/**
-	 * 
-	 * @param username
-	 * @return
+	 * Verifica se existe um utilizador
+	 * @param username- nome do utilizador a verificar da sua existencia
+	 * @return True caso utilizador exista, false caso contrario
 	 */
 	@Override
 	public boolean existsUser(String username) {
@@ -52,9 +63,10 @@ public class Authentication implements AuthenticationInterface {
 	}
 
 	/**
+	 * Adiciona um utilizador ao sistema
 	 * 
-	 * @param username
-	 * @param password
+	 * @param username-utilizador a ser adicionado
+	 * @param password- palavra passe do utilizador
 	 */
 	@Override
 	public void addUser(String username, String password) {
