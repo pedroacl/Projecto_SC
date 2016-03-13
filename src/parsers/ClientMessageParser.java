@@ -238,7 +238,7 @@ public class ClientMessageParser {
 			File file = ssn.receiveFile(clientMessage.getFileSize(), path);
 			
 			//verifica se o ficheiro foi bem recebido
-			if (file.length() > clientMessage.getFileSize())
+			if (file.length() >= clientMessage.getFileSize())
 				serverMessage = new ServerMessage(MessageType.OK);
 			else {
 				serverMessage = new ServerMessage(MessageType.NOK);

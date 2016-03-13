@@ -41,7 +41,7 @@ public class UserDAO implements UserDAOInterface {
 		//nao existe ficheiro
 		if (!file.exists()) {
 			System.out.println("Nao existem utilizadores adicionados.");
-			return null;
+			return users;
 		}
 
 		try {
