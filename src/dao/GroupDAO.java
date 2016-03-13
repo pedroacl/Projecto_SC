@@ -1,7 +1,7 @@
 package dao;
 
 /**
- * <<SINGLETON>>
+ * 
  * Classe que gere os grupos, persistindo-os no disco
  */
 

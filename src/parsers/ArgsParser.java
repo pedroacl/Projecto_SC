@@ -5,6 +5,13 @@ import java.io.File;
 import network.ClientMessage;
 import network.MessageType;
 
+/**
+ * Classe que verifica os parametros de entrada e cria um ClientMessage correspondente
+ * a opção do utilizador
+ * 
+ * @author Pedro, Jose, Antonio
+ *
+ */
 public class ArgsParser {
 
 	private String username;
@@ -21,10 +28,20 @@ public class ArgsParser {
 
 	private String action;
 
+	/**
+	 * Devolve o ip do servidor
+	 * @return String com a representaçao do ip do servidor a contactar
+	 * @requires isValid == true
+	 */
 	public String getServerIP() {
 		return serverIP;
 	}
-
+	
+	/**
+	 * Devolve o porto do servidor selecionado pelo utilizador
+	 * @return String com o porto
+	 * @requires isValid == True
+	 */
 	public String getServerPort() {
 		return serverPort;
 	}
@@ -38,6 +55,10 @@ public class ArgsParser {
 		this.args = args;
 	}
 
+	/**
+	 * Verifica se  os argumentros de entrada são válidos.
+	 * @return true, caso seja uma opção válida, false caso contrario
+	 */
 	public boolean validateInput() {
 		if (args.length < 4 || args.length > 8) {
 			System.out.println("xau 0");
@@ -86,11 +107,20 @@ public class ArgsParser {
 		isValid = true;
 		return true;
 	}
-
+	
+	/**
+	 * Informa sobre a validade dos argumentos de entrada
+	 * @return True, caso a analise dos argumentos de entrada ter dado positivo
+	 */
 	public boolean isValidInput() {
 		return isValid;
 	}
-
+	
+	/**
+	 * Devolve um clientMessage preenchida conforme as opçoes do utilizador
+	 * @return ClientMessage, mensagem com pedido do cliente ao servidor
+	 * @requires isValid == True
+	 */
 	public ClientMessage getMessage() {
 		String[] act = action.split(" ");
 		ClientMessage pedido = null;
@@ -147,7 +177,8 @@ public class ArgsParser {
 		return pedido;
 
 	}
-
+	
+	//Devolve a ação propriamente dita a fazer
 	private static String parseAction(String[] args, int i) {
 
 		if (args.length == i)
@@ -224,11 +255,17 @@ public class ArgsParser {
 		return res;
 
 	}
-
+	
+	/**
+	 * Devolve o utilizador que está a usar o sistema
+	 * @return nome do utilizador a usar o sistema
+	 * @requires isValid == True
+	 */
 	public String getUsername() {
 		return username;
 	}
 
+	//devolve o tamanho do ficheiro que o utilizador quer enviar
 	private int fileSize(String name) {
 		File file = new File(name);
 		return (int) file.length();

@@ -15,6 +15,12 @@ import network.ServerSocketNetwork;
 import service.ConversationService;
 import service.GroupService;
 
+/**
+ * Classe que analisa a mensagem de rede com o pedido do cliente
+ * 
+ * @author Pedro, Jose, Antonio
+ *
+ */
 public class ClientMessageParser {
 
 	private ClientMessage clientMessage;
@@ -28,7 +34,8 @@ public class ClientMessageParser {
 	private ServerSocketNetwork ssn;
 
 	private final int MAX_FILE_SIZE = Integer.MAX_VALUE;
-
+	
+	
 	public ClientMessageParser(ClientMessage clientMessage, ServerSocketNetwork serverSocketNetwork) {
 		this.clientMessage = clientMessage;
 		authentication = Authentication.getInstance();
@@ -38,7 +45,11 @@ public class ClientMessageParser {
 
 		this.ssn = serverSocketNetwork;
 	}
-
+	
+	/**
+	 * Processa a Mensagem do cliente, executa o pedido e cria mensagem de resposta
+	 * @return ServerMessage com a resposta do servidor ao cliente
+	 */
 	public ServerMessage processRequest() {
 		ServerMessage serverMessage = null;
 
@@ -171,7 +182,8 @@ public class ClientMessageParser {
 		return serverMessage;
 
 	}
-
+	
+	// Devolve só o nome do ficheiro, não o path completo
 	private String extractName(String absolutePath) {
 		String[] splitName = absolutePath.split("/");
 		return splitName[splitName.length - 1];

@@ -2,6 +2,12 @@ package factories;
 
 import entities.Conversation;
 
+/**
+ * Classe responsavel por criar conversaçoes associando-lhe um id.
+ * 
+ * @author Jose, Pedro, Antonio
+ *
+ */
 public class ConversationFactory {
 	private static Long conversationId;
 	
@@ -22,7 +28,12 @@ public class ConversationFactory {
 		return conversationFactory;
 	}
 	
-	
+	/**
+	 * Cria uma conversa
+	 * @param fromUser, utilizador que iniciou a conversa
+	 * @param toUser, contacto a que mse destina a primeira mensagem
+	 * @return Conversation
+	 */
 	public Conversation build(String fromUser, String toUser) {
 		Conversation conversation = new Conversation(fromUser, toUser);
 		conversation.setId(conversationId);
@@ -32,6 +43,10 @@ public class ConversationFactory {
 		return conversation;
 	}
 	
+	/**
+	 * Devolve o próximo id de uam conversa
+	 * @return Long, identificador de conversa
+	 */
 	public long generateID() {
 		long id = conversationId;
 		System.out.println("[CONVERSATIOFACTORY)]: "+ conversationId);

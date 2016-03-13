@@ -6,6 +6,12 @@ import network.ClientNetwork;
 import network.ServerMessage;
 import util.UserUtil;
 
+/**
+ * Classe que processa a resposta do servidor, ao pedidio inicial do cliente
+ * 
+ * @author Pedro, Jose, Antonio
+ *
+ */
 public class ServerResponseParser {
 
 	private UserUtil userUtil;
@@ -26,8 +32,8 @@ public class ServerResponseParser {
 	}
 
 	/**
-	 * 
-	 * @param serverMessage
+	 * Analisa e informa utilizador da resposta ao pedido efectuado
+	 * @param serverMessage - Mensagem que o servido enviou
 	 */
 	public void ProcessMessage(ServerMessage serverMessage) {
 		switch (serverMessage.getMessageType()) {
