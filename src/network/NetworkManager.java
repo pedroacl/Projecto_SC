@@ -26,6 +26,8 @@ public abstract class NetworkManager {
 	 */
 	public NetworkManager(Socket socket) {
 		this.socket = socket;
+		
+		System.out.println(socket == null);
 
 		try {
 			out = new ObjectOutputStream(socket.getOutputStream());
@@ -50,11 +52,11 @@ public abstract class NetworkManager {
 	 * 
 	 * @return
 	 */
-	public NetworkMessage receiveMessage() {
-		NetworkMessage networkMessage = null;
+	public Object receiveMessage() {
+		Object networkMessage = null;
 
 		try {
-			networkMessage = (NetworkMessage) in.readObject();
+			networkMessage = in.readObject();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -110,7 +112,7 @@ public abstract class NetworkManager {
 	 * @param message
 	 * @return
 	 */
-	protected boolean send(NetworkMessage message) {
+	protected boolean send(Object message) {
 		boolean sent = true;
 		try {
 			out.writeObject(message);
@@ -134,6 +136,9 @@ public abstract class NetworkManager {
 	 * @param message
 	 */
 	public boolean sendMessage(NetworkMessage message) {
+
+		System.out.println("..." + (message.getMessageType()));
+		
 		if (message.getMessageType().equals(MessageType.FILE))
 			return sendFile(message);
 		else

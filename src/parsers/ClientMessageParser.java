@@ -10,7 +10,6 @@ import domain.Authentication;
 import entities.ChatMessage;
 import network.ClientMessage;
 import network.MessageType;
-import network.NetworkManager;
 import network.ServerMessage;
 import network.ServerNetworkManager;
 import service.ConversationService;

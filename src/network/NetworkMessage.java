@@ -1,9 +1,16 @@
 package network;
 
-public class NetworkMessage {
+import java.io.Serializable;
+
+public class NetworkMessage implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private int fileSize;
 	
-	private MessageType messageType;
+	protected MessageType messageType;
 	
 	private String content;
 	

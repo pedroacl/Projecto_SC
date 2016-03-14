@@ -1,13 +1,11 @@
 package network;
 
-import java.io.Serializable;
-
-public class ClientMessage extends NetworkMessage implements Serializable {
+public class ClientMessage extends NetworkMessage {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 90127206322736048L;
+	private static final long serialVersionUID = 1L;
 
 	private String username;
 
@@ -16,6 +14,7 @@ public class ClientMessage extends NetworkMessage implements Serializable {
 	private String password;
 
 	public ClientMessage(String username, String password, MessageType type) {
+		super(type);
 		this.username = username;
 		this.password = password;
 	}
@@ -38,7 +37,7 @@ public class ClientMessage extends NetworkMessage implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ClientMessage [username=" + username + ", password=" + password + ", messageType=" + getMessageType()
+		return "ClientMessage [username=" + username + ", password=" + password + ", messageType=" + messageType
 				+ "]";
 	}
 }

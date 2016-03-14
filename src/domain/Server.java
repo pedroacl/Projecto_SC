@@ -44,7 +44,6 @@ public class Server {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			ServerNetworkManager serverNetworkManager = new ServerNetworkManager(socket);
 
 			System.out.println("Cliente ligado!");
 
