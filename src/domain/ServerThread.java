@@ -22,6 +22,7 @@ public class ServerThread extends Thread {
 	}
 
 	public void run() {
+		//incializa comunicação com o cliente e recebe ClientMessage
 		ServerNetworkManager serverNetworkManager = new ServerNetworkManager(socket);
 		ClientMessage clientMessage = (ClientMessage) serverNetworkManager.receiveMessage();
 		System.out.println("!!!!" + clientMessage);

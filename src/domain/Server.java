@@ -24,7 +24,8 @@ public class Server {
 
 		int serverPort = Integer.parseInt(args[0]);
 		ServerSocket serverSocket = null;
-
+		
+		//cria serverSocket
 		try {
 			serverSocket = new ServerSocket(serverPort);
 		} catch (IOException e) {

@@ -79,9 +79,9 @@ public class Client {
 			ServerResponseParser srp = new ServerResponseParser(userInterface, clientNetwork, argsParser.getUsername());
 			srp.ProcessMessage(serverMsg);
 
-			// fecha a ligaçao ao servidor
+			
 		}
-
+		// fecha a ligaçao ao servidor
 		clientNetwork.close();
 
 	}
