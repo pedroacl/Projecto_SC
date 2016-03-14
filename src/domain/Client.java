@@ -44,6 +44,11 @@ public class Client {
 			userInterface.printArgsUsage();
 			System.exit(0);
 		}
+		
+		//verifica se o utlizador preencheu password
+		if(!argsParser.passwordFilled()) {
+			argsParser.setPassword(userInterface.askForPassword());
+		}
 
 		// Cria Classe de comunicação entre Cliente e servidor
 		int port = Integer.parseInt(argsParser.getServerPort());

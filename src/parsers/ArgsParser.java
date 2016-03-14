@@ -270,5 +270,18 @@ public class ArgsParser {
 		File file = new File(name);
 		return (int) file.length();
 	}
+	
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	/**
+	 * Verifica se o utilizador preencheu o campo password
+	 * 
+	 * @return True,caso a password tenha sido dado pelo utilizador
+	 * @requires isValid = true;
+	 */
+	public  boolean passwordFilled() {
+		return password != null;
+	}
 
 }

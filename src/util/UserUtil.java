@@ -2,6 +2,7 @@ package util;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Scanner;
 
 import entities.ChatMessage;
 
@@ -53,6 +54,15 @@ public class UserUtil {
 		sb.append(date);
 
 		System.out.println(sb);
+	}
+	
+	public String askForPassword () {
+		
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Qual a sua password?");
+		String lido = sc.nextLine();
+		
+		return lido;
 	}
 
 }
