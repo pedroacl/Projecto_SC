@@ -10,8 +10,9 @@ import domain.Authentication;
 import entities.ChatMessage;
 import network.ClientMessage;
 import network.MessageType;
+import network.NetworkManager;
 import network.ServerMessage;
-import network.ServerSocketNetwork;
+import network.ServerNetworkManager;
 import service.ConversationService;
 import service.GroupService;
 
@@ -31,19 +32,19 @@ public class ClientMessageParser {
 	
 	private ConversationService conversationService;
 
-	private ServerSocketNetwork ssn;
+	private ServerNetworkManager serverNetworkManager;
 
 	private final int MAX_FILE_SIZE = Integer.MAX_VALUE;
 	
 	
-	public ClientMessageParser(ClientMessage clientMessage, ServerSocketNetwork serverSocketNetwork) {
+	public ClientMessageParser(ClientMessage clientMessage, ServerNetworkManager serverNetworkManager) {
 		this.clientMessage = clientMessage;
 		authentication = Authentication.getInstance();
 
 		conversationService = new ConversationService();
 		groupService = GroupService.getInstance(); 
 
-		this.ssn = serverSocketNetwork;
+		this.serverNetworkManager = serverNetworkManager;
 	}
 	
 	/**
@@ -72,7 +73,7 @@ public class ClientMessageParser {
 			
 		case RECEIVER:
 
-			switch (clientMessage.getMessage()) {
+			switch (clientMessage.getContent()) {
 
 			case "recent":
 
@@ -116,7 +117,7 @@ public class ClientMessageParser {
 						groupService.existsGroup(clientMessage.getDestination())) {
 					//verifica se exite o path
 					String path = conversationService.existsFile(clientMessage.getUsername(), clientMessage.getDestination(),
-							clientMessage.getMessage());
+							clientMessage.getContent());
 					
 					System.out.println("[CASE RECEIVER file]: " + path);
 
@@ -125,7 +126,7 @@ public class ClientMessageParser {
 
 						File file = new File(path);
 						serverMessage = new ServerMessage(MessageType.FILE);
-						serverMessage.setSizeFile((int) file.length());
+						serverMessage.setFileSize((int) file.length());
 						System.out.print("[ProcessRequest] -r ");
 						System.out.println("file: " + path + " size = " + file.length());
 						serverMessage.setContent(path);	
@@ -172,7 +173,7 @@ public class ClientMessageParser {
 		if (authentication.existsUser(clientMessage.getDestination())) {
 
 			groupService.removeUserFromGroup(clientMessage.getUsername(), clientMessage.getDestination(),
-					clientMessage.getMessage());
+					clientMessage.getContent());
 
 		} else {
 			serverMessage = new ServerMessage(MessageType.NOK);
@@ -196,7 +197,7 @@ public class ClientMessageParser {
 		ServerMessage serverMessage = new ServerMessage(MessageType.OK);
 
 		if (authentication.existsUser(clientMessage.getDestination()) && groupService.addUserToGroup(
-				clientMessage.getUsername(), clientMessage.getDestination(), clientMessage.getMessage())) {
+				clientMessage.getUsername(), clientMessage.getDestination(), clientMessage.getContent())) {
 
 		} else {
 			serverMessage = new ServerMessage(MessageType.NOK);
@@ -220,22 +221,28 @@ public class ClientMessageParser {
 			
 			//cria chatMessage para persistir 
 			ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(), clientMessage.getDestination(),
-					clientMessage.getMessage(), MessageType.FILE);
+					clientMessage.getContent(), MessageType.FILE);
 			
 			//persiste chatMessage
 			Long conversationID = conversationService.addChatMessage(chatMessage);
 
-			String fileName = extractName(clientMessage.getMessage());
+			String fileName = extractName(clientMessage.getContent());
 			System.out.println("[ProcessRequest]: extractName = " + fileName);
 			String path = conversationService.getFilePath(fileName, conversationID);
 			System.out.println("[ProcessRequest]: pathParaFile = " + path);
 			
 			//confirma ao cliente que é possivel receber o ficheiro
 			serverMessage = new ServerMessage(MessageType.OK);
-			ssn.sendMessage(serverMessage);
+			serverNetworkManager.sendMessage(serverMessage);
 
 			//recebe ficheiro
-			File file = ssn.receiveFile(clientMessage.getFileSize(), path);
+			File file = null;
+
+			try {
+				file = serverNetworkManager.receiveFile(clientMessage.getFileSize(), path);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 			
 			//verifica se o ficheiro foi bem recebido
 			if (file.length() >= clientMessage.getFileSize())
@@ -271,11 +278,11 @@ public class ClientMessageParser {
 		if (authentication.existsUser(clientMessage.getDestination()) || 
 				groupService.existsGroup(clientMessage.getDestination())) {
 			
-			System.out.println("[ProcessRequest-CMParser]: " + clientMessage.getMessage());
+			System.out.println("[ProcessRequest-CMParser]: " + clientMessage.getContent());
 			
 			//cria chatMessage a guardar
 			ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(), clientMessage.getDestination(),
-					clientMessage.getMessage(), MessageType.MESSAGE);
+					clientMessage.getContent(), MessageType.MESSAGE);
 
 			System.out.println("[ClientMessageParser.java] Adicionar chat message");
 			System.out.println(chatMessage.getFromUser());
@@ -292,6 +299,4 @@ public class ClientMessageParser {
 		return serverMessage;
 		
 	}
-	
-	
 }

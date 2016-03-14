@@ -2,7 +2,7 @@ package parsers;
 
 import java.io.IOException;
 
-import network.ClientNetwork;
+import network.ClientNetworkManager;
 import network.ServerMessage;
 import util.UserUtil;
 
@@ -15,7 +15,7 @@ import util.UserUtil;
 public class ServerResponseParser {
 
 	private UserUtil userUtil;
-	private ClientNetwork clientNetwork;
+	private ClientNetworkManager clientNetwork;
 	private String username;
 
 	/**
@@ -25,7 +25,7 @@ public class ServerResponseParser {
 	 * @param clientNetwork
 	 * @param username
 	 */
-	public ServerResponseParser(UserUtil userInterface, ClientNetwork clientNetwork, String username) {
+	public ServerResponseParser(UserUtil userInterface, ClientNetworkManager clientNetwork, String username) {
 		this.userUtil = userInterface;
 		this.clientNetwork = clientNetwork;
 		this.username = username;
@@ -43,7 +43,7 @@ public class ServerResponseParser {
 			break;
 		// mensagem de erro
 		case NOK:
-			userUtil.print(serverMessage.getMessage());
+			userUtil.print(serverMessage.getContent());
 			break;
 
 		// todas as mensagens de uma conversa
@@ -59,7 +59,7 @@ public class ServerResponseParser {
 		// receber um ficheiro
 		case FILE:
 			try {
-				clientNetwork.receiveFile(serverMessage.getFileSize(), serverMessage.getMessage());
+				clientNetwork.receiveFile(serverMessage.getFileSize(), serverMessage.getContent());
 			} catch (IOException e) {
 				userUtil.print("ERRO a receber o ficheiro");
 				e.printStackTrace();

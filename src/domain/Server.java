@@ -1,10 +1,12 @@
 package domain;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import network.ServerNetwork;
+import network.ServerNetworkManager;
 
 /**
  * Classe que representa o servidor. Tem a lógica do negocio. Responde perante
@@ -21,7 +23,13 @@ public class Server {
 	public static void main(String[] args) {
 
 		int serverPort = Integer.parseInt(args[0]);
-		ServerNetwork serverNetwork = new ServerNetwork(serverPort);
+		ServerSocket serverSocket = null;
+
+		try {
+			serverSocket = new ServerSocket(serverPort);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		// Thread Pool
 		ExecutorService executorService = Executors.newFixedThreadPool(MAX_THREADS);
@@ -29,13 +37,21 @@ public class Server {
 		System.out.println("Servidor inicializado e ah espera de pedidos.");
 
 		while (true) {
-			Socket socket = serverNetwork.getRequest();
+			Socket socket = null;
+
+			try {
+				socket = serverSocket.accept();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			ServerNetworkManager serverNetworkManager = new ServerNetworkManager(socket);
+
 			System.out.println("Cliente ligado!");
 
 			ServerThread serverThread = new ServerThread(socket);
 			executorService.execute(serverThread);
 		}
-		
-        //executorService.shutdown();
+
+		// executorService.shutdown();
 	}
 }

@@ -133,42 +133,42 @@ public class ArgsParser {
 			for (int i = 2; i < act.length; i++) {
 				sb.append(act[i] + " ");
 			}
-			pedido.setMessage(sb.toString());
+			pedido.setContent(sb.toString());
 			break;
 		case "-f":
 			pedido = new ClientMessage(username, password, MessageType.FILE);
 			pedido.setDestination(act[1]);
 			System.out.println("Client: fileSize= " + fileSize(act[2]));
 			pedido.setFileSize(fileSize(act[2]));
-			pedido.setMessage(act[2]); // coloca nome do ficheiro na mensagem
+			pedido.setContent(act[2]); // coloca nome do ficheiro na mensagem
 			break;
 		case "-a":
 			pedido = new ClientMessage(username, password, MessageType.ADDUSER);
 			pedido.setDestination(act[1]); // coloca user a adicionar no destino
-			pedido.setMessage(act[2]); // coloca nome do grupo na mensagem
+			pedido.setContent(act[2]); // coloca nome do grupo na mensagem
 			break;
 
 		case "-d":
 			pedido = new ClientMessage(username, password, MessageType.REMOVEUSER);
 			pedido.setDestination(act[1]); // coloca user a adicionar no destino
-			pedido.setMessage(act[2]); // coloca nome do grupo na mensagem
+			pedido.setContent(act[2]); // coloca nome do grupo na mensagem
 			break;
 
 		case "-r":
 			if (act.length == 1) {
 				pedido = new ClientMessage(username, password, MessageType.RECEIVER);
-				pedido.setMessage("recent");
+				pedido.setContent("recent");
 			}
 			if (act.length == 2) {
 				pedido = new ClientMessage(username, password, MessageType.RECEIVER);
 				pedido.setDestination(act[1]);
-				pedido.setMessage("all");
+				pedido.setContent("all");
 			}
 			if (act.length == 3) {
 				pedido = new ClientMessage(username, password, MessageType.RECEIVER);
 				pedido.setDestination(act[1]);// coloca no destinatario a quem
 												// pede o file
-				pedido.setMessage(act[2]); // coloca nome do ficheiro na
+				pedido.setContent(act[2]); // coloca nome do ficheiro na
 											// mensagem
 			}
 			break;

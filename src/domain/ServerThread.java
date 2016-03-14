@@ -4,7 +4,7 @@ import java.net.Socket;
 
 import network.ClientMessage;
 import network.ServerMessage;
-import network.ServerSocketNetwork;
+import network.ServerNetworkManager;
 import parsers.ClientMessageParser;
 
 /**
@@ -22,15 +22,15 @@ public class ServerThread extends Thread {
 	}
 
 	public void run() {
-		ServerSocketNetwork serverSocketNetwork = new ServerSocketNetwork(socket);
-		ClientMessage clientMessage = serverSocketNetwork.getClientMessage();
+		ServerNetworkManager serverNetworkManager = new ServerNetworkManager(socket);
+		ClientMessage clientMessage = (ClientMessage) serverNetworkManager.receiveMessage();
 
 		// processa a mensagem do cliente e cria mensagem de resposta
-		ClientMessageParser clientMessageParser = new ClientMessageParser(clientMessage, serverSocketNetwork);
+		ClientMessageParser clientMessageParser = new ClientMessageParser(clientMessage, serverNetworkManager);
 		ServerMessage serverMessage = clientMessageParser.processRequest();
 
 		// envia resposta ao cliente
-		serverSocketNetwork.sendMessage(serverMessage);
-		serverSocketNetwork.close();
+		serverNetworkManager.sendMessage(serverMessage);
+		serverNetworkManager.close();
 	}
 }
