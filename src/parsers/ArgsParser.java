@@ -27,6 +27,8 @@ public class ArgsParser {
 	private boolean isValid;
 
 	private String action;
+	
+	private String[] act;
 
 	/**
 	 * Devolve o ip do servidor
@@ -103,6 +105,13 @@ public class ArgsParser {
 			System.out.println("xau3");
 			return false;
 		}
+		act = action.split(" ");
+		
+		//verifica se o username e o destinatario são diferentes
+		if(!act[0].equals("-r") && act[1].equals(username)) {
+			System.out.println("Destinatário igual ao username");
+			return false;
+		}
 
 		isValid = true;
 		return true;
@@ -122,7 +131,6 @@ public class ArgsParser {
 	 * @requires isValid == True
 	 */
 	public ClientMessage getMessage() {
-		String[] act = action.split(" ");
 		ClientMessage pedido = null;
 
 		switch (act[0]) {
