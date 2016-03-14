@@ -41,7 +41,7 @@ public class ClientMessageParser {
 		authentication = Authentication.getInstance();
 
 		conversationService = new ConversationService();
-		groupService = new GroupService();
+		groupService = GroupService.getInstance(); 
 
 		this.ssn = serverSocketNetwork;
 	}

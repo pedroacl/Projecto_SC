@@ -8,18 +8,33 @@ import entities.Group;
 import interfaces.service.GroupServiceInterface;
 import util.MiscUtil;
 
+/**
+ * 
+ * @author pedro
+ *
+ */
 public class GroupService implements GroupServiceInterface {
 
 	private GroupDAO groupDAO;
 
 	private static ConversationService conversationService;
+	
+	private static GroupService groupService = new GroupService();
 
 	private HashMap<String, String> groups; // groupName:owner
 
-	public GroupService() {
+	private GroupService() {
 		groupDAO = new GroupDAO();
 		groups = groupDAO.getGroups();
 		conversationService = new ConversationService();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static GroupService getInstance() {
+		return groupService;
 	}
 
 	/**

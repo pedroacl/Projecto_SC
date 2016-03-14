@@ -48,7 +48,7 @@ public class TestGroupService {
 		authentication.addUser("antonio", "1234");
 		authentication.addUser("jose", "4321");
 
-		groupService = new GroupService();
+		groupService = GroupService.getInstance();
 	}
 
 	@Test
