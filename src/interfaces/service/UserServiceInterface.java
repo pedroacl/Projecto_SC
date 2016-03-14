@@ -1,10 +1,10 @@
 package interfaces.service;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public interface UserServiceInterface {
 
-	public HashMap<String, String> getUsers();
+	public ConcurrentHashMap<String, String> getUsers();
 
 	public void addUser(String username, String password);
 

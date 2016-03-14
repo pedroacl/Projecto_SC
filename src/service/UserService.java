@@ -1,6 +1,6 @@
 package service;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import dao.UserDAO;
 import interfaces.service.UserServiceInterface;
@@ -9,7 +9,7 @@ public class UserService implements UserServiceInterface {
 	
 	private static UserDAO userDAO;
 
-	private HashMap<String, String> users;
+	private ConcurrentHashMap<String, String> users;
 
 	public UserService() {
 		userDAO = new UserDAO();
@@ -17,7 +17,7 @@ public class UserService implements UserServiceInterface {
 	}
 	
 	@Override
-	public HashMap<String, String> getUsers() {
+	public ConcurrentHashMap<String, String> getUsers() {
 		return users;
 	}
 

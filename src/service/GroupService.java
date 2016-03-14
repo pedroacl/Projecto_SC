@@ -1,7 +1,7 @@
 package service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import dao.GroupDAO;
 import entities.Group;
@@ -21,7 +21,7 @@ public class GroupService implements GroupServiceInterface {
 	
 	private static GroupService groupService = new GroupService();
 
-	private HashMap<String, String> groups; // groupName:owner
+	private ConcurrentHashMap<String, String> groups; // groupName:owner
 
 	private GroupService() {
 		groupDAO = new GroupDAO();

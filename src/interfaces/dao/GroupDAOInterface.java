@@ -1,6 +1,6 @@
 package interfaces.dao;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import entities.Group;
 
@@ -10,7 +10,7 @@ public interface GroupDAOInterface {
 	
 	public Group getGroupByName(String groupName);
 	
-	public HashMap<String, String> getGroups();
+	public ConcurrentHashMap<String, String> getGroups();
 
 	public boolean addUserToGroup(String username, String groupName);
 

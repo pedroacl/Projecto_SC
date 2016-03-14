@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import interfaces.dao.UserDAOInterface;
 import util.MiscUtil;
@@ -29,8 +29,8 @@ public class UserDAO implements UserDAOInterface {
 	 * @return HashMap de utilizadores e suas palavra-passes
 	 */
 	@Override
-	public HashMap<String, String> getUsers() {
-		HashMap<String, String> users = new HashMap<String, String>();
+	public ConcurrentHashMap<String, String> getUsers() {
+		ConcurrentHashMap<String, String> users = new ConcurrentHashMap<String, String>();
 		
 		String line;
 		BufferedReader br;

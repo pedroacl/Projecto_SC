@@ -13,6 +13,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import entities.Group;
 import factories.ConversationFactory;
@@ -67,8 +68,8 @@ public class GroupDAO implements GroupDAOInterface {
 	 * @return HasMap com todos os grupos registados associados com os seus donos
 	 */
 	@Override
-	public HashMap<String, String> getGroups() {
-		HashMap<String, String> groups = new HashMap<String, String>();
+	public ConcurrentHashMap<String, String> getGroups() {
+		ConcurrentHashMap<String, String> groups = new ConcurrentHashMap<String, String>();
 
 		String line;
 		BufferedReader br;
