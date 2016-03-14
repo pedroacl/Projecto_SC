@@ -30,7 +30,6 @@ public class Group implements Serializable {
 		this.admin = admin;
 		this.createdAt = new Date();
 		this.conversationId = conversationId;
-		
 		users = new ArrayList<String>();
 		users.add(admin);
 	}

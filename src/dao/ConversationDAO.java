@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import entities.ChatMessage;
 import entities.Conversation;
@@ -40,7 +41,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 	public Long addChatMessage(ChatMessage chatMessage) {
 
 		Conversation conversation = null;
-		HashMap<String, Long> userConversations = null;
+		Map<String, Long> userConversations = null;
 
 		String filePath = "users/" + chatMessage.getFromUser() + "/conversations";
 		File file = new File(filePath);

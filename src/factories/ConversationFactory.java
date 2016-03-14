@@ -9,6 +9,7 @@ import entities.Conversation;
  *
  */
 public class ConversationFactory {
+	
 	private static Long conversationId;
 	
 	private static ConversationFactory conversationFactory = new ConversationFactory();
@@ -44,14 +45,12 @@ public class ConversationFactory {
 	}
 	
 	/**
-	 * Devolve o próximo id de uam conversa
+	 * Devolve o próximo id de uma conversa
 	 * @return Long, identificador de conversa
 	 */
 	public long generateID() {
-		long id = conversationId;
-		System.out.println("[CONVERSATIOFACTORY)]: "+ conversationId);
-		conversationId++;
-		return id;
+		System.out.println("[CONVERSATIOFACTORY)]: "+ conversationId++);
+		return conversationId++;
 		
 	}
 }

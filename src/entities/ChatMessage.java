@@ -13,7 +13,6 @@ import network.MessageType;
 
 
 public class ChatMessage implements Serializable {
-	
 
 	private static final long serialVersionUID = 8053113085617628635L;
 
@@ -42,7 +41,7 @@ public class ChatMessage implements Serializable {
 		this.destination = destination;
 		this.type = type;
 		this.content = message;
-		createdAt = new Date();
+		this.createdAt = new Date();
 	}
 	
 	/**

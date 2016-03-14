@@ -1,16 +1,15 @@
 package network;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import entities.ChatMessage;
 
 public class ServerMessage extends NetworkMessage {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	private ArrayList<ChatMessage> messages;
+	
+	private List<ChatMessage> messages;
 
 	public ServerMessage() {
 		super();
@@ -25,7 +24,7 @@ public class ServerMessage extends NetworkMessage {
 		this.messages = list;
 	}
 
-	public ArrayList<ChatMessage> getMessageList() {
+	public List<ChatMessage> getMessageList() {
 		return this.messages;
 	}
 
