@@ -8,7 +8,7 @@ package entities;
 import java.io.Serializable;
 import java.util.Date;
 
-import network.MessageType;
+import network.messages.MessageType;
 
 
 

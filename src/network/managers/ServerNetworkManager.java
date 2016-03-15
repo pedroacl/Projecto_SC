@@ -1,7 +1,9 @@
-package network;
+package network.managers;
 
 import java.io.IOException;
 import java.net.Socket;
+
+import network.messages.NetworkMessage;
 
 public class ServerNetworkManager extends NetworkManager {
 

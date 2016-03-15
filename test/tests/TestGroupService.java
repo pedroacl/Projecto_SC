@@ -13,7 +13,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import domain.Authentication;
+import domain.server.Authentication;
 import entities.Group;
 import service.GroupService;
 import util.MiscUtil;

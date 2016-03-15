@@ -17,10 +17,10 @@ import org.junit.Test;
 
 import dao.ConversationDAO;
 import dao.GroupDAO;
-import domain.Authentication;
+import domain.server.Authentication;
 import entities.ChatMessage;
 import factories.ConversationFactory;
-import network.MessageType;
+import network.messages.MessageType;
 
 public class TestConversationDAO {
 
@@ -54,7 +54,6 @@ public class TestConversationDAO {
 		}
 
 		conversationFactory = ConversationFactory.getInstance();
-		conversationFactory.reset();
 
 		conversationDAO = new ConversationDAO();
 		groupDAO = new GroupDAO();

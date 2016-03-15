@@ -1,9 +1,9 @@
-package parsers;
+package domain.client;
 
 import java.io.File;
 
-import network.ClientMessage;
-import network.MessageType;
+import network.messages.ClientMessage;
+import network.messages.MessageType;
 
 /**
  * Classe que verifica os parametros de entrada e cria um ClientMessage correspondente

@@ -1,9 +1,9 @@
-package parsers;
+package domain.client;
 
 import java.io.IOException;
 
-import network.ClientNetworkManager;
-import network.ServerMessage;
+import network.managers.ClientNetworkManager;
+import network.messages.ServerMessage;
 import util.UserUtil;
 
 /**

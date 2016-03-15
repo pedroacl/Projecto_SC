@@ -1,4 +1,4 @@
-package domain;
+package domain.server;
 
 import interfaces.AuthenticationInterface;
 import service.UserService;

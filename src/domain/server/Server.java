@@ -1,4 +1,4 @@
-package domain;
+package domain.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import network.ServerNetworkManager;
+import network.managers.ServerNetworkManager;
 
 /**
  * Classe que representa o servidor. Tem a lógica do negocio. Responde perante

@@ -1,4 +1,4 @@
-package network;
+package network.managers;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+
+import network.messages.MessageType;
+import network.messages.NetworkMessage;
 
 public abstract class NetworkManager {
 
@@ -26,7 +29,7 @@ public abstract class NetworkManager {
 	 */
 	public NetworkManager(Socket socket) {
 		this.socket = socket;
-		
+
 		System.out.println(socket == null);
 
 		try {
@@ -49,8 +52,9 @@ public abstract class NetworkManager {
 	}
 
 	/**
+	 * Obtem uma determinado objecto enviado pela rede
 	 * 
-	 * @return
+	 * @return O objecto enviado pela rede
 	 */
 	public Object receiveMessage() {
 		Object networkMessage = null;
@@ -67,19 +71,22 @@ public abstract class NetworkManager {
 	}
 
 	/**
+	 * Obtem um ficheiro enviado pela rede baseado no seu nome e tamanho
 	 * 
-	 * @param sizeFile
+	 * @param fileSize
+	 *            Tamanho do ficheiro
 	 * @param name
-	 * @return
+	 *            Nome do ficheiro
+	 * @return Ficheiro recebido pela rede
 	 * @throws IOException
 	 */
-	public File receiveFile(int sizeFile, String name) throws IOException {
+	public File receiveFile(int fileSize, String name) throws IOException {
 
 		System.out.println("[ClientNetwork] O nome do ficheiro é: " + name);
 		File file = new File(name);
 		FileOutputStream fileOut = new FileOutputStream(file);
 
-		System.out.println("[ClientNetwork] O tamnho do ficheiro é :" + sizeFile);
+		System.out.println("[ClientNetwork] O tamnho do ficheiro é :" + fileSize);
 		System.out.println(file.getAbsolutePath());
 
 		int packageSize = 1024;
@@ -87,8 +94,8 @@ public abstract class NetworkManager {
 		byte[] bfile = new byte[packageSize];
 		int lido;
 
-		while (currentLength < sizeFile) {
-			int resto = sizeFile - currentLength;
+		while (currentLength < fileSize) {
+			int resto = fileSize - currentLength;
 			int numThisTime = resto < packageSize ? resto : bfile.length;
 			lido = in.read(bfile, 0, numThisTime);
 
@@ -108,8 +115,10 @@ public abstract class NetworkManager {
 	}
 
 	/**
+	 * Envia uma determinada mensagem pela rede
 	 * 
 	 * @param message
+	 *            Mensagem a ser enviada pela rede
 	 * @return
 	 */
 	protected boolean send(Object message) {
@@ -125,20 +134,25 @@ public abstract class NetworkManager {
 	}
 
 	/**
+	 * Envia um ficheiro pela rede
 	 * 
 	 * @param message
-	 * @return
+	 *            Mensagem que contem a informação relativa ao ficheiro a ser
+	 *            enviado
+	 * @return Devolve true caso o ficheiro tenha sido enviado correctamente ou
+	 *         false caso contrário
+	 * @require message != null
 	 */
 	public abstract boolean sendFile(NetworkMessage message);
 
 	/**
+	 * Envia uma mensagem pela rede
 	 * 
 	 * @param message
+	 *            Mensagem a ser enviada
 	 */
 	public boolean sendMessage(NetworkMessage message) {
 
-		System.out.println("..." + (message.getMessageType()));
-		
 		if (message.getMessageType().equals(MessageType.FILE))
 			return sendFile(message);
 		else

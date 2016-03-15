@@ -1,11 +1,10 @@
-package domain;
+package domain.server;
 
 import java.net.Socket;
 
-import network.ClientMessage;
-import network.ServerMessage;
-import network.ServerNetworkManager;
-import parsers.ClientMessageParser;
+import network.managers.ServerNetworkManager;
+import network.messages.ClientMessage;
+import network.messages.ServerMessage;
 
 /**
  * <<THREAD>> Classe que executa o pedido de um cliente num novo fio de execução

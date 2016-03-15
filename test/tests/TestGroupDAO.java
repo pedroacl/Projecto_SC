@@ -15,7 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import dao.GroupDAO;
-import domain.Authentication;
+import domain.server.Authentication;
 import entities.Group;
 
 public class TestGroupDAO {

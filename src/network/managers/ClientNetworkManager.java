@@ -1,7 +1,11 @@
-package network;
+package network.managers;
 
 import java.io.IOException;
 import java.net.Socket;
+
+import network.messages.MessageType;
+import network.messages.NetworkMessage;
+import network.messages.ServerMessage;
 
 public class ClientNetworkManager extends NetworkManager {
 

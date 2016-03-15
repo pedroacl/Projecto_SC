@@ -1,4 +1,4 @@
-package parsers;
+package domain.server;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,12 +6,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
-import domain.Authentication;
 import entities.ChatMessage;
-import network.ClientMessage;
-import network.MessageType;
-import network.ServerMessage;
-import network.ServerNetworkManager;
+import network.managers.ServerNetworkManager;
+import network.messages.ClientMessage;
+import network.messages.MessageType;
+import network.messages.ServerMessage;
 import service.ConversationService;
 import service.GroupService;
 

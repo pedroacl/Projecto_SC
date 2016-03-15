@@ -17,7 +17,7 @@ import entities.ChatMessage;
 import entities.Conversation;
 import factories.ConversationFactory;
 import interfaces.dao.ConversationDAOInterface;
-import network.MessageType;
+import network.messages.MessageType;
 import util.MiscUtil;
 
 public class ConversationDAO implements ConversationDAOInterface {
@@ -64,7 +64,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 			MiscUtil.createFile("conversations/" + conversation.getId() + "/conversation");
 			conversationId = conversation.getId();
 
-			// actualiza ficheiro conversaçoes acrescentado esta nova entrada
+			// actualiza ficheiro conversaçoes de cada user acrescentando esta nova entrada
 			addConversationToUser(chatMessage.getFromUser(), chatMessage.getDestination(), conversation.getId());
 			addConversationToUser(chatMessage.getDestination(), chatMessage.getFromUser(), conversation.getId());
 

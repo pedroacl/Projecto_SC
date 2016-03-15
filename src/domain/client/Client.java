@@ -1,14 +1,12 @@
-package domain;
+package domain.client;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import network.ClientMessage;
-import network.ClientNetworkManager;
-import network.ServerMessage;
-import parsers.ArgsParser;
-import parsers.ServerResponseParser;
+import network.managers.ClientNetworkManager;
+import network.messages.ClientMessage;
+import network.messages.ServerMessage;
 import util.UserUtil;
 
 /**

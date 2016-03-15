@@ -8,7 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import domain.Authentication;
+import domain.server.Authentication;
 
 public class TestAuthentication {
 
