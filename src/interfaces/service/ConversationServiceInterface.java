@@ -24,4 +24,6 @@ public interface ConversationServiceInterface {
 	public List<ChatMessage> getAllMessagesFromConversation(Long conversationId);
 	
 	public String existsFile(String username, String destination, String message);
+	
+	public Long getLastConversationId();
 }

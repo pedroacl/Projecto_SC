@@ -34,11 +34,9 @@ public class PersistenceUtil {
 			File[] files = file.listFiles();
 
 			// directoria contem ficheiros
-			if (files.length > 0) {
-				// eliminar cada ficheiro presente na directoria
-				for (File c : files)
-					delete(c);
-			}
+			// eliminar cada ficheiro presente na directoria
+			for (File c : files)
+				delete(c);
 		}
 
 		// eliminar ficheiro ou pasta vazia

@@ -1,6 +1,7 @@
 package factories;
 
 import entities.Conversation;
+import service.ConversationService;
 
 /**
  * Classe singleton responsável por auxiliar a instanciação de conversations
@@ -14,9 +15,10 @@ public class ConversationFactory {
 	private static Long conversationId;
 
 	private static ConversationFactory conversationFactory = new ConversationFactory();
-
+	
 	private ConversationFactory() {
-		conversationId = 1L;
+		ConversationService conversationService = new ConversationService();
+		conversationId = conversationService.getLastConversationId();
 	}
 
 	/**

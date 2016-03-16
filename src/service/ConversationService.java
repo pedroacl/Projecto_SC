@@ -75,4 +75,23 @@ public class ConversationService implements ConversationServiceInterface {
 	public String existsFile(String username, String destination, String fileName) {
 		return conversationDAO.existFile(username, destination, fileName);
 	}
+
+	@Override
+	public Long getLastConversationId() {
+		File file = new File("conversations");
+
+		if (!file.exists() || file.list().length == 0)
+			return 1L;
+
+		File[] files = file.listFiles();
+		Long currentId = 1L;
+		Long maxId = currentId;
+		
+		for (File currentFile: files) {
+			currentId = Long.parseLong(currentFile.getName());
+			maxId = currentId > maxId ? currentId : maxId;
+		}
+		
+		return maxId;
+	}
 }
