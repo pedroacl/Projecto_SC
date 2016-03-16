@@ -11,7 +11,7 @@ import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
 
-import util.MiscUtil;
+import util.PersistenceUtil;
 
 public class TestUsers {
 
@@ -27,7 +27,7 @@ public class TestUsers {
 		File file = new File("users/" + user1 + "/conversations");
 		assertThat(file.exists(), is(true));
 		
-		HashMap<String, String> conversations = (HashMap<String, String>) MiscUtil
+		HashMap<String, String> conversations = (HashMap<String, String>) PersistenceUtil
 				.readObject("users/" + user1 + "/conversations");
 		
 		assertThat(conversations, is(not(nullValue())));

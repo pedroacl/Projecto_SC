@@ -7,7 +7,7 @@ import java.util.List;
 import dao.ConversationDAO;
 import entities.ChatMessage;
 import interfaces.service.ConversationServiceInterface;
-import util.MiscUtil;
+import util.PersistenceUtil;
 
 public class ConversationService implements ConversationServiceInterface {
 
@@ -46,7 +46,7 @@ public class ConversationService implements ConversationServiceInterface {
 		if (file.exists())
 			return "conversations/" + conversationId + "/files/" + fileName;
 		else {
-			MiscUtil.createFile("conversations/" + conversationId + "/files");
+			PersistenceUtil.createFile("conversations/" + conversationId + "/files");
 			return "conversations/" + conversationId + "/files/" + fileName;
 		}
 	}

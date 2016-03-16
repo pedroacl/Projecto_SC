@@ -16,7 +16,7 @@ import org.junit.Test;
 import domain.server.Authentication;
 import entities.Group;
 import service.GroupService;
-import util.MiscUtil;
+import util.PersistenceUtil;
 
 public class TestGroupService {
 
@@ -86,7 +86,7 @@ public class TestGroupService {
 		File file = new File("users.txt");
 		assertThat(file.exists(), is(true));
 
-		Group group = (Group) MiscUtil.readObject("groups/" + groupName + "/group");
+		Group group = (Group) PersistenceUtil.readObject("groups/" + groupName + "/group");
 		assertThat(group.getUsers().contains(admin), is(true));
 		assertThat(group.getUsers().contains(userToAdd), is(true));
 
@@ -94,7 +94,7 @@ public class TestGroupService {
 		file = new File("users/" + admin + "/conversations");
 		assertThat(file.exists(), is(true));
 
-		HashMap<String, Long> userConversations = (HashMap<String, Long>) MiscUtil
+		HashMap<String, Long> userConversations = (HashMap<String, Long>) PersistenceUtil
 				.readObject("users/" + admin + "/conversations");
 
 		assertThat(userConversations, is(not(nullValue())));
@@ -104,7 +104,7 @@ public class TestGroupService {
 		file = new File("users/" + admin + "/conversations");
 		assertThat(file.exists(), is(true));
 
-		userConversations = (HashMap<String, Long>) MiscUtil.readObject("users/" + userToAdd + "/conversations");
+		userConversations = (HashMap<String, Long>) PersistenceUtil.readObject("users/" + userToAdd + "/conversations");
 
 		assertThat(userConversations, is(not(nullValue())));
 		assertThat(userConversations.get(groupName), is(conversationId));

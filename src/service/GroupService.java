@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import dao.GroupDAO;
 import entities.Group;
 import interfaces.service.GroupServiceInterface;
-import util.MiscUtil;
+import util.PersistenceUtil;
 
 /**
  * 
@@ -49,7 +49,7 @@ public class GroupService implements GroupServiceInterface {
 		if (existsGroup(groupName) && getGroupOwner(groupName).equals(username)) {
 			// ler ficheiro
 			String filePath = "groups/" + groupName + "/group";
-			Group group = (Group) MiscUtil.readObject(filePath);
+			Group group = (Group) PersistenceUtil.readObject(filePath);
 			System.out.println("[GroupService]" + group.getConversationId());
 
 			// utilizador nao adicionado ao grupo
@@ -84,7 +84,7 @@ public class GroupService implements GroupServiceInterface {
 		if (existsGroup(groupName) && getGroupOwner(groupName).equals(username)) {
 			// ler ficheiro
 			String filePath = "groups/" + groupName + "/group";
-			Group group = (Group) MiscUtil.readObject(filePath);
+			Group group = (Group) PersistenceUtil.readObject(filePath);
 
 			// caso user seja o dono do grupo
 			// apagar grupo inteiro

@@ -2,7 +2,6 @@ package dao;
 
 /**
  * 
- * Classe que gere os grupos, persistindo-os no disco
  */
 
 import java.io.BufferedReader;
@@ -12,14 +11,17 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import entities.Group;
 import factories.ConversationFactory;
 import interfaces.dao.GroupDAOInterface;
-import util.MiscUtil;
+import util.PersistenceUtil;
 
+/**
+ * Classe que gere os grupos, persistindo-os em disco
+ *
+ */
 public class GroupDAO implements GroupDAOInterface {
 
 	private static ConversationFactory conversationFactory;
@@ -29,33 +31,23 @@ public class GroupDAO implements GroupDAOInterface {
 	}
 
 	/**
-	 * 
-	 * @param groupName
-	 * @return
-	 */
-	@Override
-	public Group getGroupByName(String groupName) {
-		// TODO
-
-		return null;
-	}
-
-	/**
 	 * Adicionar utilizador a um grupo
 	 * 
-	 * @param groupName nome do grupo
-	 * @param username nome do utilizador a ser adicionado
-	 * @return True caso o username tenha sido adicionado a groupName,
-	 * 			false caso contrario
+	 * @param groupName
+	 *            Nome do grupo
+	 * @param username
+	 *            Nome do utilizador a ser adicionado
+	 * @return Devolve true caso o username tenha sido adicionado a groupName e
+	 *         false caso contrario
 	 */
 	@Override
 	public boolean addUserToGroup(String username, String groupName) {
 		String filePath = "groups/" + groupName + "/group";
 
-		Group group = (Group) MiscUtil.readObject(filePath);
+		Group group = (Group) PersistenceUtil.readObject(filePath);
 
 		if (group.addUser(username)) {
-			MiscUtil.writeObject(group, filePath);
+			PersistenceUtil.writeObject(group, filePath);
 		} else {
 			return false;
 		}
@@ -65,7 +57,9 @@ public class GroupDAO implements GroupDAOInterface {
 
 	/**
 	 * Função que permite obter um hashmap com todos os grupos registados
-	 * @return HasMap com todos os grupos registados associados com os seus donos
+	 * 
+	 * @return HasMap com todos os grupos registados associados com os seus
+	 *         donos
 	 */
 	@Override
 	public ConcurrentHashMap<String, String> getGroups() {
@@ -74,47 +68,48 @@ public class GroupDAO implements GroupDAOInterface {
 		String line;
 		BufferedReader br;
 
-		MiscUtil.createFile("groups.txt");
-
-		// carregar utilizadores
+		// criar ficheiro caso este nao exista
+		PersistenceUtil.createFile("groups.txt");
 		File file = new File("groups.txt");
 
-		// nao existe ficheiro
-		if (!file.exists())
-			System.out.println("Nao existem grupos adicionados.");
+		// existe ficheiro e nao estah vazio
+		if (file.exists() && file.length() > 0) {
+			try {
+				FileReader fr = new FileReader(file);
+				br = new BufferedReader(fr);
 
-		try {
-			FileReader fr = new FileReader(file);
-			br = new BufferedReader(fr);
+				// iterar linhas do ficheiro
+				// groupName:admin
+				while ((line = br.readLine()) != null) {
+					// realizar parsing de cada linha
+					String[] args = line.split(":");
+					String groupname = args[0];
+					String owner = args[1];
 
-			while ((line = br.readLine()) != null) {
-				String[] args = line.split(":");
-				String groupname = args[0];
-				String owner = args[1];
-
-				groups.put(groupname, owner);
-				System.out.println(groupname + " " + owner);
-
+					groups.put(groupname, owner);
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 
 		return groups;
-
 	}
 
 	/**
-	 * Função que permite criar um grupo
-	 * @param groupName-nome do grupo a ser criado
-	 * @param admin- Dono do grupo, isto é quem cria o grupo
+	 * Permite criar um grupo
+	 * 
+	 * @param groupName
+	 *            Nome do grupo a ser criado
+	 * @param admin
+	 *            Dono do grupo, isto é quem cria o grupo
 	 * @return Devolve o id da conversação associada ao grupo
 	 */
 	@Override
 	public Long createGroup(String groupName, String admin) {
-		
+
 		// adiciona uma entrada no ficheiro groups.txt
 		try {
 			FileWriter fw = new FileWriter("groups.txt", true);
@@ -124,31 +119,34 @@ public class GroupDAO implements GroupDAOInterface {
 			e.printStackTrace();
 		}
 
-		// cria directoria groups se não existir ainda
-		MiscUtil.createDir("groups");
+		// cria directoria groups caso nao exista previamente
+		PersistenceUtil.createDir("groups");
 
 		// cria group
 		long conversationId = conversationFactory.generateID();
 		Group novoGrupo = new Group(groupName, admin, conversationId);
 
 		// Persiste grupo na directoria groups
-		MiscUtil.createDir("groups/" + groupName);
-		MiscUtil.writeObject(novoGrupo, "groups/" + groupName + "/group");
+		PersistenceUtil.createDir("groups/" + groupName);
+		PersistenceUtil.writeObject(novoGrupo, "groups/" + groupName + "/group");
 
-		// Cria directoria da convresaçao com o respectivo id na pasta de
-		// conversaçoes
-		MiscUtil.createDir("conversations/" + conversationId);
-		MiscUtil.createDir("conversations/" + conversationId + "/messages");
-		MiscUtil.createFile("conversations/" + conversationId + "/conversation");
+		// Cria directoria da conversaçao com o respectivo id na pasta de
+		// conversacoes
+		PersistenceUtil.createDir("conversations/" + conversationId);
+		PersistenceUtil.createDir("conversations/" + conversationId + "/messages");
+		PersistenceUtil.createFile("conversations/" + conversationId + "/conversation");
 
 		return conversationId;
 	}
+
 	/**
-	 * Apaga o registo de um grupo
-	 * @param groupName - nome do grupo a ser apagado do disco
+	 * Elimina o registo de um grupo em ficheiro
+	 * 
+	 * @param groupName
+	 *            Nome do grupo a ser eliminado do ficheiro 
 	 */
 	public void deleteGroup(String groupName) {
-		// apaga entrada no ficheiro groups.txt
+		// elimina entrada no ficheiro groups.txt
 		File file = new File("groups.txt");
 		File tempFile = new File("tempGroups.txt");
 
@@ -168,15 +166,17 @@ public class GroupDAO implements GroupDAOInterface {
 
 				writer.write(line);
 			}
+			
 			writer.close();
 			reader.close();
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		// Apaga ficheiro antigo
+		// elimina ficheiro antigo
 		if (!file.delete()) {
 			System.out.println("Could not delete file");
 			return;
@@ -184,9 +184,8 @@ public class GroupDAO implements GroupDAOInterface {
 		if (!tempFile.renameTo(file))
 			System.out.println("Could not rename file");
 
-		// eliminar pasta do group
+		// eliminar pasta do grupo
 		file = new File("groups/" + groupName);
-		MiscUtil.delete(file);
-
+		PersistenceUtil.delete(file);
 	}
 }

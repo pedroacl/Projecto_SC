@@ -1,11 +1,5 @@
 package dao;
 
-/**
- *  Classe que persiste conversações, isto é, gere as pastas
- *  das conversações e guarda as mensagens de enviadas
- *
- */
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,8 +12,13 @@ import entities.Conversation;
 import factories.ConversationFactory;
 import interfaces.dao.ConversationDAOInterface;
 import network.messages.MessageType;
-import util.MiscUtil;
+import util.PersistenceUtil;
 
+/**
+ * Classe que persiste conversações, isto é, gere as pastas das conversações e
+ * guarda as mensagens de enviadas
+ *
+ */
 public class ConversationDAO implements ConversationDAOInterface {
 
 	private ConversationFactory conversationFactory;
@@ -42,16 +41,18 @@ public class ConversationDAO implements ConversationDAOInterface {
 		Conversation conversation = null;
 		HashMap<String, Long> userConversations = null;
 
+		// localizacao do registo de conversas
 		String filePath = "users/" + chatMessage.getFromUser() + "/conversations";
 		File file = new File(filePath);
 
+		// registo de conversas nao existe ou encontra se vazio
 		if (!file.exists() || file.length() == 0) {
 			userConversations = new HashMap<String, Long>();
 		} else {
-			userConversations = (HashMap<String, Long>) MiscUtil.readObject(filePath);
+			userConversations = (HashMap<String, Long>) PersistenceUtil.readObject(filePath);
 		}
 
-		// obtem Id de Conversação a partir do username
+		// obtem Id da conversação a partir do username do destinatario
 		Long conversationId = userConversations.get(chatMessage.getDestination());
 
 		// nao existe conversa -> cria uma conversa entre os dois comunicantes
@@ -59,12 +60,13 @@ public class ConversationDAO implements ConversationDAOInterface {
 
 			// cria conversa e respectivas pastas
 			conversation = conversationFactory.build(chatMessage.getFromUser(), chatMessage.getDestination());
-			MiscUtil.createDir("conversations/" + conversation.getId());
-			MiscUtil.createDir("conversations/" + conversation.getId() + "/messages");
-			MiscUtil.createFile("conversations/" + conversation.getId() + "/conversation");
+			PersistenceUtil.createDir("conversations/" + conversation.getId());
+			PersistenceUtil.createDir("conversations/" + conversation.getId() + "/messages");
+			PersistenceUtil.createFile("conversations/" + conversation.getId() + "/conversation");
 			conversationId = conversation.getId();
 
-			// actualiza ficheiro conversaçoes de cada user acrescentando esta nova entrada
+			// actualiza ficheiro conversaçoes de cada user acrescentando esta
+			// nova entrada
 			addConversationToUser(chatMessage.getFromUser(), chatMessage.getDestination(), conversation.getId());
 			addConversationToUser(chatMessage.getDestination(), chatMessage.getFromUser(), conversation.getId());
 
@@ -75,32 +77,34 @@ public class ConversationDAO implements ConversationDAOInterface {
 		filePath = "conversations/" + conversationId + "/conversation";
 
 		// pode ser null
-		Conversation auxConversation = (Conversation) MiscUtil.readObject(filePath);
+		Conversation auxConversation = (Conversation) PersistenceUtil.readObject(filePath);
 
 		// caso ficheiro esteja vazio
 		if (auxConversation == null) {
 			conversation = new Conversation(chatMessage.getFromUser(), chatMessage.getDestination());
 			conversation.setId(conversationId);
 			conversation.setLastMessageDate(chatMessage.getCreatedAt());
-			MiscUtil.writeObject(conversation, filePath);
+			PersistenceUtil.writeObject(conversation, filePath);
 		} else {
+			// atualizar ultima mensagem da conversa
 			auxConversation.setLastMessageDate(chatMessage.getCreatedAt());
-			MiscUtil.writeObject(auxConversation, filePath);
+			PersistenceUtil.writeObject(auxConversation, filePath);
 		}
 
-		// caso seja um mensagem com File
+		// caso seja uma mensagem com um ficheiro
 		if (chatMessage.getMessageType().equals(MessageType.FILE)) {
 			// verifica se existe a pasta files na directoria da conversa
 			File fileDirectory = new File("conversations/" + conversation.getId() + "/files");
 			if (!fileDirectory.exists())
-				MiscUtil.createDir("conversations/" + conversation.getId() + "/files");
+				PersistenceUtil.createDir("conversations/" + conversation.getId() + "/files");
 		}
 
 		// persiste mensagem
 		String pathToTxt = "conversations/" + conversation.getId() + "/messages/"
 				+ chatMessage.getCreatedAt().getTime();
-		MiscUtil.createFile(pathToTxt);
-		MiscUtil.writeStringToFile(chatMessage.getFromUser() + "\n" + chatMessage.getDestination() + "\n"
+
+		PersistenceUtil.createFile(pathToTxt);
+		PersistenceUtil.writeStringToFile(chatMessage.getFromUser() + "\n" + chatMessage.getDestination() + "\n"
 				+ chatMessage.getMessageType() + "\n" + chatMessage.getContent(), pathToTxt);
 
 		return conversation.getId();
@@ -123,22 +127,23 @@ public class ConversationDAO implements ConversationDAOInterface {
 		String filePath = "users/" + username + "/conversations";
 		File file = new File(filePath);
 
+		// ficheiro jah existe e nao estah vazio
 		if (file.exists() && file.length() != 0) {
-			userConversations = (HashMap<String, Long>) MiscUtil.readObject(filePath);
+			userConversations = (HashMap<String, Long>) PersistenceUtil.readObject(filePath);
 
+			// ficheiro nao existe -> criar ficheiro
 		} else {
 			userConversations = new HashMap<String, Long>();
-			MiscUtil.createFile(filePath);
+			PersistenceUtil.createFile(filePath);
 		}
 
+		// atualizar dados em memoria e em disco
 		userConversations.put(toUser, conversationId);
-		System.out.println("ConversationDAO: " + username + ": " + userConversations);
-		MiscUtil.writeObject(userConversations, filePath);
+		PersistenceUtil.writeObject(userConversations, filePath);
 	}
 
 	/**
-	 * Função que obtem uma lista das ultimas mensagens de cada conversa do
-	 * utilizador
+	 * Obtem uma lista das ultimas mensagens de cada conversa do utilizador
 	 * 
 	 * @param conversationsIDs
 	 *            Lista de IDs de cada conversa em que o utilizador participou
@@ -147,52 +152,59 @@ public class ConversationDAO implements ConversationDAOInterface {
 	@Override
 	public ChatMessage getLastChatMessage(Long conversationId) {
 		String path = "conversations/" + conversationId;
-		Conversation lastConversation = (Conversation) MiscUtil.readObject(path + "/conversation");
+		Conversation lastConversation = (Conversation) PersistenceUtil.readObject(path + "/conversation");
+
+		// nao existe ultima mensagem registada
 		if (lastConversation == null)
 			return null;
-		else {
-			long date = lastConversation.getLastMessageDate().getTime();
-			ArrayList<String> texto = (ArrayList<String>) MiscUtil.readFromFile(path + "/messages/" + date);
-			ChatMessage lastMessage = makeChatMessage(texto);
-			lastMessage.setCreatedAt(lastConversation.getLastMessageDate());
-			return lastMessage;
-		}
+
+		// atualizar data da ultima mensagem enviada
+		long date = lastConversation.getLastMessageDate().getTime();
+		ArrayList<String> texto = (ArrayList<String>) PersistenceUtil.readFromFile(path + "/messages/" + date);
+		ChatMessage lastMessage = makeChatMessage(texto);
+		lastMessage.setCreatedAt(lastConversation.getLastMessageDate());
+
+		return lastMessage;
 	}
 
+	/**
+	 * Obtem uma conversa atraves do seu id
+	 * 
+	 * @param conversationId
+	 *            Id da conversa a ser obtida
+	 * @return Devolve a conversa correspondente ao id ou null caso esta nao
+	 *         exista
+	 */
 	private Conversation getConversationById(Long conversationId) {
 		String path = "conversations/" + conversationId + "/conversation";
 		File file = new File(path);
-		Conversation conversation = null;
 
-		if (!file.exists()) {
+		// ficheiro nao existe
+		if (!file.exists())
 			return null;
-		}
 
-		conversation = (Conversation) MiscUtil.readObject(path);
+		// obter conversa
+		Conversation conversation = (Conversation) PersistenceUtil.readObject(path);
 
 		return conversation;
 	}
 
 	/**
-	 * Devolve uma lista de Ids de conversaçoes que um dado user mantem
+	 * Devolve uma lista de Ids de conversações que um dado user mantém
 	 * 
-	 * @param Username-
-	 *            nome do utilizador de quem se pretende as conversas
-	 * @return uma lista de ids das conversacoes ou null caso nao exista este
-	 *         utilizador
+	 * @param username
+	 *            Nome do utilizador de quem se pretende as conversas
+	 * @return Devolve uma lista de ids das conversacoes ou null caso nao
+	 *         existam para este utilizador
 	 */
 	@Override
-	public ArrayList<Long> getAllConversationsFrom(String userName) {
-		String path = "users/" + userName + "/conversations";
-		// Debug
-		System.out.println("[getAllConversationFrom]: " + path);
-		HashMap<String, Long> conversations = (HashMap<String, Long>) MiscUtil.readObject(path);
+	public ArrayList<Long> getAllConversationsFrom(String username) {
+		String path = "users/" + username + "/conversations";
+		HashMap<String, Long> conversations = (HashMap<String, Long>) PersistenceUtil.readObject(path);
 
-		if (conversations == null)
-			System.out.println("[getAllConversationFrom]: Conversation esta a null");
-		System.out.println("[GETALLCONVERSATIONSFROM]: " + conversations);
-
+		// obter os ids de todas as conversas do utilizador
 		Collection<Long> collection = conversations.values();
+
 		return new ArrayList<Long>(collection);
 	}
 
@@ -200,20 +212,29 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 * Obtem todas as mensagens associadas a uma conversação
 	 * 
 	 * @param consersationId
-	 *            - identificador da conversa de onde se quer as mensagens
-	 * @return Lista de todas as mensagens sobre a forma de ChatMessages
+	 *            Identificador da conversa de onde se quer as mensagens
+	 * @return Devolve uma lista de todas as mensagens sobre a forma de
+	 *         ChatMessages
 	 */
 	@Override
 	public List<ChatMessage> getAllMessagesFromConversation(Long conversationId) {
+		// pasta onde estao localizadas todas as mensagens da conversa
 		String path = "conversations/" + conversationId + "/messages";
-		ArrayList<ChatMessage> allMessages = new ArrayList<ChatMessage>();
 		File file = new File(path);
+
+		ArrayList<ChatMessage> allMessages = new ArrayList<ChatMessage>();
+
+		// obter lista de todos os ficheiros presentes no dir
 		String[] filesIn = file.list();
 
+		// percorrer todos os ficheiros das mensagens
 		for (int i = 0; i < filesIn.length; i++) {
-			ArrayList<String> texto = (ArrayList<String>) MiscUtil.readFromFile(path + "/" + filesIn[i]);
+			// ler conteudo da mensagem
+			ArrayList<String> texto = (ArrayList<String>) PersistenceUtil.readFromFile(path + "/" + filesIn[i]);
 			ChatMessage k = makeChatMessage(texto);
 
+			// definir data de inicio da conversa atraves do seu nome de
+			// ficheiro
 			k.setCreatedAt(new Date(Long.parseLong(filesIn[i])));
 			allMessages.add(k);
 		}
@@ -224,17 +245,25 @@ public class ConversationDAO implements ConversationDAOInterface {
 
 	/**
 	 * Cria uma chatMessage a partir de um ArrayList que contem os varios campos
-	 * que compoeem uma ChatMessagae
+	 * que compõem uma ChatMessage
+	 * 
+	 * @param messageFields
+	 *            Lista de atributos da mensagem a ser criada
+	 * @return
 	 */
-	private ChatMessage makeChatMessage(ArrayList<String> texto) {
-
+	private ChatMessage makeChatMessage(ArrayList<String> messageFields) {
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < texto.size(); i++) {
+
+		// iterar atributos da mensagem
+		for (int i = 0; i < messageFields.size(); i++) {
 			if (i > 2)
-				sb.append(texto.get(i));
+				sb.append(messageFields.get(i));
 		}
-		ChatMessage message = new ChatMessage(texto.get(0), texto.get(1), sb.toString(),
-				MessageType.valueOf(texto.get(2)));
+
+		// criar mensagem
+		ChatMessage message = new ChatMessage(messageFields.get(0), messageFields.get(1), sb.toString(),
+				MessageType.valueOf(messageFields.get(2)));
+
 		return message;
 	}
 
@@ -242,15 +271,16 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 * Devolve o identificador da conversa entre dois utilizadores
 	 * 
 	 * @param user1
-	 *            - utilizador que faz parte da conversa
+	 *            Utilizador que faz parte da conversa
 	 * @param user2
-	 *            - utilizador que faz parte da conversa
-	 * @return identificador da conversa ou -1 caso esta não exista
+	 *            Utilizador que faz parte da conversa
+	 * @return Devolve o identificador da conversa ou -1 caso esta não exista
+	 * @require user1 != && user2 != null;
 	 */
 	public Long getConversationInCommom(String user1, String user2) {
 		// vai as conversaçoes do user1
 		String path = "users/" + user1 + "/conversations";
-		HashMap<String, Long> conversations = (HashMap<String, Long>) MiscUtil.readObject(path);
+		HashMap<String, Long> conversations = (HashMap<String, Long>) PersistenceUtil.readObject(path);
 
 		if (conversations == null)
 			return (long) -1;
@@ -265,17 +295,20 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 * Retorna um path caso exista um ficheiro na conversa entre 2 utilizadores
 	 * 
 	 * @param fromUser
-	 *            utilizador participante da conversa
+	 *            Utilizador participante da conversa
 	 * @param toUser
-	 *            utilizador participante da conversa
+	 *            Utilizador participante da conversa
 	 * @param fileName
-	 *            nome do ficheiro que se quer obter o path
-	 * @return uma string com o caminho para o ficheiro ou null caso nao exista
+	 *            Nome do ficheiro que se quer obter o path
+	 * @return Devolve uma string com o caminho para o ficheiro ou null caso nao exista
 	 */
 	public String existFile(String fromUser, String toUser, String fileName) {
 		Long id = getConversationInCommom(fromUser, toUser);
+
+		// nao existe conversa em comum
 		if (id == -1) {
 			return null;
+
 		} else {
 			String path = "conversations/" + id + "/files/" + fileName;
 			File f = new File(path);
@@ -287,9 +320,9 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 * Remove uma conversa das lista de conversaçoes de username
 	 * 
 	 * @param username
-	 *            utilizador que quer ver removida conversa
+	 *            Utilizador que quer ver removida conversa
 	 * @param fromUser
-	 *            nome do utilizador com o qual username tem uma conversa
+	 *            Nome do utilizador com o qual username tem uma conversa
 	 * 
 	 */
 	@Override
@@ -298,23 +331,24 @@ public class ConversationDAO implements ConversationDAOInterface {
 		String filePath = "users/" + username + "/conversations";
 		File file = new File(filePath);
 
+		// ficheiro existe e nao estah vazio
 		if (file.exists() && file.length() != 0) {
-			userConversations = (HashMap<String, Long>) MiscUtil.readObject(filePath);
+			// remover utilizador e atualizar o ficheiro
+			userConversations = (HashMap<String, Long>) PersistenceUtil.readObject(filePath);
 			userConversations.remove(fromUser);
-			MiscUtil.writeObject(userConversations, filePath);
+			PersistenceUtil.writeObject(userConversations, filePath);
 		}
 	}
 
 	/**
-	 * Remove uma conversa do disco
+	 * Remove uma conversa do ficheiro
 	 * 
-	 * @param conversationId-
-	 *            identificador da conversa a ser removida
+	 * @param conversationId
+	 *            Identificador da conversa a ser removida
 	 */
 	@Override
 	public void removeConversation(Long conversationId) {
 		File file = new File("conversations/" + conversationId);
-		MiscUtil.delete(file);
-
+		PersistenceUtil.delete(file);
 	}
 }
