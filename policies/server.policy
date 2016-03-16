@@ -14,7 +14,10 @@ grant {
 	permission java.io.FilePermission "users.txt", "read, write";
 
 	// ler e escrever no ficheiro de grupos
-	permission java.io.FilePermission "groups.txt", "read, write";
+	permission java.io.FilePermission "groups.txt", "read, write, delete";
+	
+	// ler e escrever no ficheiro de grupos
+	permission java.io.FilePermission "tempGroups.txt", "read, write";
 
 	// criar pastas na raiz	
 	permission java.io.FilePermission "users", "write";
@@ -23,8 +26,8 @@ grant {
 
 	// criar subpastas
 	permission java.io.FilePermission "users/-", "write";
-	permission java.io.FilePermission "groups/-", "write";
-	permission java.io.FilePermission "conversations/-", "write";
+	permission java.io.FilePermission "groups/-", "write, delete";
+	permission java.io.FilePermission "conversations/-", "write, delete";
 
 	// ler todos os ficheiros	
 	permission java.io.FilePermission "/-", "read";

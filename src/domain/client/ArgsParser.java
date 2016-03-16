@@ -108,7 +108,7 @@ public class ArgsParser {
 		act = action.split(" ");
 		
 		//verifica se o username e o destinatario são diferentes
-		if(!act[0].equals("-r") && act[1].equals(username)) {
+		if(!act[0].equals("-r") && !act[0].equals("-d") && act[1].equals(username)) {
 			System.out.println("Destinatário igual ao username");
 			return false;
 		}
