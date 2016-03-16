@@ -5,10 +5,20 @@ grant {
 	permission java.net.SocketPermission "*:1024-", "accept";
 	permission java.net.SocketPermission "localhost:23456", "listen, resolve";
 	
-	permission java.io.FilePermission "users.txt", "read, delete, write";
-	permission java.io.FilePermission "groups.txt", "read, delete, write";
-	permission java.io.FilePermission "*", "read, write";
-	permission java.io.FilePermission "users/-", "read, write";
-	permission java.io.FilePermission "groups-", "read, write";
-	permission java.io.FilePermission "groups/-", "read, write";
+	permission java.util.PropertyPermission "user.dir", "read";
+	
+	// ler e escrever no ficheiro de users
+	permission java.io.FilePermission "users.txt", "read, write";
+
+	// ler e escrever no ficheiro de grupos
+	permission java.io.FilePermission "groups.txt", "read, write";
+
+	permission java.io.FilePermission "users/-", "write";
+	permission java.io.FilePermission "groups/-", "write";
+	permission java.io.FilePermission "conversations/-", "write";
+
+	// ler todos os ficheiros	
+	permission java.io.FilePermission "/-", "read";
+	permission java.io.FilePermission "*", "read";
+
 };
