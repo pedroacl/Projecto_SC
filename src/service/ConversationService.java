@@ -78,16 +78,12 @@ public class ConversationService implements ConversationServiceInterface {
 
 	@Override
 	public Long getLastConversationId() {
-		File file = new File("conversations");
+		File[] conversationsFolders = conversationDAO.getConversationsFolders();
 
-		if (!file.exists() || file.list().length == 0)
-			return 1L;
-
-		File[] files = file.listFiles();
 		Long currentId = 1L;
 		Long maxId = currentId;
 		
-		for (File currentFile: files) {
+		for (File currentFile: conversationsFolders) {
 			currentId = Long.parseLong(currentFile.getName());
 			maxId = currentId > maxId ? currentId : maxId;
 		}

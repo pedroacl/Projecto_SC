@@ -1,9 +1,9 @@
 package interfaces.dao;
 
+import java.io.File;
 import java.util.List;
 
 import entities.ChatMessage;
-import entities.Conversation;
 
 public interface ConversationDAOInterface {
 	
@@ -23,4 +23,5 @@ public interface ConversationDAOInterface {
 
 	void removeConversationFromUser(String username, String fromUser);
 
+	public File[] getConversationsFolders();
 }

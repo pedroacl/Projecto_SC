@@ -351,4 +351,18 @@ public class ConversationDAO implements ConversationDAOInterface {
 		File file = new File("conversations/" + conversationId);
 		PersistenceUtil.delete(file);
 	}
+
+	/**
+	 * Obtem as pastas de todas as conversas registadas
+	 * @return Devolve todas as pastas das conversas
+	 */
+	@Override
+	public File[] getConversationsFolders() {
+		File file = new File("conversations");
+		
+		if (!file.exists() || file.list().length == 0)
+			return null;
+		
+		return file.listFiles();
+	}
 }
