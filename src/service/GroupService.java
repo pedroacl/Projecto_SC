@@ -45,7 +45,9 @@ public class GroupService implements GroupServiceInterface {
 	 */
 	@Override
 	public boolean addUserToGroup(String username, String userToAdd, String groupName) {
-
+		
+		System.out.println("ADDUSSERTOGROUP: "+ username + " e " + groupName + ":"+getGroupOwner(groupName));
+		
 		if (existsGroup(groupName) && getGroupOwner(groupName).equals(username)) {
 			// ler ficheiro
 			String filePath = "groups/" + groupName + "/group";
@@ -65,13 +67,15 @@ public class GroupService implements GroupServiceInterface {
 		}
 		// grupo nao existe
 		else {
-			Long conversationId = groupDAO.createGroup(groupName, username);
-			groupDAO.addUserToGroup(userToAdd, groupName);
-			conversationService.addConversationToUser(username, groupName, conversationId);
-			conversationService.addConversationToUser(userToAdd, groupName, conversationId);
-			groups.put(groupName, username);
-
-			return true;
+			if(!existsGroup(groupName)) {
+				Long conversationId = groupDAO.createGroup(groupName, username);
+				groupDAO.addUserToGroup(userToAdd, groupName);
+				conversationService.addConversationToUser(username, groupName, conversationId);
+				conversationService.addConversationToUser(userToAdd, groupName, conversationId);
+				groups.put(groupName, username);
+	
+				return true;
+			}
 		}
 
 		return false;

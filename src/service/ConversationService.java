@@ -2,6 +2,7 @@ package service;
 
 import java.io.File;
 import java.util.ArrayList;
+
 import java.util.List;
 
 import dao.ConversationDAO;
@@ -43,8 +44,9 @@ public class ConversationService implements ConversationServiceInterface {
 		String filesDirectory = "conversations/" + conversationId + "/files";
 		File file = new File(filesDirectory);
 
-		if (file.exists())
-			return "conversations/" + conversationId + "/files/" + fileName;
+		if (file.exists()) {
+			return addVersionToFile("conversations/" + conversationId + "/files/", fileName);
+		}
 		else {
 			PersistenceUtil.createFile("conversations/" + conversationId + "/files");
 			return "conversations/" + conversationId + "/files/" + fileName;
@@ -93,4 +95,24 @@ public class ConversationService implements ConversationServiceInterface {
 		
 		return maxId;
 	}
+	
+	private String addVersionToFile(String path, String fileName) {
+		
+		String [] nameSplitted = fileName.split("\\.");
+		
+		String realFileName = nameSplitted[0];
+		String extension = nameSplitted.length == 1 ? "" : "." + nameSplitted[1];
+		
+		File f = new File(path + fileName );
+		int i = 1;
+		
+		while(f.exists()) {
+			realFileName = nameSplitted[0] + i;
+			i++;
+			f = new File(path + realFileName + extension );
+		}
+
+		return path + realFileName + extension;
+	}
+	
 }

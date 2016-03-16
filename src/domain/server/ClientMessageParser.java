@@ -217,14 +217,14 @@ public class ClientMessageParser {
 				groupService.existsGroup(clientMessage.getDestination())) 
 				&& clientMessage.getFileSize() < MAX_FILE_SIZE) {
 			
+			String fileName = extractName(clientMessage.getContent());
+			
 			//cria chatMessage para persistir 
 			ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(), clientMessage.getDestination(),
-					clientMessage.getContent(), MessageType.FILE);
+					fileName, MessageType.FILE);
 			
 			//persiste chatMessage
 			Long conversationID = conversationService.addChatMessage(chatMessage);
-
-			String fileName = extractName(clientMessage.getContent());
 			System.out.println("[ProcessRequest]: extractName = " + fileName);
 			String path = conversationService.getFilePath(fileName, conversationID);
 			System.out.println("[ProcessRequest]: pathParaFile = " + path);
