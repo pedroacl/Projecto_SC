@@ -2,7 +2,10 @@
 //permission java.io.FilePermission "${user.home}/-", "read";
 
 grant {
+	// aceitar ligacoes em portos superiores ao porto 1024
 	permission java.net.SocketPermission "*:1024-", "accept";
+	
+	// escutar ligacoes no ip 127.0.0.1 e porto 23456
 	permission java.net.SocketPermission "localhost:23456", "listen, resolve";
 	
 	permission java.util.PropertyPermission "user.dir", "read";
@@ -13,6 +16,12 @@ grant {
 	// ler e escrever no ficheiro de grupos
 	permission java.io.FilePermission "groups.txt", "read, write";
 
+	// criar pastas na raiz	
+	permission java.io.FilePermission "users", "write";
+	permission java.io.FilePermission "groups", "write";
+	permission java.io.FilePermission "conversations", "write";
+
+	// criar subpastas
 	permission java.io.FilePermission "users/-", "write";
 	permission java.io.FilePermission "groups/-", "write";
 	permission java.io.FilePermission "conversations/-", "write";
