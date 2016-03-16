@@ -87,17 +87,6 @@ public class TestGroupDAO {
 		assertThat(file.exists(), is(true));
 		assertThat(file.isDirectory(), is(true));
 	}
-
-	@Test
-	public void testGetGroupByName() {
-		String groupName = "grupo1";
-		String user = "jose";
-	
-		groupDAO.createGroup(groupName, user);
-
-		Group group = groupDAO.getGroupByName(groupName);
-		assertThat(group, is(not(nullValue())));
-	}
 	
 	@Test
 	public void testGetGroupId() {
