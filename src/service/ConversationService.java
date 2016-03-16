@@ -79,8 +79,11 @@ public class ConversationService implements ConversationServiceInterface {
 	@Override
 	public Long getLastConversationId() {
 		File[] conversationsFolders = conversationDAO.getConversationsFolders();
-
 		Long currentId = 1L;
+		
+		if (conversationsFolders == null)
+			return currentId;
+
 		Long maxId = currentId;
 		
 		for (File currentFile: conversationsFolders) {
