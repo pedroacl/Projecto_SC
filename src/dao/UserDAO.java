@@ -1,7 +1,5 @@
 package dao;
 
-import interfaces.dao.UserDAOInterface;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
+import interfaces.dao.UserDAOInterface;
 import util.PersistenceUtil;
 
 /**
@@ -50,6 +49,7 @@ public class UserDAO implements UserDAOInterface {
 			FileReader fr = new FileReader(file);
 			br = new BufferedReader(fr);
 
+			// iterar linhas do ficheiro
 			while ((line = br.readLine()) != null) {
 				String[] args = line.split(":");
 				String username = args[0];
@@ -60,9 +60,9 @@ public class UserDAO implements UserDAOInterface {
 				// criar pasta para o user
 				PersistenceUtil.createDir("users/" + username);
 			}
-			
+
 			br.close();
-			
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -81,12 +81,10 @@ public class UserDAO implements UserDAOInterface {
 	 *            Password do utilizador
 	 * @return Devolve true caso o utilizador tenha sido adicionado e false caso
 	 *         contrário
+	 * @requires username != null && password != null
 	 */
 	@Override
 	public void addUser(String username, String password) {
-		if (username == null || password == null)
-			return;
-
 		// atualizar ficheiro
 		try {
 			FileWriter fw = new FileWriter("users.txt", true);
@@ -104,8 +102,9 @@ public class UserDAO implements UserDAOInterface {
 	/**
 	 * Elimina um utilizador do ficheiro users.txt
 	 * 
-	 * @param username-
-	 *            nome do utilizador a ser apagado
+	 * @param username
+	 *            Nome do utilizador a ser apagado
+	 * @requires username != null
 	 */
 	@Override
 	public void deleteUser(String username) {

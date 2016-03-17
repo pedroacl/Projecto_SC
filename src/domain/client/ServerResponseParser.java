@@ -9,22 +9,17 @@ import util.UserUtil;
 /**
  * Classe que processa a resposta do servidor, ao pedidio inicial do cliente
  * 
- * @author Pedro, Jose, Antonio
+ * @author Pedro, José e António
  *
  */
 public class ServerResponseParser {
 
 	private UserUtil userUtil;
+
 	private ClientNetworkManager clientNetwork;
+
 	private String username;
 
-	/**
-	 * Construtor
-	 * 
-	 * @param userInterface
-	 * @param clientNetwork
-	 * @param username
-	 */
 	public ServerResponseParser(UserUtil userInterface, ClientNetworkManager clientNetwork, String username) {
 		this.userUtil = userInterface;
 		this.clientNetwork = clientNetwork;
@@ -33,7 +28,10 @@ public class ServerResponseParser {
 
 	/**
 	 * Analisa e informa utilizador da resposta ao pedido efectuado
-	 * @param serverMessage - Mensagem que o servido enviou
+	 * 
+	 * @param serverMessage
+	 *            Mensagem que o servido enviou
+	 * @requires serverMessage != null
 	 */
 	public void ProcessMessage(ServerMessage serverMessage) {
 		switch (serverMessage.getMessageType()) {
@@ -41,6 +39,7 @@ public class ServerResponseParser {
 		case OK:
 			userUtil.print("OK");
 			break;
+
 		// mensagem de erro
 		case NOK:
 			userUtil.print(serverMessage.getContent());
@@ -65,6 +64,7 @@ public class ServerResponseParser {
 				e.printStackTrace();
 			}
 			break;
+
 		// mensagem do servidor mal formatada
 		default:
 			userUtil.print("Mensagem invalida");

@@ -9,7 +9,7 @@ import network.messages.MessageType;
  * Classe que verifica os parametros de entrada e cria um ClientMessage
  * correspondente a opção do utilizador
  * 
- * @author Pedro, Jose, Antonio
+ * @author Pedro, José e António
  *
  */
 public class ArgsParser {

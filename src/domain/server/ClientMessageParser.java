@@ -17,7 +17,7 @@ import service.GroupService;
 /**
  * Classe que analisa a mensagem de rede com o pedido do cliente
  * 
- * @author Pedro, Jose, Antonio
+ * @author Pedro, José e António
  *
  */
 public class ClientMessageParser {
@@ -27,26 +27,27 @@ public class ClientMessageParser {
 	private Authentication authentication;
 
 	private GroupService groupService;
-	
+
 	private ConversationService conversationService;
 
 	private ServerNetworkManager serverNetworkManager;
 
 	private final int MAX_FILE_SIZE = Integer.MAX_VALUE;
-	
-	
+
 	public ClientMessageParser(ClientMessage clientMessage, ServerNetworkManager serverNetworkManager) {
 		this.clientMessage = clientMessage;
 		authentication = Authentication.getInstance();
 
 		conversationService = new ConversationService();
-		groupService = GroupService.getInstance(); 
+		groupService = GroupService.getInstance();
 
 		this.serverNetworkManager = serverNetworkManager;
 	}
-	
+
 	/**
-	 * Processa a Mensagem do cliente, executa o pedido e cria mensagem de resposta
+	 * Processa a Mensagem do cliente, executa o pedido e cria mensagem de
+	 * resposta
+	 * 
 	 * @return ServerMessage com a resposta do servidor ao cliente
 	 */
 	public ServerMessage processRequest() {
@@ -61,20 +62,19 @@ public class ClientMessageParser {
 		}
 
 		switch (clientMessage.getMessageType()) {
+		// mensagem de texto
 		case MESSAGE:
 			serverMessage = saveMessage();
 			break;
-
+		// mensagem contendo um ficheiro
 		case FILE:
 			serverMessage = receiveFile();
 			break;
-			
+		// mensagem contendo diversas mensagens
 		case RECEIVER:
-
 			switch (clientMessage.getContent()) {
-
+			// mensagem mais recente com cada utilizador
 			case "recent":
-
 				ArrayList<Long> ids = conversationService.getAllConversationsFrom(clientMessage.getUsername());
 				ArrayList<ChatMessage> recent = new ArrayList<ChatMessage>();
 				for (long id : ids) {
@@ -85,13 +85,15 @@ public class ClientMessageParser {
 
 				break;
 
+			// todas as mensagens trocadas com um utilizador
 			case "all":
-				if (authentication.existsUser(clientMessage.getDestination()) || 
-						groupService.existsGroup(clientMessage.getDestination())) {
-					
+				// destinatario eh utilizador ou grupo
+				if (authentication.existsUser(clientMessage.getDestination())
+						|| groupService.existsGroup(clientMessage.getDestination())) {
+
 					Long conversationId = conversationService.getConversationInCommom(clientMessage.getUsername(),
 							clientMessage.getDestination());
-					
+
 					// se existir conversa em comum
 					if (conversationId != -1) {
 						ArrayList<ChatMessage> messages = (ArrayList<ChatMessage>) conversationService
@@ -103,50 +105,51 @@ public class ClientMessageParser {
 						serverMessage = new ServerMessage(MessageType.NOK);
 						serverMessage.setContent("Não há registos desta conversa");
 					}
-
+					// destinatario nao existe
 				} else {
 					serverMessage = new ServerMessage(MessageType.NOK);
 					serverMessage.setContent("Não existe esse contact");
 				}
 				break;
 			default:
-				
-				if (authentication.existsUser(clientMessage.getDestination()) || 
-						groupService.existsGroup(clientMessage.getDestination())) {
-					//verifica se exite o path
-					String path = conversationService.existsFile(clientMessage.getUsername(), clientMessage.getDestination(),
-							clientMessage.getContent());
-					
+				// destinatario eh utilizador ou grupo
+				if (authentication.existsUser(clientMessage.getDestination())
+						|| groupService.existsGroup(clientMessage.getDestination())) {
+					// verifica se exite o path
+					String path = conversationService.existsFile(clientMessage.getUsername(),
+							clientMessage.getDestination(), clientMessage.getContent());
+
 					// se exitir o path
 					if (path != null) {
 
 						File file = new File(path);
 						serverMessage = new ServerMessage(MessageType.FILE);
 						serverMessage.setFileSize((int) file.length());
-						serverMessage.setContent(path);	
-							
-					} 
-					else {
+						serverMessage.setContent(path);
+
+					} else {
 						serverMessage = new ServerMessage(MessageType.NOK);
 						serverMessage.setContent("Não há registos desta conversa");
 					}
-					
-				} 
-				else {
+					// destinatario nao existe
+				} else {
 					serverMessage = new ServerMessage(MessageType.NOK);
 					serverMessage.setContent("Não existe esse contacto");
 				}
 			}
 
 			break;
+		// adicionar utilizador
 		case ADDUSER:
 			serverMessage = addUserToGroup();
 			break;
 
+		// remover utilizador
 		case REMOVEUSER:
 			serverMessage = removeUserFromGroup();
 			break;
 
+		// mensagem mal formatada
 		default:
 			serverMessage = new ServerMessage(MessageType.NOK);
 			serverMessage.setContent("erro");
@@ -166,11 +169,11 @@ public class ClientMessageParser {
 		// utilizador a ser removido existe
 		if (authentication.existsUser(clientMessage.getDestination())) {
 
-			if(!groupService.removeUserFromGroup(clientMessage.getUsername(), clientMessage.getDestination(),
-					clientMessage.getContent())){
-				
+			if (!groupService.removeUserFromGroup(clientMessage.getUsername(), clientMessage.getDestination(),
+					clientMessage.getContent())) {
+
 				serverMessage = new ServerMessage(MessageType.NOK);
-				serverMessage.setContent("Não foi possivel remover esse utilizador");			
+				serverMessage.setContent("Não foi possivel remover esse utilizador");
 			}
 
 		} else {
@@ -181,8 +184,14 @@ public class ClientMessageParser {
 		return serverMessage;
 
 	}
-	
-	// Devolve só o nome do ficheiro, não o path completo
+
+	/**
+	 * Função que obtem o nome do ficheiro presente num path
+	 * 
+	 * @param absolutePath
+	 *            Caminho absoluto
+	 * @return Devolve o nome do ficheiro
+	 */
 	private String extractName(String absolutePath) {
 		String[] splitName = absolutePath.split("/");
 		return splitName[splitName.length - 1];
@@ -204,34 +213,36 @@ public class ClientMessageParser {
 
 		return serverMessage;
 	}
-	
+
 	/**
 	 * Função que guarda um ficheiro vindo do utilizador
 	 */
 	private ServerMessage receiveFile() {
-		
+
 		ServerMessage serverMessage;
-		
-		//verifica se o user de destino existe e que o ficheiro tem tamnho válido
-		if ( (authentication.existsUser(clientMessage.getDestination()) || 
-				groupService.existsGroup(clientMessage.getDestination())) 
+
+		// verifica se o user de destino existe e que o ficheiro tem tamnho
+		// válido
+		if ((authentication.existsUser(clientMessage.getDestination())
+				|| groupService.existsGroup(clientMessage.getDestination()))
 				&& clientMessage.getFileSize() < MAX_FILE_SIZE) {
-			
+
+			// obter nome do ficheiro
 			String fileName = extractName(clientMessage.getContent());
-			
-			//cria chatMessage para persistir 
+
+			// cria chatMessage para persistir
 			ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(), clientMessage.getDestination(),
 					fileName, MessageType.FILE);
-			
-			//persiste chatMessage
+
+			// persiste chatMessage
 			Long conversationID = conversationService.addChatMessage(chatMessage);
 			String path = conversationService.getFilePath(fileName, conversationID);
-			
-			//confirma ao cliente que é possivel receber o ficheiro
+
+			// confirma ao cliente que é possivel receber o ficheiro
 			serverMessage = new ServerMessage(MessageType.OK);
 			serverNetworkManager.sendMessage(serverMessage);
 
-			//recebe ficheiro
+			// recebe ficheiro
 			File file = null;
 
 			try {
@@ -239,8 +250,8 @@ public class ClientMessageParser {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-			
-			//verifica se o ficheiro foi bem recebido
+
+			// verifica se o ficheiro foi bem recebido
 			if (file.length() >= clientMessage.getFileSize())
 				serverMessage = new ServerMessage(MessageType.OK);
 			else {
@@ -259,35 +270,35 @@ public class ClientMessageParser {
 			serverMessage = new ServerMessage(MessageType.NOK);
 			serverMessage.setContent("Não existe esse contact");
 		}
-		
+
 		return serverMessage;
 	}
-	
+
 	/**
 	 * Função que processa e guarda um mensagem do utilizador
 	 */
 	private ServerMessage saveMessage() {
-		
+
 		ServerMessage serverMessage;
-		
-		//verifica se o user de destino existe
-		if (authentication.existsUser(clientMessage.getDestination()) || 
-				groupService.existsGroup(clientMessage.getDestination())) {
-			
-			//cria chatMessage a guardar
+
+		// destinatario eh um utilizador ou grupo
+		if (authentication.existsUser(clientMessage.getDestination())
+				|| groupService.existsGroup(clientMessage.getDestination())) {
+
+			// cria chatMessage a guardar
 			ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(), clientMessage.getDestination(),
 					clientMessage.getContent(), MessageType.MESSAGE);
 
-			//persiste chatMessage
+			// persiste chatMessage
 			conversationService.addChatMessage(chatMessage);
 			serverMessage = new ServerMessage(MessageType.OK);
-			
+
+			// destinatario nao existe
 		} else {
 			serverMessage = new ServerMessage(MessageType.NOK);
 			serverMessage.setContent("Não existe esse contact");
 		}
-		
+
 		return serverMessage;
-		
 	}
 }

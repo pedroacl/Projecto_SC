@@ -17,7 +17,8 @@ import util.PersistenceUtil;
 /**
  * Classe que persiste conversações, isto é, gere as pastas das conversações e
  * guarda as mensagens de enviadas
- *
+ * 
+ * @author António, José, Pedro
  */
 public class ConversationDAO implements ConversationDAOInterface {
 
@@ -30,10 +31,11 @@ public class ConversationDAO implements ConversationDAOInterface {
 	/**
 	 * Função que permite persistir uma determinada mensagem em disco
 	 * 
-	 * @param chatMessage-Mensagem
-	 *            a ser guardada
+	 * @param chatMessage
+	 *            Mensagem a ser guardada
 	 * @return Long com identificador da conversa onde esta mensagem está
 	 *         guardada
+	 * @requires chatMessage != null;
 	 */
 	@Override
 	public Long addChatMessage(ChatMessage chatMessage) {
@@ -114,11 +116,12 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 * Adiciona uma conversaçao ao ficheiros de conversaçoes do user
 	 * 
 	 * @param username
-	 *            - utilizador cuja conversaçao vai ser actulaizada
+	 *            Utilizador cuja conversaçao vai ser actulaizada
 	 * @param toUser
-	 *            - nome do utilizador com o qual se esta a conversar
-	 * @param conversationId-
-	 *            identificador da conversação entre username e toUser
+	 *            Nome do utilizador com o qual se esta a conversar
+	 * @param conversationId
+	 *            Identificador da conversação entre username e toUser
+	 * @requires username != null && toUser != null && conversationId != null
 	 * 
 	 */
 	@Override
@@ -148,6 +151,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 * @param conversationsIDs
 	 *            Lista de IDs de cada conversa em que o utilizador participou
 	 * @return Lista das ultimas mensagens
+	 * @requires conversationId != null
 	 */
 	@Override
 	public ChatMessage getLastChatMessage(Long conversationId) {
@@ -174,6 +178,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 *            Id da conversa a ser obtida
 	 * @return Devolve a conversa correspondente ao id ou null caso esta nao
 	 *         exista
+	 * @requires conversationId != null
 	 */
 	private Conversation getConversationById(Long conversationId) {
 		String path = "conversations/" + conversationId + "/conversation";
@@ -196,6 +201,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 *            Nome do utilizador de quem se pretende as conversas
 	 * @return Devolve uma lista de ids das conversacoes ou null caso nao
 	 *         existam para este utilizador
+	 * @requires username != null
 	 */
 	@Override
 	public ArrayList<Long> getAllConversationsFrom(String username) {
@@ -249,7 +255,8 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 * 
 	 * @param messageFields
 	 *            Lista de atributos da mensagem a ser criada
-	 * @return
+	 * @return Mensagem composta pelos vários atributos
+	 * @requires messageFields != null
 	 */
 	private ChatMessage makeChatMessage(ArrayList<String> messageFields) {
 		StringBuilder sb = new StringBuilder();
@@ -275,7 +282,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 * @param user2
 	 *            Utilizador que faz parte da conversa
 	 * @return Devolve o identificador da conversa ou -1 caso esta não exista
-	 * @require user1 != && user2 != null;
+	 * @requires user1 != && user2 != null
 	 */
 	public Long getConversationInCommom(String user1, String user2) {
 		// vai as conversaçoes do user1
@@ -287,7 +294,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 
 		// verifica se existe uma conversaçao com o user2
 		Long id = conversations.get(user2);
-		
+
 		return id == null ? (long) -1 : id;
 	}
 
@@ -300,7 +307,9 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 *            Utilizador participante da conversa
 	 * @param fileName
 	 *            Nome do ficheiro que se quer obter o path
-	 * @return Devolve uma string com o caminho para o ficheiro ou null caso nao exista
+	 * @return Devolve uma string com o caminho para o ficheiro ou null caso nao
+	 *         exista
+	 * @requires fromUser != null && toUser != null && fileName != null
 	 */
 	public String existFile(String fromUser, String toUser, String fileName) {
 		Long id = getConversationInCommom(fromUser, toUser);
@@ -323,7 +332,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 *            Utilizador que quer ver removida conversa
 	 * @param fromUser
 	 *            Nome do utilizador com o qual username tem uma conversa
-	 * 
+	 * @requires username != null && fromUser != null
 	 */
 	@Override
 	public void removeConversationFromUser(String username, String fromUser) {
@@ -345,6 +354,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 * 
 	 * @param conversationId
 	 *            Identificador da conversa a ser removida
+	 * @requires conversationId != null
 	 */
 	@Override
 	public void removeConversation(Long conversationId) {
@@ -354,15 +364,16 @@ public class ConversationDAO implements ConversationDAOInterface {
 
 	/**
 	 * Obtem as pastas de todas as conversas registadas
+	 * 
 	 * @return Devolve todas as pastas das conversas
 	 */
 	@Override
 	public File[] getConversationsFolders() {
 		File file = new File("conversations");
-		
+
 		if (!file.exists() || file.list().length == 0)
 			return null;
-		
+
 		return file.listFiles();
 	}
 }

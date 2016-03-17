@@ -20,7 +20,8 @@ import util.PersistenceUtil;
 
 /**
  * Classe que gere os grupos, persistindo-os em disco
- *
+ * 
+ * @author António, José, Pedro
  */
 public class GroupDAO implements GroupDAOInterface {
 
@@ -39,6 +40,7 @@ public class GroupDAO implements GroupDAOInterface {
 	 *            Nome do utilizador a ser adicionado
 	 * @return Devolve true caso o username tenha sido adicionado a groupName e
 	 *         false caso contrario
+	 * @requires username != null && groupName != null
 	 */
 	@Override
 	public boolean addUserToGroup(String username, String groupName) {
@@ -88,6 +90,7 @@ public class GroupDAO implements GroupDAOInterface {
 
 					groups.put(groupname, owner);
 				}
+
 				br.close();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -100,13 +103,14 @@ public class GroupDAO implements GroupDAOInterface {
 	}
 
 	/**
-	 * Permite criar um grupo
+	 * Cria um grupo
 	 * 
 	 * @param groupName
 	 *            Nome do grupo a ser criado
 	 * @param admin
 	 *            Dono do grupo, isto é quem cria o grupo
 	 * @return Devolve o id da conversação associada ao grupo
+	 * @requires groupName != null && admin != null
 	 */
 	@Override
 	public Long createGroup(String groupName, String admin) {
@@ -144,8 +148,10 @@ public class GroupDAO implements GroupDAOInterface {
 	 * Elimina o registo de um grupo em ficheiro
 	 * 
 	 * @param groupName
-	 *            Nome do grupo a ser eliminado do ficheiro 
+	 *            Nome do grupo a ser eliminado do ficheiro
+	 * @requires groupName != null
 	 */
+	@Override
 	public void deleteGroup(String groupName) {
 		// elimina entrada no ficheiro groups.txt
 		File file = new File("groups.txt");
@@ -167,7 +173,7 @@ public class GroupDAO implements GroupDAOInterface {
 
 				writer.write(line);
 			}
-			
+
 			writer.close();
 			reader.close();
 
@@ -189,28 +195,35 @@ public class GroupDAO implements GroupDAOInterface {
 		file = new File("groups/" + groupName);
 		PersistenceUtil.delete(file);
 	}
-	
+
 	/**
 	 * Obtem um grupo do ficheiro guardado em disco
-	 * @param groupName nome do grupo a obter
-	 * @return Group chamado groupNAme ou null caso nao exista esse grupo;
+	 * 
+	 * @param groupName
+	 *            Nome do grupo a obter
+	 * @return Group chamado groupNAme ou null caso nao exista esse grupo
+	 * @requires groupName != null
 	 */
 	@Override
-	public Group getGroup(String groupName ) {
+	public Group getGroup(String groupName) {
 		String filePath = "groups/" + groupName + "/group";
 		Group group = (Group) PersistenceUtil.readObject(filePath);
-		
+
 		return group;
 	}
+
 	/**
 	 * Remove um user do Group e guarda essa informação em disco
+	 * 
 	 * @param group
+	 *            Nome do grupo
 	 * @param userToRemove
+	 *            Nome do utilizador a ser removido
+	 * @requires group != null && userToRemove != null
 	 */
 	@Override
 	public void removeUserFromGroup(Group group, String userToRemove) {
 		group.removeMember(userToRemove);
 		PersistenceUtil.writeObject(group, "groups/" + group.getName() + "/group");
-		
 	}
 }

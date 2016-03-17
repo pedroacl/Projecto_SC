@@ -7,6 +7,8 @@ import entities.Group;
 public interface GroupDAOInterface {
 	
 	public Long createGroup(String groupName, String admin);
+
+	public void deleteGroup(String groupName);
 	
 	public ConcurrentHashMap<String, String> getGroups();
 

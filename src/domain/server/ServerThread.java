@@ -10,7 +10,6 @@ import network.messages.ServerMessage;
  * <<THREAD>> Classe que executa o pedido de um cliente num novo fio de execução
  * 
  * @author Pedro, José, António
- * @author Pedro, Jose, Antonio
  *
  */
 public class ServerThread extends Thread {
@@ -21,6 +20,9 @@ public class ServerThread extends Thread {
 		this.socket = socket;
 	}
 
+	/**
+	 * Executar thread
+	 */
 	public void run() {
 		//incializa comunicação com o cliente e recebe ClientMessage
 		ServerNetworkManager serverNetworkManager = new ServerNetworkManager(socket);

@@ -12,6 +12,8 @@ import network.messages.MessageType;
 import network.messages.NetworkMessage;
 
 public abstract class NetworkManager {
+	
+	private static final int PACKAGE_SIZE = 1024;
 
 	private Socket socket;
 
@@ -77,13 +79,14 @@ public abstract class NetworkManager {
 	 *            Nome do ficheiro
 	 * @return Ficheiro recebido pela rede
 	 * @throws IOException
+	 * @requires fileSize >= 0 && name != null
 	 */
 	public File receiveFile(int fileSize, String name) throws IOException {
 
 		File file = new File(name);
 		FileOutputStream fileOut = new FileOutputStream(file);
 
-		int packageSize = 1024;
+		int packageSize = PACKAGE_SIZE;
 		int currentLength = 0;
 		byte[] bfile = new byte[packageSize];
 		int lido;
@@ -159,7 +162,7 @@ public abstract class NetworkManager {
 	 * @throws IOException
 	 */
 	protected void sendByteFile(String name, int fileSize) throws IOException {
-		int packageSize = 1024;
+		int packageSize = PACKAGE_SIZE;
 
 		FileInputStream fileInputStream = new FileInputStream(name);
 		int currentLength = 0;

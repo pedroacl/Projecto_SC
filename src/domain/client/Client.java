@@ -12,10 +12,9 @@ import util.UserUtil;
 /**
  * Classe que representa um cliente, isto é responsavel por contactar o servidor
  * 
- * @author Pedro, José, Antonio
+ * @author Pedro, José e Antonio
  *
  */
-
 public class Client {
 
 	private static ClientNetworkManager clientNetwork;
@@ -24,7 +23,7 @@ public class Client {
 	 * Funçao principal
 	 * 
 	 * @param args
-	 *            - argumentos com o pedido do utilizador
+	 *            Argumentos com o pedido do utilizador
 	 * 
 	 */
 	public static void main(String[] args) {
@@ -56,8 +55,7 @@ public class Client {
 
 		clientNetwork = new ClientNetworkManager(socket);
 
-		System.out.println("Cliente ligado ao servidor "
-				+ argsParser.getServerIP() + ":" + argsParser.getServerPort());
+		System.out.println("Cliente ligado ao servidor " + argsParser.getServerIP() + ":" + argsParser.getServerPort());
 
 		// Cria mensagem de comunicaçao com o pedido do cliente
 		ClientMessage clientMessage = argsParser.getMessage();
@@ -67,13 +65,11 @@ public class Client {
 
 		if (sended) {
 			// recebe a resposta
-			ServerMessage serverMsg = (ServerMessage) clientNetwork
-					.receiveMessage();
+			ServerMessage serverMsg = (ServerMessage) clientNetwork.receiveMessage();
 
 			// passa resposta ao parser para ser processada
-			ServerResponseParser srp = new ServerResponseParser(userInterface,
-					clientNetwork, argsParser.getUsername());
-			
+			ServerResponseParser srp = new ServerResponseParser(userInterface, clientNetwork, argsParser.getUsername());
+
 			srp.ProcessMessage(serverMsg);
 
 		}

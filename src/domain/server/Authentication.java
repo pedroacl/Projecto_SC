@@ -7,7 +7,7 @@ import service.UserService;
  * <<SINGLETON>> Classe que verifica existencia dos utilizadores e que trata da
  * sua autenticaçao
  * 
- * @author António, José e Pedro 
+ * @author António, José e Pedro
  *
  */
 public class Authentication implements AuthenticationInterface {
@@ -21,7 +21,7 @@ public class Authentication implements AuthenticationInterface {
 	}
 
 	/**
-	 * Obtem uma instancia desta classe
+	 * Obtem uma instancia do singleton
 	 * 
 	 * @return Authentication
 	 */
@@ -34,10 +34,11 @@ public class Authentication implements AuthenticationInterface {
 	 * existir verifica se a password está correcta
 	 * 
 	 * @param username
-	 *            nome do utilizador a autenticar
+	 *            Nome do utilizador a autenticar
 	 * @param password
-	 *            palavra passe do utilizador
+	 *            Palavra passe do utilizador
 	 * @return False caso a password esteja errada
+	 * @requires username != null && password != null
 	 */
 	@Override
 	public boolean authenticateUser(String username, String password) {
@@ -59,12 +60,12 @@ public class Authentication implements AuthenticationInterface {
 	/**
 	 * Verifica se existe um utilizador
 	 * 
-	 * @param username-
-	 *            nome do utilizador a verificar da sua existencia
-	 * 
 	 * @param username
-	 *            - nome do utilizador a verificar da sua existencia
+	 *            Nome do utilizador a verificar da sua existencia
+	 * @param username
+	 *            Nome do utilizador a verificar da sua existencia
 	 * @return True caso utilizador exista, false caso contrario
+	 * @requires username != null
 	 */
 	@Override
 	public boolean existsUser(String username) {
@@ -74,10 +75,11 @@ public class Authentication implements AuthenticationInterface {
 	/**
 	 * Adiciona um utilizador ao sistema
 	 * 
-	 * @param username-utilizador
-	 *            a ser adicionado
-	 * @param password-
-	 *            palavra passe do utilizador
+	 * @param username
+	 *            Utilizador a ser adicionado
+	 * @param password
+	 *            Palavra passe do utilizador
+	 * @requires username != null && password != null
 	 */
 	@Override
 	public void addUser(String username, String password) {
