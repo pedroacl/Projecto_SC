@@ -28,12 +28,6 @@ public class Client {
 	 * 
 	 */
 	public static void main(String[] args) {
-		System.out.println("argsLength = " + args.length);
-
-		for (String s : args) {
-			System.out.println(s);
-		}
-
 		ArgsParser argsParser = new ArgsParser(args);
 		UserUtil userInterface = new UserUtil();
 
@@ -42,9 +36,9 @@ public class Client {
 			userInterface.printArgsUsage();
 			System.exit(0);
 		}
-		
-		//verifica se o utlizador preencheu password
-		if(!argsParser.passwordFilled()) {
+
+		// verifica se o utlizador preencheu password
+		if (!argsParser.passwordFilled()) {
 			argsParser.setPassword(userInterface.askForPassword());
 		}
 
@@ -62,27 +56,26 @@ public class Client {
 
 		clientNetwork = new ClientNetworkManager(socket);
 
-		System.out.println("Cliente ligado ao servidor " + argsParser.getServerIP() + ":" + argsParser.getServerPort());
+		System.out.println("Cliente ligado ao servidor "
+				+ argsParser.getServerIP() + ":" + argsParser.getServerPort());
 
 		// Cria mensagem de comunicaçao com o pedido do cliente
 		ClientMessage clientMessage = argsParser.getMessage();
-		System.out.println("[Client.java] message: " + clientMessage);
 
 		// envia a mensagem
 		Boolean sended = clientNetwork.sendMessage(clientMessage);
 
 		if (sended) {
 			// recebe a resposta
-			ServerMessage serverMsg = (ServerMessage) clientNetwork.receiveMessage();
-
-			// para debbug
-			System.out.println("[Client] Recebeu ultima Resposta: " + serverMsg.getMessageType());
+			ServerMessage serverMsg = (ServerMessage) clientNetwork
+					.receiveMessage();
 
 			// passa resposta ao parser para ser processada
-			ServerResponseParser srp = new ServerResponseParser(userInterface, clientNetwork, argsParser.getUsername());
+			ServerResponseParser srp = new ServerResponseParser(userInterface,
+					clientNetwork, argsParser.getUsername());
+			
 			srp.ProcessMessage(serverMsg);
 
-			
 		}
 		// fecha a ligaçao ao servidor
 		clientNetwork.close();

@@ -61,6 +61,9 @@ public class Authentication implements AuthenticationInterface {
 	 * 
 	 * @param username-
 	 *            nome do utilizador a verificar da sua existencia
+	 * 
+	 * @param username
+	 *            - nome do utilizador a verificar da sua existencia
 	 * @return True caso utilizador exista, false caso contrario
 	 */
 	@Override
@@ -78,8 +81,7 @@ public class Authentication implements AuthenticationInterface {
 	 */
 	@Override
 	public void addUser(String username, String password) {
-		if (userService.getUserPassword(username) == null) {
+		if (userService.getUserPassword(username) == null)
 			userService.addUser(username, password);
-		}
 	}
 }

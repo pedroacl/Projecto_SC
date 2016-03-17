@@ -10,6 +10,7 @@ import network.messages.ServerMessage;
  * <<THREAD>> Classe que executa o pedido de um cliente num novo fio de execução
  * 
  * @author Pedro, José, António
+ * @author Pedro, Jose, Antonio
  *
  */
 public class ServerThread extends Thread {

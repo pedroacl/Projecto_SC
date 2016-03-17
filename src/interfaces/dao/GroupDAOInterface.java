@@ -12,4 +12,8 @@ public interface GroupDAOInterface {
 
 	public boolean addUserToGroup(String username, String groupName);
 
+	public Group getGroup(String groupName);
+
+	public void removeUserFromGroup(Group group, String userToRemove);
+
 }

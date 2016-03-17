@@ -6,8 +6,8 @@ import network.messages.ClientMessage;
 import network.messages.MessageType;
 
 /**
- * Classe que verifica os parametros de entrada e cria um ClientMessage correspondente
- * a opção do utilizador
+ * Classe que verifica os parametros de entrada e cria um ClientMessage
+ * correspondente a opção do utilizador
  * 
  * @author Pedro, Jose, Antonio
  *
@@ -27,20 +27,22 @@ public class ArgsParser {
 	private boolean isValid;
 
 	private String action;
-	
+
 	private String[] act;
 
 	/**
 	 * Devolve o ip do servidor
+	 * 
 	 * @return String com a representaçao do ip do servidor a contactar
 	 * @requires isValid == true
 	 */
 	public String getServerIP() {
 		return serverIP;
 	}
-	
+
 	/**
 	 * Devolve o porto do servidor selecionado pelo utilizador
+	 * 
 	 * @return String com o porto
 	 * @requires isValid == True
 	 */
@@ -58,29 +60,24 @@ public class ArgsParser {
 	}
 
 	/**
-	 * Verifica se  os argumentros de entrada são válidos.
+	 * Verifica se os argumentros de entrada são válidos.
+	 * 
 	 * @return true, caso seja uma opção válida, false caso contrario
 	 */
 	public boolean validateInput() {
-		if (args.length < 4 || args.length > 8) {
-			System.out.println("xau 0");
+		if (args.length < 4 || args.length > 8)
 			return false;
-		}
 
 		// verifica 1º parametro(nome da aplicação)
-		if (!args[0].equals("myWhats")) {
-			System.out.println("xau 1");
+		if (!args[0].equals("myWhats"))
 			return false;
-		}
 
 		// coloca nome de utilizador na segunda posiçao do novo array
 		username = args[1];
 
 		// verifica 3º parametro (serverAddress)
-		if (!args[2].matches("(\\d+\\.){3}(\\d:\\d+)")) {
-			System.out.println(args[2] + "xau 2");
+		if (!args[2].matches("(\\d+\\.){3}(\\d:\\d+)"))
 			return false;
-		}
 
 		// obter IP e porto do servidor
 		String[] address = args[2].split(":");
@@ -101,14 +98,14 @@ public class ArgsParser {
 
 		// se nao houver parametros errados retorna um novo array de argumentos
 		// estruturado,
-		if (action == null) {
-			System.out.println("xau3");
+		if (action == null)
 			return false;
-		}
+
 		act = action.split(" ");
-		
-		//verifica se o username e o destinatario são diferentes
-		if(!act[0].equals("-r") && !act[0].equals("-d") && act[1].equals(username)) {
+
+		// verifica se o username e o destinatario são diferentes
+		if (!act[0].equals("-r") && !act[0].equals("-d")
+				&& act[1].equals(username)) {
 			System.out.println("Destinatário igual ao username");
 			return false;
 		}
@@ -116,17 +113,19 @@ public class ArgsParser {
 		isValid = true;
 		return true;
 	}
-	
+
 	/**
 	 * Informa sobre a validade dos argumentos de entrada
+	 * 
 	 * @return True, caso a analise dos argumentos de entrada ter dado positivo
 	 */
 	public boolean isValidInput() {
 		return isValid;
 	}
-	
+
 	/**
 	 * Devolve um clientMessage preenchida conforme as opçoes do utilizador
+	 * 
 	 * @return ClientMessage, mensagem com pedido do cliente ao servidor
 	 * @requires isValid == True
 	 */
@@ -138,18 +137,20 @@ public class ArgsParser {
 			pedido = new ClientMessage(username, password, MessageType.MESSAGE);
 			pedido.setDestination(act[1]);
 			StringBuilder sb = new StringBuilder();
-			for (int i = 2; i < act.length; i++) {
+
+			for (int i = 2; i < act.length; i++)
 				sb.append(act[i] + " ");
-			}
+
 			pedido.setContent(sb.toString());
 			break;
+
 		case "-f":
 			pedido = new ClientMessage(username, password, MessageType.FILE);
 			pedido.setDestination(act[1]);
-			System.out.println("Client: fileSize= " + fileSize(act[2]));
 			pedido.setFileSize(fileSize(act[2]));
 			pedido.setContent(act[2]); // coloca nome do ficheiro na mensagem
 			break;
+
 		case "-a":
 			pedido = new ClientMessage(username, password, MessageType.ADDUSER);
 			pedido.setDestination(act[1]); // coloca user a adicionar no destino
@@ -157,44 +158,45 @@ public class ArgsParser {
 			break;
 
 		case "-d":
-			pedido = new ClientMessage(username, password, MessageType.REMOVEUSER);
+			pedido = new ClientMessage(username, password,
+					MessageType.REMOVEUSER);
+
 			pedido.setDestination(act[1]); // coloca user a adicionar no destino
 			pedido.setContent(act[2]); // coloca nome do grupo na mensagem
 			break;
 
 		case "-r":
 			if (act.length == 1) {
-				pedido = new ClientMessage(username, password, MessageType.RECEIVER);
+				pedido = new ClientMessage(username, password,
+						MessageType.RECEIVER);
+
 				pedido.setContent("recent");
-			}
-			if (act.length == 2) {
-				pedido = new ClientMessage(username, password, MessageType.RECEIVER);
+			} else if (act.length == 2) {
+				pedido = new ClientMessage(username, password,
+						MessageType.RECEIVER);
 				pedido.setDestination(act[1]);
 				pedido.setContent("all");
-			}
-			if (act.length == 3) {
-				pedido = new ClientMessage(username, password, MessageType.RECEIVER);
+			} else if (act.length == 3) {
+				pedido = new ClientMessage(username, password,
+						MessageType.RECEIVER);
+
 				pedido.setDestination(act[1]);// coloca no destinatario a quem
 												// pede o file
 				pedido.setContent(act[2]); // coloca nome do ficheiro na
 											// mensagem
 			}
+
 			break;
 		}
 
 		return pedido;
 
 	}
-	
-	//Devolve a ação propriamente dita a fazer
-	private static String parseAction(String[] args, int i) {
 
+	// Devolve a ação propriamente dita a fazer
+	private static String parseAction(String[] args, int i) {
 		if (args.length == i)
 			return null;
-
-		System.out.println("tamanho: " + args.length + " i: " + i);
-
-		System.out.println("print: " + args[i]);
 
 		String res;
 
@@ -211,18 +213,15 @@ public class ArgsParser {
 			if (args.length == i + 3) {
 				res = args[i] + " " + args[i + 1] + " " + args[i + 2];
 				File file = new File(args[i + 2]);
-				if (!file.isFile() || file.length() >= Integer.MAX_VALUE) {
 
-					System.out.println(file.getPath());
+				if (!file.isFile() || file.length() >= Integer.MAX_VALUE) {
 					System.out.println("ficheiro não existe ou excede limite");
 					res = null;
 				}
-			}
-
-			else {
-				System.out.println("adeus 2");
+			} else {
 				res = null;
 			}
+
 			break;
 
 		case "-r":
@@ -233,39 +232,39 @@ public class ArgsParser {
 			else if (args.length == i + 3)
 				res = args[i] + " " + args[i + 1] + " " + args[i + 2];
 			else {
-				System.out.println("adeus 3");
 				res = null;
 			}
+
 			break;
+
 		case "-a":
 			if (args.length == i + 3)
 				res = args[i] + " " + args[i + 1] + " " + args[i + 2];
 			else {
-				System.out.println("adeus 4");
 				res = null;
 			}
+
 			break;
+
 		case "-d":
 			if (args.length == i + 3)
 				res = args[i] + " " + args[i + 1] + " " + args[i + 2];
 			else {
-				System.out.println("adeus 5");
 				res = null;
 			}
 			break;
 		default: {
-			System.out.println("adeus 6");
 			res = null;
 		}
-
 		}
 
 		return res;
 
 	}
-	
+
 	/**
 	 * Devolve o utilizador que está a usar o sistema
+	 * 
 	 * @return nome do utilizador a usar o sistema
 	 * @requires isValid == True
 	 */
@@ -273,23 +272,23 @@ public class ArgsParser {
 		return username;
 	}
 
-	//devolve o tamanho do ficheiro que o utilizador quer enviar
+	// devolve o tamanho do ficheiro que o utilizador quer enviar
 	private int fileSize(String name) {
 		File file = new File(name);
 		return (int) file.length();
 	}
-	
+
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
 	/**
 	 * Verifica se o utilizador preencheu o campo password
 	 * 
 	 * @return True,caso a password tenha sido dado pelo utilizador
 	 * @requires isValid = true;
 	 */
-	public  boolean passwordFilled() {
+	public boolean passwordFilled() {
 		return password != null;
 	}
-
 }

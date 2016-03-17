@@ -86,7 +86,7 @@ public class ConversationService implements ConversationServiceInterface {
 	@Override
 	public Long getLastConversationId() {
 		File[] conversationsFolders = conversationDAO.getConversationsFolders();
-		Long currentId = 1L;
+		Long currentId = 0L;
 		
 		if (conversationsFolders == null)
 			return currentId;

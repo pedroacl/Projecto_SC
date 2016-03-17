@@ -88,6 +88,7 @@ public class GroupDAO implements GroupDAOInterface {
 
 					groups.put(groupname, owner);
 				}
+				br.close();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -187,5 +188,29 @@ public class GroupDAO implements GroupDAOInterface {
 		// eliminar pasta do grupo
 		file = new File("groups/" + groupName);
 		PersistenceUtil.delete(file);
+	}
+	
+	/**
+	 * Obtem um grupo do ficheiro guardado em disco
+	 * @param groupName nome do grupo a obter
+	 * @return Group chamado groupNAme ou null caso nao exista esse grupo;
+	 */
+	@Override
+	public Group getGroup(String groupName ) {
+		String filePath = "groups/" + groupName + "/group";
+		Group group = (Group) PersistenceUtil.readObject(filePath);
+		
+		return group;
+	}
+	/**
+	 * Remove um user do Group e guarda essa informação em disco
+	 * @param group
+	 * @param userToRemove
+	 */
+	@Override
+	public void removeUserFromGroup(Group group, String userToRemove) {
+		group.removeMember(userToRemove);
+		PersistenceUtil.writeObject(group, "groups/" + group.getName() + "/group");
+		
 	}
 }

@@ -96,4 +96,17 @@ public class Group implements Serializable {
 	public Long getConversationId() {
 		return conversationId;
 	}
+	
+	/**
+	 * Remove um membro deste grupo
+	 * @param username nome do utilizador a remover
+	 * @return true caso tenha sido removido
+	 */
+	public boolean removeMember(String username) {
+		return users.remove(username);
+	}
+	
+	public boolean contains(String username) {
+		return users.contains(username);
+	}
 }

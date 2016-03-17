@@ -1,12 +1,12 @@
 package service;
 
+import interfaces.service.GroupServiceInterface;
+
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 import dao.GroupDAO;
 import entities.Group;
-import interfaces.service.GroupServiceInterface;
-import util.PersistenceUtil;
 
 /**
  * 
@@ -46,11 +46,12 @@ public class GroupService implements GroupServiceInterface {
 	@Override
 	public boolean addUserToGroup(String username, String userToAdd, String groupName) {
 
+		
 		if (existsGroup(groupName) && getGroupOwner(groupName).equals(username)) {
+			
 			// ler ficheiro
-			String filePath = "groups/" + groupName + "/group";
-			Group group = (Group) PersistenceUtil.readObject(filePath);
-
+			Group group = groupDAO.getGroup(groupName);
+			
 			// utilizador nao adicionado ao grupo
 			if (!group.getUsers().contains(userToAdd)) {
 				groupDAO.addUserToGroup(userToAdd, groupName);
@@ -64,6 +65,7 @@ public class GroupService implements GroupServiceInterface {
 		}
 		// grupo nao existe
 		else {
+			
 			if (!existsGroup(groupName)) {
 				Long conversationId = groupDAO.createGroup(groupName, username);
 				groupDAO.addUserToGroup(userToAdd, groupName);
@@ -83,9 +85,9 @@ public class GroupService implements GroupServiceInterface {
 
 		// existe grupo e o utilizador eh owner
 		if (existsGroup(groupName) && getGroupOwner(groupName).equals(username)) {
+			
 			// ler ficheiro
-			String filePath = "groups/" + groupName + "/group";
-			Group group = (Group) PersistenceUtil.readObject(filePath);
+			Group group = groupDAO.getGroup(groupName);
 
 			// caso user seja o dono do grupo
 			// apagar grupo inteiro
@@ -108,11 +110,15 @@ public class GroupService implements GroupServiceInterface {
 			}
 			// apaga membro do grupo
 			else {
-				conversationService.removeConversationFromUser(userToRemove, groupName);
-				return true;
+				if(group.contains(userToRemove)) {
+					//remove a conversa do grupo das susas conversaçoes
+					conversationService.removeConversationFromUser(userToRemove, groupName);
+					//remove utilizador do grupo e persiste informação
+					groupDAO.removeUserFromGroup(group, userToRemove);
+					return true;
+				}
 			}
 		}
-
 		return false;
 	}
 

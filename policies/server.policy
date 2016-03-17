@@ -1,7 +1,7 @@
 //permission java.io.FilePermission "<<ALL FILES>>", "read, write, delete, execute";
 //permission java.io.FilePermission "${user.home}/-", "read";
 
-grant {
+grant codeBase "file:build/classes/" {
 	// aceitar ligacoes em portos superiores ao porto 1024
 	permission java.net.SocketPermission "*:1024-", "accept";
 	
@@ -32,5 +32,4 @@ grant {
 	// ler todos os ficheiros	
 	permission java.io.FilePermission "/-", "read";
 	permission java.io.FilePermission "*", "read";
-
 };

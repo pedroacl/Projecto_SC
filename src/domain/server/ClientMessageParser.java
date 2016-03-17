@@ -168,8 +168,12 @@ public class ClientMessageParser {
 		// utilizador a ser removido existe
 		if (authentication.existsUser(clientMessage.getDestination())) {
 
-			groupService.removeUserFromGroup(clientMessage.getUsername(), clientMessage.getDestination(),
-					clientMessage.getContent());
+			if(!groupService.removeUserFromGroup(clientMessage.getUsername(), clientMessage.getDestination(),
+					clientMessage.getContent())){
+				
+				serverMessage = new ServerMessage(MessageType.NOK);
+				serverMessage.setContent("Não foi possivel remover esse utilizador");			
+			}
 
 		} else {
 			serverMessage = new ServerMessage(MessageType.NOK);
