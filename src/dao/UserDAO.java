@@ -56,7 +56,6 @@ public class UserDAO implements UserDAOInterface {
 				String password = args[1];
 
 				users.put(username, password);
-				System.out.println(username + " " + password);
 
 				// criar pasta para o user
 				PersistenceUtil.createDir("users/" + username);

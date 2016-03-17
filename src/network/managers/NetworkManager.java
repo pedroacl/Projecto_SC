@@ -30,8 +30,6 @@ public abstract class NetworkManager {
 	public NetworkManager(Socket socket) {
 		this.socket = socket;
 
-		System.out.println(socket == null);
-
 		try {
 			out = new ObjectOutputStream(socket.getOutputStream());
 			in = new ObjectInputStream(socket.getInputStream());
@@ -82,12 +80,8 @@ public abstract class NetworkManager {
 	 */
 	public File receiveFile(int fileSize, String name) throws IOException {
 
-		System.out.println("[ClientNetwork] O nome do ficheiro é: " + name);
 		File file = new File(name);
 		FileOutputStream fileOut = new FileOutputStream(file);
-
-		System.out.println("[ClientNetwork] O tamnho do ficheiro é :" + fileSize);
-		System.out.println(file.getAbsolutePath());
 
 		int packageSize = 1024;
 		int currentLength = 0;
@@ -107,7 +101,6 @@ public abstract class NetworkManager {
 			currentLength += lido;
 		}
 
-		System.out.println("[ClientNetwork] li no total2: " + currentLength);
 		fileOut.close();
 
 		return file;
@@ -179,7 +172,6 @@ public abstract class NetworkManager {
 				bfile = new byte[packageSize];
 
 			int lido = fileInputStream.read(bfile, 0, bfile.length);
-			System.out.println("li: " + lido);
 			currentLength += lido;
 			out.write(bfile, 0, bfile.length);
 		}

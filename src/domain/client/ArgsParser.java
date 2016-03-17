@@ -215,7 +215,7 @@ public class ArgsParser {
 				File file = new File(args[i + 2]);
 
 				if (!file.isFile() || file.length() >= Integer.MAX_VALUE) {
-					System.out.println("ficheiro não existe ou excede limite");
+					System.out.println("Ficheiro não existe ou excede o limite");
 					res = null;
 				}
 			} else {

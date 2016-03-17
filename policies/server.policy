@@ -1,14 +1,12 @@
-//permission java.io.FilePermission "<<ALL FILES>>", "read, write, delete, execute";
-//permission java.io.FilePermission "${user.home}/-", "read";
 
 grant codeBase "file:build/classes/" {
+	permission java.util.PropertyPermission "user.dir", "read";
+
 	// aceitar ligacoes em portos superiores ao porto 1024
 	permission java.net.SocketPermission "*:1024-", "accept";
 	
 	// escutar ligacoes no ip 127.0.0.1 e porto 23456
 	permission java.net.SocketPermission "localhost:23456", "listen, resolve";
-	
-	permission java.util.PropertyPermission "user.dir", "read";
 	
 	// ler e escrever no ficheiro de users
 	permission java.io.FilePermission "users.txt", "read, write";

@@ -123,8 +123,6 @@ public class ClientMessageParser {
 						File file = new File(path);
 						serverMessage = new ServerMessage(MessageType.FILE);
 						serverMessage.setFileSize((int) file.length());
-						System.out.print("[ProcessRequest] -r ");
-						System.out.println("file: " + path + " size = " + file.length());
 						serverMessage.setContent(path);	
 							
 					} 
@@ -136,7 +134,7 @@ public class ClientMessageParser {
 				} 
 				else {
 					serverMessage = new ServerMessage(MessageType.NOK);
-					serverMessage.setContent("Não existe esse contact");
+					serverMessage.setContent("Não existe esse contacto");
 				}
 			}
 
@@ -227,9 +225,7 @@ public class ClientMessageParser {
 			
 			//persiste chatMessage
 			Long conversationID = conversationService.addChatMessage(chatMessage);
-			System.out.println("[ProcessRequest]: extractName = " + fileName);
 			String path = conversationService.getFilePath(fileName, conversationID);
-			System.out.println("[ProcessRequest]: pathParaFile = " + path);
 			
 			//confirma ao cliente que é possivel receber o ficheiro
 			serverMessage = new ServerMessage(MessageType.OK);
@@ -278,15 +274,10 @@ public class ClientMessageParser {
 		if (authentication.existsUser(clientMessage.getDestination()) || 
 				groupService.existsGroup(clientMessage.getDestination())) {
 			
-			System.out.println("[ProcessRequest-CMParser]: " + clientMessage.getContent());
-			
 			//cria chatMessage a guardar
 			ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(), clientMessage.getDestination(),
 					clientMessage.getContent(), MessageType.MESSAGE);
 
-			System.out.println("[ClientMessageParser.java] Adicionar chat message");
-			System.out.println(chatMessage.getFromUser());
-			
 			//persiste chatMessage
 			conversationService.addChatMessage(chatMessage);
 			serverMessage = new ServerMessage(MessageType.OK);

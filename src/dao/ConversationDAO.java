@@ -287,7 +287,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 
 		// verifica se existe uma conversaçao com o user2
 		Long id = conversations.get(user2);
-		System.out.println("[getConversationInCommom]: id em comum = " + id);
+		
 		return id == null ? (long) -1 : id;
 	}
 

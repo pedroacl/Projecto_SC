@@ -1,9 +1,10 @@
+
 grant codeBase "file:build/classes/" {
-//	permission java.security.AllPermission;
-	
 	permission java.util.PropertyPermission "user.dir", "read";
 	
-	permission java.net.SocketPermission "*:23456", "connect";
-	permission java.io.FilePermission "<<ALL FILES>>", "read, write";
+	// aceitar ligacoes em portos superiores ao porto 1024
+	permission java.net.SocketPermission "*:1024-", "connect";
 	
+	// permissao para ler e escrever qualquer ficheiro
+	permission java.io.FilePermission "<<ALL FILES>>", "read, write";
 };
