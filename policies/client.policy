@@ -1,6 +1,9 @@
-grant {
+grant codeBase "file:build/classes/" {
 //	permission java.security.AllPermission;
-	permission java.net.SocketPermission "*:23456", "connect";
-	permission java.io.FilePermission "<<ALL FILES>>", "read,write ";
+	
 	permission java.util.PropertyPermission "user.dir", "read";
+	
+	permission java.net.SocketPermission "*:23456", "connect";
+	permission java.io.FilePermission "<<ALL FILES>>", "read, write";
+	
 };

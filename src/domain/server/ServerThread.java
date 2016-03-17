@@ -9,7 +9,7 @@ import network.messages.ServerMessage;
 /**
  * <<THREAD>> Classe que executa o pedido de um cliente num novo fio de execução
  * 
- * @author Pedro, José, Antonio
+ * @author Pedro, Jose, Antonio
  *
  */
 public class ServerThread extends Thread {
@@ -24,7 +24,6 @@ public class ServerThread extends Thread {
 		//incializa comunicação com o cliente e recebe ClientMessage
 		ServerNetworkManager serverNetworkManager = new ServerNetworkManager(socket);
 		ClientMessage clientMessage = (ClientMessage) serverNetworkManager.receiveMessage();
-		System.out.println("!!!!" + clientMessage);
 
 		// processa a mensagem do cliente e cria mensagem de resposta
 		ClientMessageParser clientMessageParser = new ClientMessageParser(clientMessage, serverNetworkManager);

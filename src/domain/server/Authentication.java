@@ -2,9 +2,10 @@ package domain.server;
 
 import interfaces.AuthenticationInterface;
 import service.UserService;
+
 /**
- * <<SINGLETON>>
- * Classe que verifica existencia dos utilizadores e que trata da sua autenticaçao
+ * <<SINGLETON>> Classe que verifica existencia dos utilizadores e que trata da
+ * sua autenticaçao
  * 
  * @author Pedro, Jose, Antonio
  *
@@ -17,10 +18,11 @@ public class Authentication implements AuthenticationInterface {
 
 	private Authentication() {
 		userService = new UserService();
-		System.out.println("[Authentication.java] Users: " + userService.getUsers());
 	}
+
 	/**
 	 * Obtem uma instancia desta classe
+	 * 
 	 * @return Authentication
 	 */
 	public static Authentication getInstance() {
@@ -28,11 +30,13 @@ public class Authentication implements AuthenticationInterface {
 	}
 
 	/**
-	 * Adiciona um utilizador ao sistema caso este não exista. Se o utilizador existir
-	 * verifica se a password está correcta
+	 * Adiciona um utilizador ao sistema caso este não exista. Se o utilizador
+	 * existir verifica se a password está correcta
 	 * 
-	 * @param username nome do utilizador a autenticar
-	 * @param password palavra passe do utilizador
+	 * @param username
+	 *            nome do utilizador a autenticar
+	 * @param password
+	 *            palavra passe do utilizador
 	 * @return False caso a password esteja errada
 	 */
 	@Override
@@ -54,7 +58,9 @@ public class Authentication implements AuthenticationInterface {
 
 	/**
 	 * Verifica se existe um utilizador
-	 * @param username- nome do utilizador a verificar da sua existencia
+	 * 
+	 * @param username
+	 *            - nome do utilizador a verificar da sua existencia
 	 * @return True caso utilizador exista, false caso contrario
 	 */
 	@Override
@@ -65,13 +71,14 @@ public class Authentication implements AuthenticationInterface {
 	/**
 	 * Adiciona um utilizador ao sistema
 	 * 
-	 * @param username-utilizador a ser adicionado
-	 * @param password- palavra passe do utilizador
+	 * @param username
+	 *            -utilizador a ser adicionado
+	 * @param password
+	 *            - palavra passe do utilizador
 	 */
 	@Override
 	public void addUser(String username, String password) {
-		if (userService.getUserPassword(username) == null) {
+		if (userService.getUserPassword(username) == null)
 			userService.addUser(username, password);
-		}
 	}
 }

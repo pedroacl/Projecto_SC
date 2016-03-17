@@ -6,8 +6,6 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import network.managers.ServerNetworkManager;
-
 /**
  * Classe que representa o servidor. Tem a lógica do negocio. Responde perante
  * os pedidos do cliente
@@ -53,5 +51,6 @@ public class Server {
 		}
 
 		// executorService.shutdown();
+		// serverSocket.close();
 	}
 }

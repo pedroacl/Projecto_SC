@@ -1,12 +1,12 @@
 package service;
 
+import interfaces.service.GroupServiceInterface;
+
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 import dao.GroupDAO;
 import entities.Group;
-import interfaces.service.GroupServiceInterface;
-import util.PersistenceUtil;
 
 /**
  * 

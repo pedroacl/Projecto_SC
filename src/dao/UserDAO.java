@@ -1,5 +1,7 @@
 package dao;
 
+import interfaces.dao.UserDAOInterface;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -9,7 +11,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
-import interfaces.dao.UserDAOInterface;
 import util.PersistenceUtil;
 
 /**
@@ -59,8 +60,10 @@ public class UserDAO implements UserDAOInterface {
 
 				// criar pasta para o user
 				PersistenceUtil.createDir("users/" + username);
-
 			}
+			
+			br.close();
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
