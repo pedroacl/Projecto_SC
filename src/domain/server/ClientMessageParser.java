@@ -117,8 +117,6 @@ public class ClientMessageParser {
 					String path = conversationService.existsFile(clientMessage.getUsername(), clientMessage.getDestination(),
 							clientMessage.getContent());
 					
-					System.out.println("[CASE RECEIVER file]: " + path);
-
 					// se exitir o path
 					if (path != null) {
 

@@ -18,7 +18,7 @@ public class GroupService implements GroupServiceInterface {
 	private GroupDAO groupDAO;
 
 	private static ConversationService conversationService;
-	
+
 	private static GroupService groupService = new GroupService();
 
 	private ConcurrentHashMap<String, String> groups; // groupName:owner
@@ -28,7 +28,7 @@ public class GroupService implements GroupServiceInterface {
 		groups = groupDAO.getGroups();
 		conversationService = new ConversationService();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -45,14 +45,11 @@ public class GroupService implements GroupServiceInterface {
 	 */
 	@Override
 	public boolean addUserToGroup(String username, String userToAdd, String groupName) {
-		
-		System.out.println("ADDUSSERTOGROUP: "+ username + " e " + groupName + ":"+getGroupOwner(groupName));
-		
+
 		if (existsGroup(groupName) && getGroupOwner(groupName).equals(username)) {
 			// ler ficheiro
 			String filePath = "groups/" + groupName + "/group";
 			Group group = (Group) PersistenceUtil.readObject(filePath);
-			System.out.println("[GroupService]" + group.getConversationId());
 
 			// utilizador nao adicionado ao grupo
 			if (!group.getUsers().contains(userToAdd)) {
@@ -67,13 +64,13 @@ public class GroupService implements GroupServiceInterface {
 		}
 		// grupo nao existe
 		else {
-			if(!existsGroup(groupName)) {
+			if (!existsGroup(groupName)) {
 				Long conversationId = groupDAO.createGroup(groupName, username);
 				groupDAO.addUserToGroup(userToAdd, groupName);
 				conversationService.addConversationToUser(username, groupName, conversationId);
 				conversationService.addConversationToUser(userToAdd, groupName, conversationId);
 				groups.put(groupName, username);
-	
+
 				return true;
 			}
 		}
@@ -83,7 +80,7 @@ public class GroupService implements GroupServiceInterface {
 
 	@Override
 	public boolean removeUserFromGroup(String username, String userToRemove, String groupName) {
-		
+
 		// existe grupo e o utilizador eh owner
 		if (existsGroup(groupName) && getGroupOwner(groupName).equals(username)) {
 			// ler ficheiro
@@ -97,9 +94,8 @@ public class GroupService implements GroupServiceInterface {
 				// cada elemento
 				ArrayList<String> members = (ArrayList<String>) group.getUsers();
 
-				for (String user : members) {
+				for (String user : members)
 					conversationService.removeConversationFromUser(user, groupName);
-				}
 
 				// Apaga conversa da pasta conversations
 				conversationService.removeConversation(group.getConversationId());
@@ -107,7 +103,7 @@ public class GroupService implements GroupServiceInterface {
 				// Apaga o group do "disco"
 				groupDAO.deleteGroup(groupName);
 				groups.remove(groupName);
-				
+
 				return true;
 			}
 			// apaga membro do grupo
@@ -119,7 +115,7 @@ public class GroupService implements GroupServiceInterface {
 
 		return false;
 	}
-	
+
 	@Override
 	public boolean existsGroup(String groupName) {
 		return groups.get(groupName) != null;

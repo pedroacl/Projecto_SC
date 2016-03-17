@@ -8,7 +8,7 @@ import service.ConversationService;
  * associando-lhes um id que é incrementado à medida que são instanciados
  * objectos deste tipo.
  * 
- * @author Jose, Pedro, Antonio
+ * @author José, Pedro, António
  *
  */
 public class ConversationFactory {
@@ -18,7 +18,7 @@ public class ConversationFactory {
 	
 	private ConversationFactory() {
 		ConversationService conversationService = new ConversationService();
-		conversationId = conversationService.getLastConversationId();
+		conversationId = conversationService.getLastConversationId() + 1;
 	}
 
 	/**

@@ -10,6 +10,11 @@ import entities.ChatMessage;
 import interfaces.service.ConversationServiceInterface;
 import util.PersistenceUtil;
 
+/**
+ * 
+ * @author António, José e Pedro
+ *
+ */
 public class ConversationService implements ConversationServiceInterface {
 
 	private static ConversationDAO conversationDAO;
