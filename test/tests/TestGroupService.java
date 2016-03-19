@@ -6,10 +6,8 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,24 +24,6 @@ public class TestGroupService {
 
 	@Before
 	public void setUp() {
-		try {
-			FileUtils.deleteDirectory(new File("users"));
-			FileUtils.deleteDirectory(new File("conversations"));
-
-			File file = new File("users.txt");
-
-			if (file.exists())
-				FileUtils.forceDelete(file);
-
-			file = new File("groups.txt");
-
-			if (file.exists())
-				FileUtils.forceDelete(file);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
 		authentication = Authentication.getInstance();
 		authentication.addUser("antonio", "1234");
 		authentication.addUser("jose", "4321");

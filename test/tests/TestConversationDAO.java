@@ -7,10 +7,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,25 +32,6 @@ public class TestConversationDAO {
 
 	@Before
 	public void setUp() {
-		try {
-			FileUtils.deleteDirectory(new File("users"));
-			FileUtils.deleteDirectory(new File("conversations"));
-			FileUtils.deleteDirectory(new File("groups"));
-
-			File file = new File("users.txt");
-
-			if (file.exists()) {
-				FileUtils.forceDelete(file);
-			}
-			
-			file = new File("groups.txt");
-
-			if (file.exists())
-				FileUtils.forceDelete(file);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
 		conversationFactory = ConversationFactory.getInstance();
 
 		conversationDAO = new ConversationDAO();

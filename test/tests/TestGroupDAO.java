@@ -1,22 +1,16 @@
 package tests;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import org.apache.commons.io.FileUtils;
+import java.io.File;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import dao.GroupDAO;
 import domain.server.Authentication;
-import entities.Group;
 
 public class TestGroupDAO {
 
@@ -26,25 +20,6 @@ public class TestGroupDAO {
 
 	@Before
 	public void setUp() {
-		try {
-			File file = new File("users.txt");
-
-			if (file.exists())
-				FileUtils.forceDelete(file);
-			
-			file = new File("groups.txt");
-
-			if (file.exists())
-				FileUtils.forceDelete(file);
-
-			FileUtils.deleteDirectory(new File("users"));
-			FileUtils.deleteDirectory(new File("conversations"));
-			FileUtils.deleteDirectory(new File("groups"));
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
 		authentication = Authentication.getInstance();
 
 		groupDAO = new GroupDAO();
