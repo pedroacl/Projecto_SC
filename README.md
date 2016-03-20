@@ -1,15 +1,12 @@
-##############################
-#   Trabalho realizado pelo  #
-#			  Grupo 34  		  #
-#									  #
-# António Rodrigues, nº40853 #
-# José Albuquerque, 	nº40251 #
-# Pedro Luís, 			nº45588 #
-##############################
+#   Trabalho realizado pelo  	
+#			  Grupo 34  		  		
 
-############
-# Servidor #
-############
+# António Rodrigues, 	nº40853 	
+# José Albuquerque, 	nº40251 	
+# Pedro Luís, 				nº45588 	
+
+
+# Servidor
 
 De modo a corrermos o servidor devemos executar a seguinte instrução na linha
 de comandos:
@@ -18,9 +15,7 @@ java -Djava.security.manager -Djava.security.policy=policies/server.policy -jar
 	server.jar <serverPort>
 
 
-##########
-# Client #
-##########
+# Client
 
 Para corrermos o cliente devemos executar a seguinte instrução:
 
