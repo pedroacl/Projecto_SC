@@ -1,5 +1,5 @@
 
-grant codeBase "file:build/classes/" {
+grant codeBase "file:server.jar" {
 	permission java.util.PropertyPermission "user.dir", "read";
 
 	// aceitar ligacoes em portos superiores ao porto 1024
