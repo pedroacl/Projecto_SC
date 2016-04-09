@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dao.ConversationDAO;
+import dao.UserDAO;
 import entities.ChatMessage;
 import interfaces.service.ConversationServiceInterface;
+import security.ServerSecurity;
 import util.PersistenceUtil;
 
 /**
@@ -18,9 +20,12 @@ import util.PersistenceUtil;
 public class ConversationService implements ConversationServiceInterface {
 
 	private static ConversationDAO conversationDAO;
-	
+
+	private UserService userService;
+
 	public ConversationService() {
 		conversationDAO = new ConversationDAO();
+		userService = new UserService();
 	}
 
 	@Override
@@ -30,6 +35,13 @@ public class ConversationService implements ConversationServiceInterface {
 
 	@Override
 	public Long addChatMessage(ChatMessage chatMessage) {
+		ServerSecurity serverSecurity = new ServerSecurity();
+
+		// guardar chave privada associada ah mensagem
+		String fileName = Long.toString(chatMessage.getCreatedAt().getTime());
+		conversationDAO.saveUserFilePrivateKey(chatMessage.getFromUser(), fileName, chatMessage.getContent());
+		conversationDAO.saveUserFilePrivateKey(chatMessage.getDestination(), fileName, chatMessage.getContent());
+
 		return conversationDAO.addChatMessage(chatMessage);
 	}
 
@@ -41,7 +53,7 @@ public class ConversationService implements ConversationServiceInterface {
 	@Override
 	public void removeConversation(Long conversationId) {
 		conversationDAO.removeConversation(conversationId);
-		
+
 	}
 
 	@Override
@@ -51,8 +63,7 @@ public class ConversationService implements ConversationServiceInterface {
 
 		if (file.exists()) {
 			return addVersionToFile("conversations/" + conversationId + "/files/", fileName);
-		}
-		else {
+		} else {
 			PersistenceUtil.createFile("conversations/" + conversationId + "/files");
 			return "conversations/" + conversationId + "/files/" + fileName;
 		}
@@ -87,37 +98,37 @@ public class ConversationService implements ConversationServiceInterface {
 	public Long getLastConversationId() {
 		File[] conversationsFolders = conversationDAO.getConversationsFolders();
 		Long currentId = 0L;
-		
+
 		if (conversationsFolders == null)
 			return currentId;
 
 		Long maxId = currentId;
-		
-		for (File currentFile: conversationsFolders) {
+
+		for (File currentFile : conversationsFolders) {
 			currentId = Long.parseLong(currentFile.getName());
 			maxId = currentId > maxId ? currentId : maxId;
 		}
-		
+
 		return maxId;
 	}
-	
+
 	private String addVersionToFile(String path, String fileName) {
-		
-		String [] nameSplitted = fileName.split("\\.");
-		
+
+		String[] nameSplitted = fileName.split("\\.");
+
 		String realFileName = nameSplitted[0];
 		String extension = nameSplitted.length == 1 ? "" : "." + nameSplitted[1];
-		
-		File f = new File(path + fileName );
+
+		File f = new File(path + fileName);
 		int i = 1;
-		
-		while(f.exists()) {
+
+		while (f.exists()) {
 			realFileName = nameSplitted[0] + i;
 			i++;
-			f = new File(path + realFileName + extension );
+			f = new File(path + realFileName + extension);
 		}
 
 		return path + realFileName + extension;
 	}
-	
+
 }

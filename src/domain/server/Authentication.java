@@ -86,4 +86,5 @@ public class Authentication implements AuthenticationInterface {
 		if (userService.getUserPassword(username) == null)
 			userService.addUser(username, password);
 	}
+
 }

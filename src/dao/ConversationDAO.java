@@ -376,4 +376,22 @@ public class ConversationDAO implements ConversationDAOInterface {
 
 		return file.listFiles();
 	}
+	
+	/**
+	 * Guarda a chave privada, enviada por um utilizador, associada a uma mensagem ou ficheiro
+	 * esta irá ser guardada em fich.txt.key.FromUser e fich.txt.key.ToUser
+	 * 
+	 * @param username
+	 * @param fileName
+	 * @param privateKey
+	 */
+	public void saveUserFilePrivateKey(String username, String fileName, String privateKey) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("keys/");
+		sb.append(fileName);
+		sb.append(".key.");
+		sb.append(username);
+		
+		PersistenceUtil.writeStringToFile(privateKey, sb.toString());
+	}
 }

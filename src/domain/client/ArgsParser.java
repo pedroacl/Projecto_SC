@@ -133,7 +133,7 @@ public class ArgsParser {
 		ClientMessage pedido = null;
 
 		switch (act[0]) {
-		case "-m":
+		case "-m":	
 			pedido = new ClientMessage(username, password, MessageType.MESSAGE);
 			pedido.setDestination(act[1]);
 			StringBuilder sb = new StringBuilder();
