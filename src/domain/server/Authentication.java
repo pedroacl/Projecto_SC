@@ -1,6 +1,7 @@
 package domain.server;
 
 import interfaces.AuthenticationInterface;
+import security.Security;
 import service.UserService;
 
 /**
@@ -42,19 +43,19 @@ public class Authentication implements AuthenticationInterface {
 	 */
 	@Override
 	public boolean authenticateUser(String username, String password) {
-
-		String userPassword = userService.getUserPassword(username);
+		String[] userPasswordAndSalt = userService.getUserPasswordAndSalt(username);
 
 		// user nao existe
-		if (userPassword == null) {
+		if (userPasswordAndSalt == null) {
 			userService.addUser(username, password);
 		}
 		// user existe e a password eh invalida
-		else if (!userPassword.equals(password)) {
-			return false;
+		else {
+			byte[] passwordHash = Security.getHash((password + userPasswordAndSalt[0]).getBytes());
+			return userPasswordAndSalt[1].equals(passwordHash.toString());
 		}
 
-		return true;
+		return false;
 	}
 
 	/**
@@ -69,7 +70,7 @@ public class Authentication implements AuthenticationInterface {
 	 */
 	@Override
 	public boolean existsUser(String username) {
-		return userService.getUserPassword(username) != null;
+		return userService.getUserPasswordAndSalt(username) != null;
 	}
 
 	/**
@@ -83,7 +84,7 @@ public class Authentication implements AuthenticationInterface {
 	 */
 	@Override
 	public void addUser(String username, String password) {
-		if (userService.getUserPassword(username) == null)
+		if (userService.getUserPasswordAndSalt(username) == null)
 			userService.addUser(username, password);
 	}
 

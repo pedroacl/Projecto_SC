@@ -1,9 +1,12 @@
 package service;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.concurrent.ConcurrentHashMap;
 
 import dao.UserDAO;
 import interfaces.service.UserServiceInterface;
+import security.Security;
 
 public class UserService implements UserServiceInterface {
 	
@@ -23,12 +26,21 @@ public class UserService implements UserServiceInterface {
 
 	@Override
 	public void addUser(String username, String password) {
-		users.put(username, password);
-		userDAO.addUser(username, password);
-	}
+		final SecureRandom randomNumber = new SecureRandom();
+		String salt = new BigInteger(130, randomNumber).toString(32);
 
+		String passwordAndSalt = salt + ":" + (Security.getHash((salt + password).getBytes())).toString();
+		users.put(username, passwordAndSalt);
+		userDAO.addUser(username, passwordAndSalt);
+	}
+	
 	@Override
-	public String getUserPassword(String username) {
-		return users.get(username);
+	public String[] getUserPasswordAndSalt(String username) {
+		String passwordAndSalt = users.get(username);
+		
+		//username:salt:password_hash
+		String[] passwordAndSaltArray = passwordAndSalt.split(":");
+		
+		return passwordAndSaltArray;
 	}
 }

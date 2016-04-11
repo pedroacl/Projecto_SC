@@ -53,9 +53,10 @@ public class UserDAO implements UserDAOInterface {
 			while ((line = br.readLine()) != null) {
 				String[] args = line.split(":");
 				String username = args[0];
-				String password = args[1];
+				String password = args[2];
+				String salt = args[1];
 
-				users.put(username, password);
+				users.put(username, salt + ":" + password);
 
 				// criar pasta para o user
 				PersistenceUtil.createDir("users/" + username);
@@ -84,11 +85,11 @@ public class UserDAO implements UserDAOInterface {
 	 * @requires username != null && password != null
 	 */
 	@Override
-	public void addUser(String username, String password) {
+	public void addUser(String username, String passwordAndSalt) {
 		// atualizar ficheiro
 		try {
 			FileWriter fw = new FileWriter("users.txt", true);
-			fw.write(username + ":" + password + "\n");
+			fw.write(username + ":" + passwordAndSalt + "\n");
 			fw.close();
 
 			// criar directorias

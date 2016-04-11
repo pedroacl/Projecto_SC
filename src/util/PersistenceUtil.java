@@ -11,6 +11,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +25,7 @@ import java.util.List;
  *
  */
 public class PersistenceUtil {
+	private static final String KEYSTORE = "keystore.keystore";
 
 	/**
 	 * Elimina um determinado ficheiro ou pasta
@@ -202,5 +208,34 @@ public class PersistenceUtil {
 		}
 
 		return txt;
+	}
+	
+	/**
+	 * Obter keystore guardada num ficheiro
+	 * @param userPassword Password de acesso à keystore
+	 */
+	public static KeyStore getKeyStore(String password) {
+		FileInputStream fileInputStream = null;
+		KeyStore keyStore = null;
+
+		try {
+			fileInputStream = new FileInputStream(KEYSTORE);
+			keyStore = KeyStore.getInstance("JKS");
+			keyStore.load(fileInputStream, password.toCharArray());
+			fileInputStream.close();
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (KeyStoreException e) {
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (CertificateException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return keyStore;
 	}
 }

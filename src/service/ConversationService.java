@@ -2,14 +2,11 @@ package service;
 
 import java.io.File;
 import java.util.ArrayList;
-
 import java.util.List;
 
 import dao.ConversationDAO;
-import dao.UserDAO;
 import entities.ChatMessage;
 import interfaces.service.ConversationServiceInterface;
-import security.ServerSecurity;
 import util.PersistenceUtil;
 
 /**
@@ -35,8 +32,6 @@ public class ConversationService implements ConversationServiceInterface {
 
 	@Override
 	public Long addChatMessage(ChatMessage chatMessage) {
-		ServerSecurity serverSecurity = new ServerSecurity();
-
 		// guardar chave privada associada ah mensagem
 		String fileName = Long.toString(chatMessage.getCreatedAt().getTime());
 		conversationDAO.saveUserFilePrivateKey(chatMessage.getFromUser(), fileName, chatMessage.getContent());

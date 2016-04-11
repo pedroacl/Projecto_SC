@@ -4,10 +4,15 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.cert.Certificate;
 import java.security.spec.InvalidKeySpecException;
 
 import javax.crypto.BadPaddingException;
@@ -20,9 +25,24 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
-public class Security {
+import util.PersistenceUtil;
 
-	public KeyPair getKeyPair() {
+public class Security {
+	private static final String KEYSTORE_PASSWORD = "1234";
+	
+	public static byte[] getHash(byte[] message) {
+		MessageDigest messageDigest = null;
+		
+		try {
+			messageDigest = MessageDigest.getInstance("SHA-256");
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+
+		return messageDigest.digest(message);
+	}
+	
+	public static KeyPair getKeyPair() {
 		KeyPair keyPair = null;
 
 		try {
@@ -37,7 +57,7 @@ public class Security {
 		return keyPair;
 	}
 
-	public SecretKey getSecretKey() {
+	public static SecretKey getSecretKey() {
 		SecretKey secretKey = null;
 
 		try {
@@ -51,8 +71,7 @@ public class Security {
 		return secretKey;
 	}
 
-	public byte[] signMessage(String message, PrivateKey privateKey) {
-		// PrivateKey privateKey = getKeyPair().getPrivate();
+	public static byte[] signMessage(String message, PrivateKey privateKey) {
 		byte[] signedMessage = null;
 
 		try {
@@ -82,7 +101,7 @@ public class Security {
 	 * @param secretKey
 	 * @return Devolve uma mensagem cifrada com uma chave privada
 	 */
-	public byte[] cipherWithSecretKey(byte[] message, SecretKey secretKey) {
+	public static byte[] cipherWithSecretKey(byte[] message, SecretKey secretKey) {
 		byte[] encryptedMessage = null;
 
 		try {
@@ -104,6 +123,29 @@ public class Security {
 
 		return encryptedMessage;
 	}
+	
+	public static byte[] decipherWithSecretKey(byte[] cipheredMessage, SecretKey secretKey) {
+		byte[] decipheredMessage;
+
+		try {
+			Cipher cipher = Cipher.getInstance("AES");
+			cipher.init(Cipher.DECRYPT_MODE, secretKey);
+			decipheredMessage = cipher.doFinal(cipheredMessage);
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+		} catch (IllegalBlockSizeException e) {
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			e.printStackTrace();
+		} 
+		
+		return cipheredMessage;
+	}
 
 	public Cipher cipherWithPublicKey() {
 		Cipher cipher = null;
@@ -113,11 +155,12 @@ public class Security {
 	
 	/**
 	 * Função que cifra a chave privada a ser enviada
+	 * @param username 
 	 * 
 	 * @param secretKey
 	 * @return Devolve a chave privada cifrada
 	 */
-	public byte[] wrapSecretKey(SecretKey secretKey) {
+	public static byte[] wrapSecretKey(String username, SecretKey secretKey) {
 		String password = "Come you spirits that tend on mortal thoughts";
 		byte[] salt = { (byte) 0xc9, (byte) 0x36, (byte) 0x78, (byte) 0x99, (byte) 0x52, (byte) 0x3e, (byte) 0xea, (byte) 0xf2 };
 
@@ -149,5 +192,23 @@ public class Security {
 		}
 		
 		return wrappedKey;
+	}
+	
+	/**
+	 * Obtem uma chave publica guardada na keystore
+	 * @param username
+	 */
+	public PublicKey getPublicKey(String username) {
+		PublicKey publicKey = null;
+		
+		try {
+			KeyStore keyStore = PersistenceUtil.getKeyStore(KEYSTORE_PASSWORD);
+			Certificate certificate = keyStore.getCertificate(username);
+			publicKey = certificate.getPublicKey();
+		} catch (KeyStoreException e) {
+			e.printStackTrace();
+		}
+		
+		return publicKey;
 	}
 }

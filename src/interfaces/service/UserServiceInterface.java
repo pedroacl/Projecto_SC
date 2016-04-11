@@ -8,5 +8,5 @@ public interface UserServiceInterface {
 
 	public void addUser(String username, String password);
 
-	public String getUserPassword(String username);
+	public String[] getUserPasswordAndSalt(String username);
 }
