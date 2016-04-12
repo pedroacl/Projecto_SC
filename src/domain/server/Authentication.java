@@ -47,6 +47,7 @@ public class Authentication implements AuthenticationInterface {
 
 		// user nao existe
 		if (userPasswordAndSalt == null) {
+			System.out.println("User nao existe. Adicionar " + username + "!");
 			userService.addUser(username, password);
 		}
 		// user existe e a password eh invalida

@@ -1,7 +1,7 @@
 package security;
 
-import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
@@ -10,10 +10,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
-import java.security.spec.InvalidKeySpecException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -21,27 +22,27 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.PBEParameterSpec;
 
 import util.PersistenceUtil;
 
 public class Security {
 	private static final String KEYSTORE_PASSWORD = "1234";
-	
+
 	public static byte[] getHash(byte[] message) {
 		MessageDigest messageDigest = null;
-		
+
 		try {
 			messageDigest = MessageDigest.getInstance("SHA-256");
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
+		
+		System.out.println(messageDigest.digest(message)[0]);
+		System.out.println(messageDigest.digest(message)[1]);
 
 		return messageDigest.digest(message);
 	}
-	
+
 	public static KeyPair getKeyPair() {
 		KeyPair keyPair = null;
 
@@ -123,7 +124,7 @@ public class Security {
 
 		return encryptedMessage;
 	}
-	
+
 	public static byte[] decipherWithSecretKey(byte[] cipheredMessage, SecretKey secretKey) {
 		byte[] decipheredMessage;
 
@@ -142,8 +143,8 @@ public class Security {
 			e.printStackTrace();
 		} catch (BadPaddingException e) {
 			e.printStackTrace();
-		} 
-		
+		}
+
 		return cipheredMessage;
 	}
 
@@ -152,55 +153,82 @@ public class Security {
 
 		return cipher;
 	}
-	
+
 	/**
 	 * Função que cifra a chave privada a ser enviada
-	 * @param username 
+	 * 
+	 * @param username
 	 * 
 	 * @param secretKey
 	 * @return Devolve a chave privada cifrada
 	 */
 	public static byte[] wrapSecretKey(String username, SecretKey secretKey) {
-		String password = "Come you spirits that tend on mortal thoughts";
-		byte[] salt = { (byte) 0xc9, (byte) 0x36, (byte) 0x78, (byte) 0x99, (byte) 0x52, (byte) 0x3e, (byte) 0xea, (byte) 0xf2 };
-
-		PBEKeySpec keySpec = new PBEKeySpec(password.toCharArray( ));		
 		byte[] wrappedKey = null;
-		
+
 		try {
-			SecretKeyFactory kf = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
-			SecretKey passwordKey = kf.generateSecret(keySpec);
-			PBEParameterSpec paramSpec = new PBEParameterSpec(salt, 20);
-			Cipher c = Cipher.getInstance("PBEWithMD5AndAES");
-			c.init(Cipher.WRAP_MODE, passwordKey, paramSpec);
-			
+			// obter certificado
+			KeyStore keystore = PersistenceUtil.getKeyStore(KEYSTORE_PASSWORD);
+			Certificate certificate = keystore.getCertificate(username);
+
+			// inicializar cifra
+			Cipher c = Cipher.getInstance("RSA");
+			c.init(Cipher.WRAP_MODE, certificate);
+
 			// cifrar a chave secreta que queremos enviar
 			wrappedKey = c.wrap(secretKey);
 
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
-		} catch (InvalidKeySpecException e) {
-			e.printStackTrace();
 		} catch (NoSuchPaddingException e) {
 			e.printStackTrace();
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
-		} catch (InvalidAlgorithmParameterException e) {
-			e.printStackTrace();
 		} catch (IllegalBlockSizeException e) {
+			e.printStackTrace();
+		} catch (KeyStoreException e) {
+			e.printStackTrace();
+		}
+
+		return wrappedKey;
+	}
+
+	public static SecretKey unwrapSecretKey(String username, char[] keyPassword, byte[] wrappedKey) {
+		Key unwrappedSecretKey = null;
+
+		try {
+			// obter keystore
+			KeyStore keystore = PersistenceUtil.getKeyStore(KEYSTORE_PASSWORD);
+			Key privateKey = keystore.getKey(username, keyPassword);
+		
+			// inicializar cifra
+			Cipher cipher = Cipher.getInstance("RSA");
+			cipher.init(Cipher.UNWRAP_MODE, privateKey);
+			
+			unwrappedSecretKey = cipher.unwrap(wrappedKey, "RSA", Cipher.SECRET_KEY);
+
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+		} catch (UnrecoverableKeyException e) {
+			e.printStackTrace();
+		} catch (KeyStoreException e) {
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
 			e.printStackTrace();
 		}
 		
-		return wrappedKey;
+		return (SecretKey) unwrappedSecretKey;
 	}
-	
+
 	/**
 	 * Obtem uma chave publica guardada na keystore
+	 * 
 	 * @param username
 	 */
 	public PublicKey getPublicKey(String username) {
 		PublicKey publicKey = null;
-		
+
 		try {
 			KeyStore keyStore = PersistenceUtil.getKeyStore(KEYSTORE_PASSWORD);
 			Certificate certificate = keyStore.getCertificate(username);
@@ -208,7 +236,16 @@ public class Security {
 		} catch (KeyStoreException e) {
 			e.printStackTrace();
 		}
-		
+
 		return publicKey;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public static int generateSalt() {
+		final SecureRandom randomNumber = new SecureRandom();
+		return (randomNumber.nextInt(900000) + 100000);
 	}
 }

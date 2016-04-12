@@ -10,6 +10,8 @@ import entities.ChatMessage;
 import network.managers.ServerNetworkManager;
 import network.messages.ClientMessage;
 import network.messages.MessageType;
+import network.messages.NetworkMessage;
+import network.messages.ServerContactTypeMessage;
 import network.messages.ServerMessage;
 import service.ConversationService;
 import service.GroupService;
@@ -50,13 +52,16 @@ public class ClientMessageParser {
 	 * 
 	 * @return ServerMessage com a resposta do servidor ao cliente
 	 */
-	public ServerMessage processRequest() {
-		ServerMessage serverMessage = null;
+	public NetworkMessage processRequest() {
+		NetworkMessage serverMessage = null;
 
+		System.out.println("Server - Recebi msg");
+
+		// erro de autenticacao
 		if (!authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword())) {
-
-			serverMessage = new ServerMessage(MessageType.NOK);
-			serverMessage.setContent("password Errada");
+			ServerContactTypeMessage auxMessage = new ServerContactTypeMessage(MessageType.NOK);
+			auxMessage.setContent("Password errada");
+			serverMessage = auxMessage;
 
 			return serverMessage;
 		}
@@ -64,7 +69,31 @@ public class ClientMessageParser {
 		switch (clientMessage.getMessageType()) {
 		// mensagem de texto
 		case MESSAGE:
-			serverMessage = saveMessage();
+			System.out.println("Client - Message");
+			// serverMessage = saveMessage();
+
+			// destinatario eh um utilizador ou grupo
+			if (authentication.existsUser(clientMessage.getDestination())) {
+				serverMessage = new ServerContactTypeMessage(MessageType.CONTACT);
+			// group 
+			} else if (groupService.existsGroup(clientMessage.getDestination())) {
+				ServerContactTypeMessage testMessage = new ServerContactTypeMessage(MessageType.CONTACT);
+//				serverMessage = new ServerContactTypeMessage(MessageType.CONTACT);
+				
+				ArrayList<String> groupMembers = new ArrayList<String>();
+				groupMembers.add("jose");
+				groupMembers.add("antonio");
+				groupMembers.add("pedro");
+
+				testMessage.setGroupMembers(groupMembers);
+				serverMessage = testMessage;
+				//serverMessage.setGroupMembers(groupMembers);
+				
+			} else {
+				serverMessage = new ServerContactTypeMessage(MessageType.NOK);
+				serverMessage.setContent("Não existe esse contact");
+			}
+
 			break;
 		// mensagem contendo um ficheiro
 		case FILE:
@@ -81,7 +110,7 @@ public class ClientMessageParser {
 					recent.add(conversationService.getLastChatMessage(id));
 				}
 				serverMessage = new ServerMessage(MessageType.LAST_MESSAGES);
-				serverMessage.setMessages(recent);
+				// serverMessage.setMessages(recent);
 
 				break;
 
@@ -100,7 +129,7 @@ public class ClientMessageParser {
 								.getAllMessagesFromConversation(conversationId);
 
 						serverMessage = new ServerMessage(MessageType.CONVERSATION);
-						serverMessage.setMessages(messages);
+						// serverMessage.setMessages(messages);
 					} else {
 						serverMessage = new ServerMessage(MessageType.NOK);
 						serverMessage.setContent("Não há registos desta conversa");
@@ -277,6 +306,7 @@ public class ClientMessageParser {
 	/**
 	 * Função que processa e guarda um mensagem do utilizador
 	 */
+
 	private ServerMessage saveMessage() {
 
 		ServerMessage serverMessage;

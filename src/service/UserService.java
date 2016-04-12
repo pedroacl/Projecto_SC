@@ -1,6 +1,5 @@
 package service;
 
-import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,11 +25,11 @@ public class UserService implements UserServiceInterface {
 
 	@Override
 	public void addUser(String username, String password) {
-		final SecureRandom randomNumber = new SecureRandom();
-		String salt = new BigInteger(130, randomNumber).toString(32);
-
-		String passwordAndSalt = salt + ":" + (Security.getHash((salt + password).getBytes())).toString();
-		users.put(username, passwordAndSalt);
+		int salt = Security.generateSalt();
+		String passwordAndSalt = Integer.toString(salt) + password;
+		byte[] hash = Security.getHash(passwordAndSalt.getBytes());
+		
+		users.put(username, new String(hash));
 		userDAO.addUser(username, passwordAndSalt);
 	}
 	
@@ -38,7 +37,9 @@ public class UserService implements UserServiceInterface {
 	public String[] getUserPasswordAndSalt(String username) {
 		String passwordAndSalt = users.get(username);
 		
-		//username:salt:password_hash
+		if (passwordAndSalt == null)
+			return null;
+		
 		String[] passwordAndSaltArray = passwordAndSalt.split(":");
 		
 		return passwordAndSaltArray;

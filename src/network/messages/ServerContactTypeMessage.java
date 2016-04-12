@@ -14,6 +14,7 @@ public class ServerContactTypeMessage extends NetworkMessage {
 
 	public ServerContactTypeMessage(MessageType messageType) {
 		super(messageType);
+		groupMembers = null;
 	}
 
 	public ServerContactTypeMessage(MessageType messageType, ArrayList<String> groupMembers) {
@@ -23,5 +24,9 @@ public class ServerContactTypeMessage extends NetworkMessage {
 	
 	public List<String> getGroupMembers() {
 		return groupMembers;
+	}
+	
+	public void setGroupMembers(ArrayList<String> groupMembers) {
+		this.groupMembers = groupMembers;
 	}
 }

@@ -82,14 +82,19 @@ public class Client {
 					MessageType.MESSAGE);
 
 			aux_message.setDestination(clientMessage.getDestination());
+			System.out.println("Client - Enviar msg");
 			clientNetwork.sendMessage(aux_message);
 
 			// obter resposta do servidor
 			ServerContactTypeMessage serverContactTypeMessage = (ServerContactTypeMessage) clientNetwork
 					.receiveMessage();
+			
+			System.out.println(serverContactTypeMessage.getMessageType());
 
 			switch (serverContactTypeMessage.getMessageType()) {
 			case CONTACT:
+				System.out.println("Client - CONTACT");
+
 				ClientPGPMessage clientPGPMessage = new ClientPGPMessage();
 				
 				// gerar assinatura e enviar ao servidor
@@ -119,11 +124,7 @@ public class Client {
 				break;
 			}
 
-			// obter key publica do utilizador
-			// Key myKey = new SecretKeySpec(serverMsg.getContent().getBytes(),
-			// "AES");
-
-			clientNetwork.sendMessage(aux_message);
+			//clientNetwork.sendMessage(aux_message);
 
 			break;
 

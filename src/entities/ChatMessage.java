@@ -21,6 +21,8 @@ public class ChatMessage implements Serializable {
 	private String fromUser;
 
 	private String destination;
+	
+	private byte[] wrappedKey;
 
 	private MessageType type;
 
@@ -87,6 +89,22 @@ public class ChatMessage implements Serializable {
 	 */
 	public MessageType getMessageType() {
 		return type;
+	}
+	
+	/**
+	 * Getter para a wrapped key
+	 * @return
+	 */
+	public byte[] getWrappedKey() {
+		return wrappedKey;
+	}
+	
+	/**
+	 * Setter para a wrapped key
+	 * @param wrappedKey
+	 */
+	public void setWrappedKey(byte[] wrappedKey) {
+		this.wrappedKey = wrappedKey;
 	}
 
 	@Override
