@@ -85,11 +85,11 @@ public class UserDAO implements UserDAOInterface {
 	 * @requires username != null && password != null
 	 */
 	@Override
-	public void addUser(String username, String passwordAndSalt) {
+	public void addUser(String username, String saltAndHashedPassword) {
 		// atualizar ficheiro
 		try {
 			FileWriter fw = new FileWriter("users.txt", true);
-			fw.write(username + ":" + passwordAndSalt + "\n");
+			fw.write(username + ":" + saltAndHashedPassword + "\n");
 			fw.close();
 
 			// criar directorias

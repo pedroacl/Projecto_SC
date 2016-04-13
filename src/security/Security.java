@@ -1,5 +1,6 @@
 package security;
 
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyPair;
@@ -28,19 +29,20 @@ import util.PersistenceUtil;
 public class Security {
 	private static final String KEYSTORE_PASSWORD = "1234";
 
-	public static byte[] getHash(byte[] message) {
-		MessageDigest messageDigest = null;
-
+	public static byte[] getHash(String message) {
+		byte[] hashedMessage = null;
+		
 		try {
-			messageDigest = MessageDigest.getInstance("SHA-256");
+			byte[] auxMessage = message.getBytes("UTF-8");
+			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+			hashedMessage = messageDigest.digest(auxMessage);
+		} catch (UnsupportedEncodingException e1) {
+			e1.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
-		
-		System.out.println(messageDigest.digest(message)[0]);
-		System.out.println(messageDigest.digest(message)[1]);
 
-		return messageDigest.digest(message);
+		return hashedMessage;
 	}
 
 	public static KeyPair getKeyPair() {

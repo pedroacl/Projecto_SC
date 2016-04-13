@@ -1,5 +1,6 @@
 package service;
 
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -8,7 +9,7 @@ import interfaces.service.UserServiceInterface;
 import security.Security;
 
 public class UserService implements UserServiceInterface {
-	
+
 	private static UserDAO userDAO;
 
 	private ConcurrentHashMap<String, String> users;
@@ -17,7 +18,7 @@ public class UserService implements UserServiceInterface {
 		userDAO = new UserDAO();
 		users = userDAO.getUsers();
 	}
-	
+
 	@Override
 	public ConcurrentHashMap<String, String> getUsers() {
 		return users;
@@ -25,23 +26,39 @@ public class UserService implements UserServiceInterface {
 
 	@Override
 	public void addUser(String username, String password) {
+		// adicionar salt ah password
 		int salt = Security.generateSalt();
-		String passwordAndSalt = Integer.toString(salt) + password;
-		byte[] hash = Security.getHash(passwordAndSalt.getBytes());
+		String saltString = Integer.toString(salt);
+		String passwordAndSalt = saltString + password;
+
+		// obter hash
+		byte[] hash = Security.getHash(passwordAndSalt);
+		String hashString = String.format("%064x", new java.math.BigInteger(1, hash));
+
+		// criar par salt:hashedPassword
+		StringBuilder sb = new StringBuilder(); 
+		sb.append(saltString);
+		sb.append(":");
+		sb.append(hashString);
+
+		users.put(username, sb.toString());
 		
-		users.put(username, new String(hash));
-		userDAO.addUser(username, passwordAndSalt);
+		// persistir utilizador
+		userDAO.addUser(username, sb.toString());
 	}
-	
+
 	@Override
 	public String[] getUserPasswordAndSalt(String username) {
 		String passwordAndSalt = users.get(username);
-		
+
 		if (passwordAndSalt == null)
 			return null;
-		
+
+		// salt:password
+		// [0] -> salt
+		// [1] -> password
 		String[] passwordAndSaltArray = passwordAndSalt.split(":");
-		
+
 		return passwordAndSaltArray;
 	}
 }
