@@ -129,61 +129,52 @@ public class ArgsParser {
 	 * @return ClientMessage, mensagem com pedido do cliente ao servidor
 	 * @requires isValid == True
 	 */
-	public ClientMessage getMessage() {
-		ClientMessage pedido = null;
+	public Parsed getParsed() {
+		Parsed pedido = new Parsed(username, password);
 
 		switch (act[0]) {
 		case "-m":	
-			pedido = new ClientMessage(username, password, MessageType.MESSAGE);
-			pedido.setDestination(act[1]);
+			pedido.setOrder("-m");
+			pedido.setContact(act[1]);
 			StringBuilder sb = new StringBuilder();
 
 			for (int i = 2; i < act.length; i++)
 				sb.append(act[i] + " ");
 
-			pedido.setContent(sb.toString());
+			pedido.setSpecificField(sb.toString());
 			break;
 
 		case "-f":
-			pedido = new ClientMessage(username, password, MessageType.FILE);
-			pedido.setDestination(act[1]);
+			pedido.setOrder("-f");
+			pedido.setContact(act[1]);
 			pedido.setFileSize(fileSize(act[2]));
-			pedido.setContent(act[2]); // coloca nome do ficheiro na mensagem
+			pedido.setSpecificField(act[2]); // coloca nome do ficheiro na mensagem
 			break;
 
 		case "-a":
-			pedido = new ClientMessage(username, password, MessageType.ADDUSER);
-			pedido.setDestination(act[1]); // coloca user a adicionar no destino
-			pedido.setContent(act[2]); // coloca nome do grupo na mensagem
+			pedido.setOrder("-a");
+			pedido.setContact(act[1]); // coloca user a adicionar no destino
+			pedido.setSpecificField(act[2]); // coloca nome do grupo na mensagem
 			break;
 
 		case "-d":
-			pedido = new ClientMessage(username, password,
-					MessageType.REMOVEUSER);
-
-			pedido.setDestination(act[1]); // coloca user a adicionar no destino
-			pedido.setContent(act[2]); // coloca nome do grupo na mensagem
+			pedido.setOrder("-d");
+			pedido.setContact(act[1]); // coloca user a adicionar no destino
+			pedido.setSpecificField(act[2]); // coloca nome do grupo na mensagem
 			break;
 
 		case "-r":
 			if (act.length == 1) {
-				pedido = new ClientMessage(username, password,
-						MessageType.RECEIVER);
-
-				pedido.setContent("recent");
+				pedido.setOrder("-rLast");
 			} else if (act.length == 2) {
-				pedido = new ClientMessage(username, password,
-						MessageType.RECEIVER);
-				pedido.setDestination(act[1]);
-				pedido.setContent("all");
+				pedido.setOrder("-rContact");
+				pedido.setContact(act[1]);
 			} else if (act.length == 3) {
-				pedido = new ClientMessage(username, password,
-						MessageType.RECEIVER);
+				pedido.setOrder("-rFile");
 
-				pedido.setDestination(act[1]);// coloca no destinatario a quem
+				pedido.setContact(act[1]);// coloca no destinatario a quem
 												// pede o file
-				pedido.setContent(act[2]); // coloca nome do ficheiro na
-											// mensagem
+				pedido.setSpecificField(act[2]); // coloca nome do ficheiro na									// mensagem
 			}
 
 			break;
