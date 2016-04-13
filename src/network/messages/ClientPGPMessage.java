@@ -1,6 +1,6 @@
 package network.messages;
 
-import java.util.List;
+import java.util.HashMap;
 
 public class ClientPGPMessage extends NetworkMessage {
 
@@ -13,16 +13,20 @@ public class ClientPGPMessage extends NetworkMessage {
 
 	private byte[] message;
 
-	private List<byte[]> wrappedSecretKeys;
+	private HashMap<String, byte[]> userKey;
 
 	public ClientPGPMessage() {
 
 	}
 
-	public ClientPGPMessage(byte[] signature, byte[] message, List<byte[]> wrappedSecretKeys) {
+	public ClientPGPMessage(byte[] signature, byte[] message) {
 		this.signature = signature;
 		this.message = message;
-		this.wrappedSecretKeys = wrappedSecretKeys;
+		userKey = new HashMap<>();
+	}
+	
+	public void putUserKey(String user, byte[] key) {
+		userKey.put(user, key);
 	}
 
 	public byte[] getSignature() {
@@ -40,17 +44,4 @@ public class ClientPGPMessage extends NetworkMessage {
 	public void setMessage(byte[] message) {
 		this.message = message;
 	}
-
-	public List<byte[]> getWrappedSecretKeys() {
-		return wrappedSecretKeys;
-	}
-
-	public void setWrappedSecretKey(List<byte[]> wrappedSecretKeys) {
-		this.wrappedSecretKeys = wrappedSecretKeys;
-	}
-
-	public void addWrappedSecretKey(byte[] wrappedSecretKey) {
-		wrappedSecretKeys.add(wrappedSecretKey);
-	}
-
 }

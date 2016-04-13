@@ -184,7 +184,7 @@ public class Security {
 	/**
 	 * Função que cifra a chave privada a ser enviada
 	 * 
-	 * @param username
+	 * @param username Nome do dono da chave publica a ser usada para cifrar 
 	 * 
 	 * @param secretKey
 	 * @return Devolve a chave privada cifrada

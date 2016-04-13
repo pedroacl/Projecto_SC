@@ -65,7 +65,7 @@ public class Client {
 		clientNetwork = new ClientNetworkManager(socket);
 		System.out.println("Cliente ligado ao servidor " + argsParser.getServerIP() + ":" + argsParser.getServerPort());
 
-		// gerar chave assimétrica
+		// obter chave assimétrica do utilizador
 		KeyPair keyPair = Security.getKeyPair();
 		PrivateKey privateKey = keyPair.getPrivate();
 
@@ -85,46 +85,48 @@ public class Client {
 			System.out.println("Client - Enviar msg");
 			clientNetwork.sendMessage(aux_message);
 
-			// obter resposta do servidor
+			// obter tipo de contacto
 			ServerContactTypeMessage serverContactTypeMessage = (ServerContactTypeMessage) clientNetwork
 					.receiveMessage();
-			
+
 			System.out.println(serverContactTypeMessage.getMessageType());
 
-			switch (serverContactTypeMessage.getMessageType()) {
-			case CONTACT:
-				System.out.println("Client - CONTACT");
-
+			// existe contacto
+			if (serverContactTypeMessage.getMessageType() == MessageType.CONTACT) {
 				ClientPGPMessage clientPGPMessage = new ClientPGPMessage();
-				
-				// gerar assinatura e enviar ao servidor
-				byte[] clientSignature = Security.signMessage(clientMessage.getContent(), privateKey);
-				clientPGPMessage.setSignature(clientSignature);
 
-				// obter chave secreta
-				SecretKey secretKey = Security.getSecretKey();
+				// contacto
+				if (serverContactTypeMessage.getGroupMembers().size() != 0) {
+					System.out.println("Client - CONTACT");
 
-				// cifrar mensagem com chave secreta
-				byte[] encryptedMessage = Security.cipherWithSecretKey(clientMessage.getContent().getBytes(),
-						secretKey);
-				clientPGPMessage.setMessage(encryptedMessage);
+					// gerar assinatura e enviar ao servidor
+					byte[] clientSignature = Security.signMessage(clientMessage.getContent(), privateKey);
+					clientPGPMessage.setSignature(clientSignature);
 
-				ArrayList<String> groupMembers = (ArrayList<String>) serverContactTypeMessage.getGroupMembers();
+					ArrayList<String> groupMembers = (ArrayList<String>) serverContactTypeMessage.getGroupMembers();
 
-				// cifrar chave privada, usada para cifrar mensagem anterior
-				for (String username: groupMembers) {
-					byte[] wrappedSecretKey = Security.wrapSecretKey(username, secretKey);
-					clientPGPMessage.addWrappedSecretKey(wrappedSecretKey);
+					// cifrar chave privada, usada para cifrar mensagem anterior
+					for (String username : groupMembers) {
+						// obter chave secreta
+						SecretKey secretKey = Security.getSecretKey();
+						
+						// wrap da chave secreta a ser enviada com a chave publica
+						// do contacto de destino
+						byte[] wrappedSecretKey = Security.wrapSecretKey(username, secretKey);
+
+						// cifrar mensagem com chave secreta
+						byte[] encryptedMessage = Security.cipherWithSecretKey(clientMessage.getContent().getBytes(),
+								secretKey);
+						clientPGPMessage.putUserKey(username, wrappedSecretKey);
+					}
+				} else {
+
 				}
-				
-				clientNetwork.sendMessage(clientPGPMessage);
 
-				break;
-			default:
-				break;
+				clientNetwork.sendMessage(clientPGPMessage);
 			}
 
-			//clientNetwork.sendMessage(aux_message);
+			// clientNetwork.sendMessage(aux_message);
 
 			break;
 
