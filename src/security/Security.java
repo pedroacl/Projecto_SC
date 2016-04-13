@@ -29,9 +29,16 @@ import util.PersistenceUtil;
 public class Security {
 	private static final String KEYSTORE_PASSWORD = "1234";
 
+	/**
+	 * Gera uma sintese SHA 256 baseada numa string message
+	 * 
+	 * @param message
+	 *            String para a qual vai ser gerada a sintese
+	 * @return Devolve um array de bytes representativo da sintese
+	 */
 	public static byte[] getHash(String message) {
 		byte[] hashedMessage = null;
-		
+
 		try {
 			byte[] auxMessage = message.getBytes("UTF-8");
 			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
@@ -45,6 +52,12 @@ public class Security {
 		return hashedMessage;
 	}
 
+	/**
+	 * Obtem um par chave pública / chave privada baseado no algoritmo de chave
+	 * assimétrica RSA
+	 * 
+	 * @return Devolve o par de chaves
+	 */
 	public static KeyPair getKeyPair() {
 		KeyPair keyPair = null;
 
@@ -60,6 +73,11 @@ public class Security {
 		return keyPair;
 	}
 
+	/**
+	 * Obtem uma chave secreta baseada no algoritmo de chave simétrica AES
+	 * 
+	 * @return
+	 */
 	public static SecretKey getSecretKey() {
 		SecretKey secretKey = null;
 
@@ -74,6 +92,13 @@ public class Security {
 		return secretKey;
 	}
 
+	/**
+	 * Gera a assinatura de uma string através de uma chave privada e baseado nos algoritmos 
+	 * MD5 e RSA
+	 * @param message String a ser assinada
+	 * @param privateKey Chave privada a ser usada para a assinatura
+	 * @return Devolve um array de bytes representativo da assinatura
+	 */
 	public static byte[] signMessage(String message, PrivateKey privateKey) {
 		byte[] signedMessage = null;
 
@@ -201,11 +226,11 @@ public class Security {
 			// obter keystore
 			KeyStore keystore = PersistenceUtil.getKeyStore(KEYSTORE_PASSWORD);
 			Key privateKey = keystore.getKey(username, keyPassword);
-		
+
 			// inicializar cifra
 			Cipher cipher = Cipher.getInstance("RSA");
 			cipher.init(Cipher.UNWRAP_MODE, privateKey);
-			
+
 			unwrappedSecretKey = cipher.unwrap(wrappedKey, "RSA", Cipher.SECRET_KEY);
 
 		} catch (InvalidKeyException e) {
@@ -219,7 +244,7 @@ public class Security {
 		} catch (NoSuchPaddingException e) {
 			e.printStackTrace();
 		}
-		
+
 		return (SecretKey) unwrappedSecretKey;
 	}
 

@@ -32,7 +32,7 @@ public class Authentication implements AuthenticationInterface {
 
 	/**
 	 * Adiciona um utilizador ao sistema caso este não exista. Se o utilizador
-	 * existir verifica se a password está correcta
+	 * existir verifica se a password corresponde ah respectiva sintese guardada 
 	 * 
 	 * @param username
 	 *            Nome do utilizador a autenticar
