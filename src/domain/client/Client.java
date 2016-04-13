@@ -105,13 +105,13 @@ public class Client {
 
 					ArrayList<String> groupMembers = (ArrayList<String>) serverContactTypeMessage.getGroupMembers();
 
+					// obter chave secreta
+					SecretKey secretKey = Security.getSecretKey();
+
 					// cifrar chave privada, usada para cifrar mensagem anterior
 					for (String username : groupMembers) {
-						// obter chave secreta
-						SecretKey secretKey = Security.getSecretKey();
-						
-						// wrap da chave secreta a ser enviada com a chave publica
-						// do contacto de destino
+						// wrap da chave secreta a ser enviada com a chave
+						// publica do contacto de destino
 						byte[] wrappedSecretKey = Security.wrapSecretKey(username, secretKey);
 
 						// cifrar mensagem com chave secreta
