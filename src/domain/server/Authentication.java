@@ -1,7 +1,14 @@
 package domain.server;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.crypto.SecretKey;
@@ -82,7 +89,8 @@ public class Authentication implements AuthenticationInterface {
 	 * @return
 	 */
 	public boolean validateUsersFileMAC(String usersFilePath, String password) {
-
+		// TODO testar
+		byte[] originalMAC = null;
 		boolean validMAC = false;
 
 		try {
@@ -92,18 +100,39 @@ public class Authentication implements AuthenticationInterface {
 			SecretKey secretKey = kf.generateSecret(keySpec);
 
 			// obter MAC original
+			BufferedReader inF = new BufferedReader(new FileReader(usersFilePath + ".mac"));
+			String orignalMACString = inF.readLine();
+			originalMAC = orignalMACString.getBytes();
+			inF.close();
+
+			// gerar MAC atual
 			byte[] fileMAC = SecurityUtils.generateFileMAC(usersFilePath, secretKey);
-			byte[] originalMAC = PersistenceUtil.readBytesFromFile(usersFilePath + ".mac");
-			
 			validMAC = Arrays.equals(fileMAC, originalMAC);
 
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		} catch (InvalidKeySpecException e) {
 			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
 		return validMAC;
+	}
+
+	/**
+	 * 
+	 * @param usersFilePath
+	 */
+	public void updateUsersFileMAC(String usersFilePath) {
+		// TODO terminar
+		try {
+			FileOutputStream fileOutputStream = new FileOutputStream(new File(usersFilePath));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
