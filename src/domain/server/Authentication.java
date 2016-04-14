@@ -52,14 +52,14 @@ public class Authentication implements AuthenticationInterface {
 		}
 		// user existe e a password eh invalida
 		else {
-			System.out.println("User existe!");
+			System.out.println("Authentication - User existe!");
 			byte[] passwordHash = Security.getHash(userPasswordAndSalt[0] + password);
 			String hashString = String.format("%064x", new java.math.BigInteger(1, passwordHash));
 
 			System.out.println("Hash guardada: " + userPasswordAndSalt[1]);
-			System.out.println("Hash gerada: " + hashString);
+			System.out.println("Hash gerada:   " + hashString);
 
-			return userPasswordAndSalt[1].equals(passwordHash.toString());
+			return userPasswordAndSalt[1].equals(hashString);
 		}
 
 		return false;

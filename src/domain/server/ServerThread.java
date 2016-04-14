@@ -3,7 +3,7 @@ package domain.server;
 import java.net.Socket;
 
 import network.managers.ServerNetworkManager;
-import network.messages.ClientMessage;
+import network.messages.ClientNetworkMessage;
 import network.messages.NetworkMessage;
 
 /**
@@ -26,10 +26,10 @@ public class ServerThread extends Thread {
 	public void run() {
 		//incializa comunicação com o cliente e recebe ClientMessage
 		ServerNetworkManager serverNetworkManager = new ServerNetworkManager(socket);
-		ClientMessage clientMessage = (ClientMessage) serverNetworkManager.receiveMessage();
+		ClientNetworkMessage clientMessage = (ClientNetworkMessage) serverNetworkManager.receiveMessage();
 
 		// processa a mensagem do cliente e cria mensagem de resposta
-		ClientMessageParser clientMessageParser = new ClientMessageParser(clientMessage, serverNetworkManager);
+		ServerClientMessageParser clientMessageParser = new ServerClientMessageParser(clientMessage, serverNetworkManager);
 		NetworkMessage serverMessage = clientMessageParser.processRequest();
 
 		// envia resposta ao cliente

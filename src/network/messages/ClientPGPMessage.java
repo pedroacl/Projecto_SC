@@ -14,17 +14,12 @@ public class ClientPGPMessage extends NetworkMessage {
 	private byte[] message;
 
 	private HashMap<String, byte[]> userKey;
-
-	public ClientPGPMessage() {
-
-	}
-
-	public ClientPGPMessage(byte[] signature, byte[] message) {
-		this.signature = signature;
-		this.message = message;
+	
+	public ClientPGPMessage(MessageType pgpMessage) {
+		super(pgpMessage);
 		userKey = new HashMap<>();
 	}
-	
+
 	public void putUserKey(String user, byte[] key) {
 		userKey.put(user, key);
 	}

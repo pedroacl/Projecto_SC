@@ -12,13 +12,9 @@ public class ServerMessage extends NetworkMessage {
 	private static final long serialVersionUID = 1L;
 	private ArrayList<ChatMessage> messages;
 
-	public ServerMessage() {
-		super();
-		messages = new ArrayList<ChatMessage>();
-	}
-
 	public ServerMessage(MessageType messageType) {
 		super(messageType);
+		messages = new ArrayList<ChatMessage>();
 	}
 
 	public void setMessages(ArrayList<ChatMessage> list) {

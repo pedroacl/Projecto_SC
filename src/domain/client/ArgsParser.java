@@ -2,7 +2,7 @@ package domain.client;
 
 import java.io.File;
 
-import network.messages.ClientMessage;
+import network.messages.ClientNetworkMessage;
 import network.messages.MessageType;
 
 /**

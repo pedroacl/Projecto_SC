@@ -1,6 +1,8 @@
 package network.messages;
 
-public class ClientMessage extends NetworkMessage {
+import java.security.PublicKey;
+
+public class ClientNetworkMessage extends NetworkMessage {
 
 	/**
 	 * 
@@ -9,11 +11,13 @@ public class ClientMessage extends NetworkMessage {
 
 	private String username;
 
-	private String destination;
-
 	private String password;
+	
+	private String destination;
+	
+	private PublicKey publicKey;
 
-	public ClientMessage(String username, String password, MessageType type) {
+	public ClientNetworkMessage(String username, String password, MessageType type) {
 		super(type);
 		this.username = username;
 		this.password = password;
@@ -26,13 +30,13 @@ public class ClientMessage extends NetworkMessage {
 	public String getUsername() {
 		return username;
 	}
-
-	public void setDestination(String to) {
-		this.destination = to;
-	}
-
+	
 	public String getDestination() {
 		return destination;
+	}
+	
+	public void setDestination(String destination) {
+		this.destination = destination;
 	}
 
 	@Override

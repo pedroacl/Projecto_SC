@@ -4,14 +4,18 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.KeyPair;
+import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.util.ArrayList;
 
 import entities.ChatMessage;
 import network.managers.ServerNetworkManager;
-import network.messages.ClientMessage;
+import network.messages.ClientNetworkMessage;
 import network.messages.MessageType;
 import network.messages.NetworkMessage;
-import network.messages.ServerContactTypeMessage;
+import network.messages.ServerNetworkContactTypeMessage;
+import security.Security;
 import network.messages.ServerMessage;
 import service.ConversationService;
 import service.GroupService;
@@ -22,9 +26,9 @@ import service.GroupService;
  * @author Pedro, José e António
  *
  */
-public class ClientMessageParser {
+public class ServerClientMessageParser {
 
-	private ClientMessage clientMessage;
+	private ClientNetworkMessage clientMessage;
 
 	private Authentication authentication;
 
@@ -36,7 +40,7 @@ public class ClientMessageParser {
 
 	private final int MAX_FILE_SIZE = Integer.MAX_VALUE;
 
-	public ClientMessageParser(ClientMessage clientMessage, ServerNetworkManager serverNetworkManager) {
+	public ServerClientMessageParser(ClientNetworkMessage clientMessage, ServerNetworkManager serverNetworkManager) {
 		this.clientMessage = clientMessage;
 		authentication = Authentication.getInstance();
 
@@ -59,38 +63,54 @@ public class ClientMessageParser {
 
 		// erro de autenticacao
 		if (!authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword())) {
-			ServerContactTypeMessage auxMessage = new ServerContactTypeMessage(MessageType.NOK);
+			ServerNetworkContactTypeMessage auxMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
 			auxMessage.setContent("Password errada");
+			System.out.println("Server - Password errada!");
 			serverMessage = auxMessage;
 
 			return serverMessage;
 		}
 
+		System.out.println("Server - " + clientMessage);
+
+		// obter chave assimétrica do utilizador
+		KeyPair keyPair = Security.getKeyPair();
+		PrivateKey privateKey = keyPair.getPrivate();
+
 		switch (clientMessage.getMessageType()) {
 		// mensagem de texto
 		case MESSAGE:
-			System.out.println("Client - Message");
+			System.out.println("Server - Message");
 			// serverMessage = saveMessage();
 
 			// destinatario eh um utilizador ou grupo
 			if (authentication.existsUser(clientMessage.getDestination())) {
-				serverMessage = new ServerContactTypeMessage(MessageType.CONTACT);
-			// group 
-			} else if (groupService.existsGroup(clientMessage.getDestination())) {
-				ServerContactTypeMessage testMessage = new ServerContactTypeMessage(MessageType.CONTACT);
-//				serverMessage = new ServerContactTypeMessage(MessageType.CONTACT);
-				
-				ArrayList<String> groupMembers = new ArrayList<String>();
-				groupMembers.add("jose");
-				groupMembers.add("antonio");
-				groupMembers.add("pedro");
+				System.out.println("Server - MESSAGE - Existe utilizador");
+				ServerNetworkContactTypeMessage serverContactTypeMessage = new ServerNetworkContactTypeMessage(
+						MessageType.CONTACT);
 
-				testMessage.setGroupMembers(groupMembers);
-				serverMessage = testMessage;
-				//serverMessage.setGroupMembers(groupMembers);
-				
+				serverContactTypeMessage.addGroupMember(clientMessage.getDestination(),
+						Security.getCertificate(clientMessage.getDestination()));
+
+				serverMessage = serverContactTypeMessage;
+
+				// group
+			} else if (groupService.existsGroup(clientMessage.getDestination())) {
+				ServerNetworkContactTypeMessage serverContactTypeMessage = new ServerNetworkContactTypeMessage(
+						MessageType.CONTACT);
+				// serverMessage = new
+				// ServerContactTypeMessage(MessageType.CONTACT);
+
+				serverContactTypeMessage.addGroupMember("jose", null);
+				serverContactTypeMessage.addGroupMember("pedro", null);
+				serverContactTypeMessage.addGroupMember("antonio", null);
+
+				serverMessage = serverContactTypeMessage;
+				// serverMessage.setGroupMembers(groupMembers);
+
+				// contacto
 			} else {
-				serverMessage = new ServerContactTypeMessage(MessageType.NOK);
+				serverMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
 				serverMessage.setContent("Não existe esse contact");
 			}
 

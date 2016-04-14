@@ -10,7 +10,6 @@ import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
@@ -27,7 +26,7 @@ import javax.crypto.SecretKey;
 import util.PersistenceUtil;
 
 public class Security {
-	private static final String KEYSTORE_PASSWORD = "1234";
+	private static final String KEYSTORE_PASSWORD = "seguranca";
 
 	/**
 	 * Gera uma sintese SHA 256 baseada numa string message
@@ -93,10 +92,13 @@ public class Security {
 	}
 
 	/**
-	 * Gera a assinatura de uma string através de uma chave privada e baseado nos algoritmos 
-	 * MD5 e RSA
-	 * @param message String a ser assinada
-	 * @param privateKey Chave privada a ser usada para a assinatura
+	 * Gera a assinatura de uma string através de uma chave privada e baseado
+	 * nos algoritmos MD5 e RSA
+	 * 
+	 * @param message
+	 *            String a ser assinada
+	 * @param privateKey
+	 *            Chave privada a ser usada para a assinatura
 	 * @return Devolve um array de bytes representativo da assinatura
 	 */
 	public static byte[] signMessage(String message, PrivateKey privateKey) {
@@ -184,18 +186,20 @@ public class Security {
 	/**
 	 * Função que cifra a chave privada a ser enviada
 	 * 
-	 * @param username Nome do dono da chave publica a ser usada para cifrar 
+	 * @param username
+	 *            Nome do dono da chave publica a ser usada para cifrar
 	 * 
 	 * @param secretKey
 	 * @return Devolve a chave privada cifrada
 	 */
-	public static byte[] wrapSecretKey(String username, SecretKey secretKey) {
+	public static byte[] wrapSecretKey(SecretKey secretKey, Certificate certificate) {
 		byte[] wrappedKey = null;
 
 		try {
 			// obter certificado
-			KeyStore keystore = PersistenceUtil.getKeyStore(KEYSTORE_PASSWORD);
-			Certificate certificate = keystore.getCertificate(username);
+			// KeyStore keystore =
+			// PersistenceUtil.getKeyStore(KEYSTORE_PASSWORD);
+			// Certificate certificate = keystore.getCertificate(username);
 
 			// inicializar cifra
 			Cipher c = Cipher.getInstance("RSA");
@@ -211,8 +215,6 @@ public class Security {
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
 		} catch (IllegalBlockSizeException e) {
-			e.printStackTrace();
-		} catch (KeyStoreException e) {
 			e.printStackTrace();
 		}
 
@@ -253,18 +255,17 @@ public class Security {
 	 * 
 	 * @param username
 	 */
-	public PublicKey getPublicKey(String username) {
-		PublicKey publicKey = null;
+	public static Certificate getCertificate(String username) {
+		Certificate certificate = null;
 
 		try {
 			KeyStore keyStore = PersistenceUtil.getKeyStore(KEYSTORE_PASSWORD);
-			Certificate certificate = keyStore.getCertificate(username);
-			publicKey = certificate.getPublicKey();
+			certificate = keyStore.getCertificate(username);
 		} catch (KeyStoreException e) {
 			e.printStackTrace();
 		}
 
-		return publicKey;
+		return certificate;
 	}
 
 	/**

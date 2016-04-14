@@ -1,0 +1,32 @@
+# Adicionar entry ah keystore
+/usr/lib/jvm/java-8-oracle/bin/keytool -keystore keystore.jks -genkey -alias maria
+(pass = seguranca)
+
+# Gerar certificado auto assinado (RSA)
+/usr/lib/jvm/java-8-oracle/bin/keytool -genkey -keyalg RSA -alias maria -keystore keystore.jks -validity 360 -keysize 2048
+
+# Gerar chave secreta (JCEKS)
+/usr/lib/jvm/java-8-oracle/bin/keytool –genseckey maria –alias secKey -storetype storetype JCEKS
+
+# Remover chave
+/usr/lib/jvm/java-8-oracle/bin/keytool -delete -alias maria -keystore keystore.jks
+
+# Gerar keypair
+/usr/lib/jvm/java-8-oracle/bin/keytool –genkeypair –alias keypair -keystore keystore.jks
+
+# Exportar certificado
+/usr/lib/jvm/java-8-oracle/bin/keytool -export -alias maria -keystore keystore.jks -rfc -file X509_certificate.cer
+
+# Importar certificado
+/usr/lib/jvm/java-8-oracle/bin/keytool -importcert -alias maria -keystore keystore.jks -file X509_certificate.cer
+
+# Print do certificado
+/usr/lib/jvm/java-8-oracle/bin/keytool -printcert -file X509_certificate.cer
+
+# Conteudo de um alias
+/usr/lib/jvm/java-8-oracle/bin/keytool -list -alias maria -keystore keystore.jks
+
+# Criar certificado
+/usr/lib/jvm/java-8-oracle/bin/keytool -keystore clientkeystore -certreq -alias client -keyalg rsa -file client.csr
+
+

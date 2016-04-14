@@ -24,7 +24,7 @@ import java.util.List;
  *
  */
 public class PersistenceUtil {
-	private static final String KEYSTORE_PATH = "keystore.keystore";
+	private static final String KEYSTORE_PATH = "keystore.jks";
 
 	/**
 	 * Elimina um determinado ficheiro ou pasta

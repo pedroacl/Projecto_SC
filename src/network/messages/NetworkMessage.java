@@ -14,10 +14,6 @@ public class NetworkMessage implements Serializable {
 	
 	private String content;
 	
-	public NetworkMessage() {
-		
-	}
-	
 	public NetworkMessage(MessageType messageType) {
 		this.messageType = messageType;
 	}

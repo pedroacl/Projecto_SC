@@ -6,7 +6,6 @@ package domain.client;
  *
  */
 public class Parsed {
-	
 
 	String username;
 	String password;
@@ -15,11 +14,11 @@ public class Parsed {
 	String specificField;
 	int fileSize;
 
-	public Parsed (String username, String password) {
+	public Parsed(String username, String password) {
 		this.username = username;
 		this.password = password;
 	}
-	
+
 	public int getFileSize() {
 		return fileSize;
 	}
@@ -59,10 +58,5 @@ public class Parsed {
 	public void setSpecificField(String specificField) {
 		this.specificField = specificField;
 	}
-	
-	
-	
-	
-	
 
 }
