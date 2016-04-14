@@ -9,6 +9,8 @@ import network.managers.ClientNetworkManager;
 import network.messages.ClientNetworkMessage;
 import network.messages.ChatMessage;
 import network.messages.MessageType;
+import network.messages.NetworkMessage;
+import network.messages.ServerMessage;
 import network.messages.ServerNetworkContactTypeMessage;
 import security.SecurityUtils;
 
@@ -26,26 +28,24 @@ public class ClientRequestManager {
 		keyPair = SecurityUtils.getKeyPair();
 	}
 
-	public void processRequest() {
+	public NetworkMessage processRequest() {
+		
+		NetworkMessage networkMessage = null;
+		
 		switch (parsedRequest.getOrder()) {
 		// client quer enviar uma mensagem
 		case "-m":
 			// enviar mensagem a perguntar o tipo do destinatario (contacto?
 			// grupo?)
-			ClientNetworkMessage aux_message = new ClientNetworkMessage(parsedRequest.getUsername(),
-					parsedRequest.getPassword(), MessageType.MESSAGE);
-
-			aux_message.setDestination(parsedRequest.getContact());
-			System.out.println("Client - Enviar msg");
-			clientNetworkManager.sendMessage(aux_message);
-
+			sendAuthenticationMessage();
+			
 			// obter tipo de contacto
 			ServerNetworkContactTypeMessage serverNetworkContactTypeMessage = (ServerNetworkContactTypeMessage) clientNetworkManager
 					.receiveMessage();
 
 			// existe contacto
 			if (serverNetworkContactTypeMessage.getMessageType() == MessageType.CONTACT) {
-				ChatMessage clientPGPMessage = new ChatMessage(MessageType.PGP_MESSAGE);
+				ChatMessage clientPGPMessage = new ChatMessage(MessageType.MESSAGE);
 
 				System.out.println(serverNetworkContactTypeMessage.numGroupMembers());
 
@@ -85,17 +85,45 @@ public class ClientRequestManager {
 				
 				// enviar mensagem
 				clientNetworkManager.sendMessage(clientPGPMessage);
+				
+				//espera resposta
+				 networkMessage = (NetworkMessage) clientNetworkManager.receiveMessage();
+				
 			} else {
-				System.out.println("Nao ha");
+				//nao existe contact, devolve erro
+				networkMessage = serverNetworkContactTypeMessage;
+				
 			}
-
-			// clientNetwork.sendMessage(aux_message);
-
 			break;
+			
+		case "-f":
+			// enviar mensagem a perguntar o tipo do destinatario (user? grupo?)
+			sendAuthenticationMessage();
+			
+			
+		
+		
 
 		default:
 			break;
 		}
+		
+		return networkMessage;
 
+	}
+	
+	/**
+	 * @param type TODO
+	 *  
+	 */
+	private void sendAuthenticationMessage() {
+		
+		ClientNetworkMessage aux_message = new ClientNetworkMessage(parsedRequest.getUsername(),
+							parsedRequest.getPassword(),MessageType.AUTH);
+
+		aux_message.setDestination(parsedRequest.getContact());
+		System.out.println("Client - Enviar msg");
+		clientNetworkManager.sendMessage(aux_message);
+	
 	}
 }
