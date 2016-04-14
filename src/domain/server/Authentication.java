@@ -1,9 +1,18 @@
 package domain.server;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
+
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+
 import interfaces.AuthenticationInterface;
-import security.Security;
+import security.SecurityUtils;
 import service.UserService;
 import util.MiscUtil;
+import util.PersistenceUtil;
 
 /**
  * <<SINGLETON>> Classe que verifica existencia dos utilizadores e que trata da
@@ -33,7 +42,7 @@ public class Authentication implements AuthenticationInterface {
 
 	/**
 	 * Adiciona um utilizador ao sistema caso este não exista. Se o utilizador
-	 * existir verifica se a password corresponde ah respectiva sintese guardada 
+	 * existir verifica se a password corresponde ah respectiva sintese guardada
 	 * 
 	 * @param username
 	 *            Nome do utilizador a autenticar
@@ -54,7 +63,7 @@ public class Authentication implements AuthenticationInterface {
 		// user existe e a password eh invalida
 		else {
 			System.out.println("Authentication - User existe!");
-			byte[] passwordHash = Security.getHash(userPasswordAndSalt[0] + password);
+			byte[] passwordHash = SecurityUtils.getHash(userPasswordAndSalt[0] + password);
 			String hashString = MiscUtil.bytesToHex(passwordHash);
 
 			System.out.println("Hash guardada: " + userPasswordAndSalt[1]);
@@ -64,6 +73,37 @@ public class Authentication implements AuthenticationInterface {
 		}
 
 		return false;
+	}
+
+	/**
+	 * 
+	 * @param usersFilePath
+	 * @param password
+	 * @return
+	 */
+	public boolean validateUsersFileMAC(String usersFilePath, String password) {
+
+		boolean validMAC = false;
+
+		try {
+			// gerar password
+			SecretKeyFactory kf = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
+			PBEKeySpec keySpec = new PBEKeySpec(password.toCharArray());
+			SecretKey secretKey = kf.generateSecret(keySpec);
+
+			// obter MAC original
+			byte[] fileMAC = SecurityUtils.generateFileMAC(usersFilePath, secretKey);
+			byte[] originalMAC = PersistenceUtil.readBytesFromFile(usersFilePath + ".mac");
+			
+			validMAC = Arrays.equals(fileMAC, originalMAC);
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (InvalidKeySpecException e) {
+			e.printStackTrace();
+		}
+
+		return validMAC;
 	}
 
 	/**

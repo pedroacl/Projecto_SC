@@ -15,7 +15,7 @@ import network.messages.MessageType;
 import network.messages.NetworkMessage;
 import network.messages.ServerMessage;
 import network.messages.ServerNetworkContactTypeMessage;
-import security.Security;
+import security.SecurityUtils;
 import service.ConversationService;
 import service.GroupService;
 
@@ -38,6 +38,8 @@ public class ServerClientMessageParser {
 	private ServerNetworkManager serverNetworkManager;
 
 	private final int MAX_FILE_SIZE = Integer.MAX_VALUE;
+	
+	private final String USERS_MAC_FILE = "users.mac.txt";
 
 	public ServerClientMessageParser(ClientNetworkMessage clientMessage, ServerNetworkManager serverNetworkManager) {
 		this.clientMessage = clientMessage;
@@ -59,6 +61,11 @@ public class ServerClientMessageParser {
 		NetworkMessage serverMessage = null;
 
 		System.out.println("Server - Recebi msg");
+		
+		// validar MAC do ficheiro de utilizadores
+		if (authentication.validateUsersFileMAC(USERS_MAC_FILE, clientMessage.getPassword())) {
+			
+		}
 
 		// erro de autenticacao
 		if (!authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword())) {
@@ -73,7 +80,7 @@ public class ServerClientMessageParser {
 		System.out.println("Server - " + clientMessage);
 
 		// obter chave assimétrica do utilizador
-		KeyPair keyPair = Security.getKeyPair();
+		KeyPair keyPair = SecurityUtils.getKeyPair();
 		PrivateKey privateKey = keyPair.getPrivate();
 
 		switch (clientMessage.getMessageType()) {
@@ -89,7 +96,7 @@ public class ServerClientMessageParser {
 						MessageType.CONTACT);
 
 				serverContactTypeMessage.addGroupMember(clientMessage.getDestination(),
-						Security.getCertificate(clientMessage.getDestination()));
+						SecurityUtils.getCertificate(clientMessage.getDestination()));
 
 				serverMessage = serverContactTypeMessage;
 				

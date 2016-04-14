@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import dao.UserDAO;
 import interfaces.service.UserServiceInterface;
-import security.Security;
+import security.SecurityUtils;
 
 public class UserService implements UserServiceInterface {
 
@@ -27,12 +27,12 @@ public class UserService implements UserServiceInterface {
 	@Override
 	public void addUser(String username, String password) {
 		// adicionar salt ah password
-		int salt = Security.generateSalt();
+		int salt = SecurityUtils.generateSalt();
 		String saltString = Integer.toString(salt);
 		String passwordAndSalt = saltString + password;
 
 		// obter hash
-		byte[] hash = Security.getHash(passwordAndSalt);
+		byte[] hash = SecurityUtils.getHash(passwordAndSalt);
 		String hashString = String.format("%064x", new java.math.BigInteger(1, hash));
 
 		// criar par salt:hashedPassword

@@ -10,7 +10,7 @@ import network.messages.ClientNetworkMessage;
 import network.messages.ChatMessage;
 import network.messages.MessageType;
 import network.messages.ServerNetworkContactTypeMessage;
-import security.Security;
+import security.SecurityUtils;
 
 public class ClientRequestManager {
 
@@ -23,7 +23,7 @@ public class ClientRequestManager {
 		this.clientNetworkManager = clientNetworkManager;
 
 		// obter chave assimétrica do utilizador
-		keyPair = Security.getKeyPair();
+		keyPair = SecurityUtils.getKeyPair();
 	}
 
 	public void processRequest() {
@@ -53,14 +53,14 @@ public class ClientRequestManager {
 				System.out.println("Client - CONTACT");
 
 				// gerar assinatura e enviar ao servidor
-				byte[] clientSignature = Security.signMessage(parsedRequest.getSpecificField(), keyPair.getPrivate());
+				byte[] clientSignature = SecurityUtils.signMessage(parsedRequest.getSpecificField(), keyPair.getPrivate());
 				clientPGPMessage.setSignature(clientSignature);
 
 				// obter chave secreta
-				SecretKey secretKey = Security.getSecretKey();
+				SecretKey secretKey = SecurityUtils.generateSecretKey();
 
 				// cifrar mensagem com chave secreta
-				byte[] encryptedMessage = Security.cipherWithSecretKey(parsedRequest.getSpecificField().getBytes(),
+				byte[] encryptedMessage = SecurityUtils.cipherWithSecretKey(parsedRequest.getSpecificField().getBytes(),
 						secretKey);
 
 				clientPGPMessage.setMessage(encryptedMessage);
@@ -72,14 +72,14 @@ public class ClientRequestManager {
 				for (String username : groupMembers) {
 					// wrap da chave secreta a ser enviada com a chave
 					// publica do contacto de destino
-					byte[] wrappedSecretKey = Security.wrapSecretKey(secretKey,
+					byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(secretKey,
 							serverNetworkContactTypeMessage.getCertificate(username));
 					clientPGPMessage.putUserKey(username, wrappedSecretKey);
 				}
 
 				// adicionar chave cifrada do proprio utilizador
-				byte[] wrappedSecretKey = Security.wrapSecretKey(secretKey,
-						Security.getCertificate(parsedRequest.getUsername()));
+				byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(secretKey,
+						SecurityUtils.getCertificate(parsedRequest.getUsername()));
 
 				clientPGPMessage.putUserKey(parsedRequest.getUsername(), wrappedSecretKey);
 				

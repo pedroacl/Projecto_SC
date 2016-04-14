@@ -1,5 +1,9 @@
 package security;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -20,12 +24,13 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 import util.PersistenceUtil;
 
-public class Security {
+public class SecurityUtils {
 	private static final String KEYSTORE_PASSWORD = "seguranca";
 
 	/**
@@ -77,7 +82,7 @@ public class Security {
 	 * 
 	 * @return
 	 */
-	public static SecretKey getSecretKey() {
+	public static SecretKey generateSecretKey() {
 		SecretKey secretKey = null;
 
 		try {
@@ -275,5 +280,41 @@ public class Security {
 	public static int generateSalt() {
 		final SecureRandom randomNumber = new SecureRandom();
 		return (randomNumber.nextInt(900000) + 100000);
+	}
+
+	/**
+	 * 
+	 * @param secretKey
+	 */
+	public static byte[] generateFileMAC(String filePath, SecretKey secretKey) {
+		byte[] digest = null;
+		
+		try {
+			Mac mac = Mac.getInstance("HmacSHA1");
+			mac.init(secretKey);
+			
+			BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath));
+			String reader;
+
+			// ler cada linha do ficheiro
+			while ((reader = bufferedReader.readLine()) != null)
+				mac.update(reader.getBytes());
+
+			mac.doFinal();
+			bufferedReader.close();
+
+		} catch (NoSuchAlgorithmException e1) {
+			e1.printStackTrace();
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return digest;
 	}
 }

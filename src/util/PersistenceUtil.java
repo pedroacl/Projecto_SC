@@ -210,6 +210,28 @@ public class PersistenceUtil {
 	}
 
 	/**
+	 * 
+	 * @return
+	 */
+	public static byte[] readBytesFromFile(String filePath) {
+		File file = new File(filePath);
+		byte[] input = new byte[(int) file.length()];
+
+		try {
+			FileInputStream fileInputStream = new FileInputStream(file);
+			fileInputStream.read(input);
+			fileInputStream.close();
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return input;
+	}
+
+	/**
 	 * Obter keystore guardada num ficheiro
 	 * 
 	 * @param userPassword
