@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Scanner;
 
-import entities.ChatMessage;
+import network.messages.ChatMessage;
 
 /**
  * Classe que trata da interacção com o utilizador 

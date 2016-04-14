@@ -2,7 +2,7 @@ package interfaces.service;
 
 import java.util.List;
 
-import entities.ChatMessage;
+import network.messages.ChatMessage;
 
 public interface ConversationServiceInterface {
 	public void removeConversationFromUser(String username, String fromUser);

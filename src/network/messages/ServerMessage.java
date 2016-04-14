@@ -2,8 +2,6 @@ package network.messages;
 
 import java.util.ArrayList;
 
-import entities.ChatMessage;
-
 public class ServerMessage extends NetworkMessage {
 
 	/**

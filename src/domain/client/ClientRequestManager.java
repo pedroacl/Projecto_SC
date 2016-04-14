@@ -7,7 +7,7 @@ import javax.crypto.SecretKey;
 
 import network.managers.ClientNetworkManager;
 import network.messages.ClientNetworkMessage;
-import network.messages.ClientPGPMessage;
+import network.messages.ChatMessage;
 import network.messages.MessageType;
 import network.messages.ServerNetworkContactTypeMessage;
 import security.Security;
@@ -45,7 +45,7 @@ public class ClientRequestManager {
 
 			// existe contacto
 			if (serverNetworkContactTypeMessage.getMessageType() == MessageType.CONTACT) {
-				ClientPGPMessage clientPGPMessage = new ClientPGPMessage(MessageType.PGP_MESSAGE);
+				ChatMessage clientPGPMessage = new ChatMessage(MessageType.PGP_MESSAGE);
 
 				System.out.println(serverNetworkContactTypeMessage.numGroupMembers());
 
@@ -64,6 +64,8 @@ public class ClientRequestManager {
 						secretKey);
 
 				clientPGPMessage.setMessage(encryptedMessage);
+				System.out.println("Client - " + encryptedMessage);
+
 				Set<String> groupMembers = (Set<String>) serverNetworkContactTypeMessage.getGroupMembers();
 
 				// cifrar chave privada, usada para cifrar mensagem anterior
@@ -80,7 +82,8 @@ public class ClientRequestManager {
 						Security.getCertificate(parsedRequest.getUsername()));
 
 				clientPGPMessage.putUserKey(parsedRequest.getUsername(), wrappedSecretKey);
-
+				
+				// enviar mensagem
 				clientNetworkManager.sendMessage(clientPGPMessage);
 			} else {
 				System.out.println("Nao ha");

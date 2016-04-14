@@ -3,19 +3,8 @@ package domain.client;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.util.ArrayList;
-
-import javax.crypto.SecretKey;
 
 import network.managers.ClientNetworkManager;
-import network.messages.ClientNetworkMessage;
-import network.messages.ClientPGPMessage;
-import network.messages.MessageType;
-import network.messages.ServerNetworkContactTypeMessage;
-import network.messages.ServerMessage;
-import security.Security;
 import util.UserUtil;
 
 /**

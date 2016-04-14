@@ -5,18 +5,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyPair;
-import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 
-import entities.ChatMessage;
 import network.managers.ServerNetworkManager;
+import network.messages.ChatMessage;
 import network.messages.ClientNetworkMessage;
 import network.messages.MessageType;
 import network.messages.NetworkMessage;
+import network.messages.ServerMessage;
 import network.messages.ServerNetworkContactTypeMessage;
 import security.Security;
-import network.messages.ServerMessage;
 import service.ConversationService;
 import service.GroupService;
 
@@ -93,6 +92,7 @@ public class ServerClientMessageParser {
 						Security.getCertificate(clientMessage.getDestination()));
 
 				serverMessage = serverContactTypeMessage;
+				
 
 				// group
 			} else if (groupService.existsGroup(clientMessage.getDestination())) {
@@ -113,6 +113,12 @@ public class ServerClientMessageParser {
 				serverMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
 				serverMessage.setContent("Não existe esse contact");
 			}
+
+			serverNetworkManager.sendMessage(serverMessage);
+			ChatMessage clientPGPMessage = (ChatMessage) serverNetworkManager.receiveMessage();
+			
+			System.out.println("Server - ClientPGPMessageType: " + clientPGPMessage.getMessageType());
+			System.out.println("Server - Mensagem: " + clientPGPMessage.getMessage());
 
 			break;
 		// mensagem contendo um ficheiro
@@ -280,8 +286,10 @@ public class ServerClientMessageParser {
 			String fileName = extractName(clientMessage.getContent());
 
 			// cria chatMessage para persistir
-			ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(), clientMessage.getDestination(),
-					fileName, MessageType.FILE);
+			ChatMessage chatMessage = new ChatMessage(MessageType.FILE);
+			chatMessage.setFromUser(clientMessage.getUsername());
+			chatMessage.setDestination(clientMessage.getDestination());
+			chatMessage.setContent(clientMessage.getContent());
 
 			// persiste chatMessage
 			Long conversationID = conversationService.addChatMessage(chatMessage);
@@ -336,8 +344,10 @@ public class ServerClientMessageParser {
 				|| groupService.existsGroup(clientMessage.getDestination())) {
 
 			// cria chatMessage a guardar
-			ChatMessage chatMessage = new ChatMessage(clientMessage.getUsername(), clientMessage.getDestination(),
-					clientMessage.getContent(), MessageType.MESSAGE);
+			ChatMessage chatMessage = new ChatMessage(MessageType.MESSAGE);
+			chatMessage.setFromUser(clientMessage.getUsername());
+			chatMessage.setDestination(clientMessage.getDestination());
+			chatMessage.setContent(clientMessage.getContent());
 
 			// persiste chatMessage
 			conversationService.addChatMessage(chatMessage);

@@ -3,7 +3,7 @@ package interfaces.dao;
 import java.io.File;
 import java.util.List;
 
-import entities.ChatMessage;
+import network.messages.ChatMessage;
 
 public interface ConversationDAOInterface {
 	

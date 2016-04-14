@@ -31,9 +31,5 @@ public class ServerThread extends Thread {
 		// processa a mensagem do cliente e cria mensagem de resposta
 		ServerClientMessageParser clientMessageParser = new ServerClientMessageParser(clientMessage, serverNetworkManager);
 		NetworkMessage serverMessage = clientMessageParser.processRequest();
-
-		// envia resposta ao cliente
-		serverNetworkManager.sendMessage(serverMessage);
-		serverNetworkManager.close();
 	}
 }

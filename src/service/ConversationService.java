@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dao.ConversationDAO;
-import entities.ChatMessage;
 import interfaces.service.ConversationServiceInterface;
+import network.messages.ChatMessage;
 import util.PersistenceUtil;
 
 /**

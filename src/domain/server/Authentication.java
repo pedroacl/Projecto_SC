@@ -3,6 +3,7 @@ package domain.server;
 import interfaces.AuthenticationInterface;
 import security.Security;
 import service.UserService;
+import util.MiscUtil;
 
 /**
  * <<SINGLETON>> Classe que verifica existencia dos utilizadores e que trata da
@@ -54,7 +55,7 @@ public class Authentication implements AuthenticationInterface {
 		else {
 			System.out.println("Authentication - User existe!");
 			byte[] passwordHash = Security.getHash(userPasswordAndSalt[0] + password);
-			String hashString = String.format("%064x", new java.math.BigInteger(1, passwordHash));
+			String hashString = MiscUtil.bytesToHex(passwordHash);
 
 			System.out.println("Hash guardada: " + userPasswordAndSalt[1]);
 			System.out.println("Hash gerada:   " + hashString);

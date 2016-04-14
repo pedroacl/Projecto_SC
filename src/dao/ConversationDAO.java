@@ -7,10 +7,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import entities.ChatMessage;
 import entities.Conversation;
 import factories.ConversationFactory;
 import interfaces.dao.ConversationDAOInterface;
+import network.messages.ChatMessage;
 import network.messages.MessageType;
 import util.PersistenceUtil;
 
@@ -268,10 +268,12 @@ public class ConversationDAO implements ConversationDAOInterface {
 		}
 
 		// criar mensagem
-		ChatMessage message = new ChatMessage(messageFields.get(0), messageFields.get(1), sb.toString(),
-				MessageType.valueOf(messageFields.get(2)));
+		ChatMessage chatMessage = new ChatMessage(MessageType.valueOf(messageFields.get(2)));
+		chatMessage.setContent(sb.toString());	
+		chatMessage.setFromUser(messageFields.get(0));
+		chatMessage.setDestination(messageFields.get(1));
 
-		return message;
+		return chatMessage;
 	}
 
 	/**
