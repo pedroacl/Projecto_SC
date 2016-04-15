@@ -6,6 +6,9 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.SSLServerSocketFactory;
+
 /**
  * Classe que representa o servidor. Tem a lógica do negocio. Responde perante
  * os pedidos do cliente
@@ -19,7 +22,9 @@ public class Server {
 
 	/**
 	 * Função principal do servidor
-	 * @param args Argumentos passados pelo utilizador na linha de comandos
+	 * 
+	 * @param args
+	 *            Argumentos passados pelo utilizador na linha de comandos
 	 */
 	public static void main(String[] args) {
 		// nao existem parametros
@@ -28,13 +33,15 @@ public class Server {
 			System.exit(-1);
 		}
 
-		int serverPort = Integer.parseInt(args[0]);
-		ServerSocket serverSocket = null;
-		
-		//cria serverSocket
+		ServerSocketFactory ssf = null;
+		ServerSocket serverSocket= null;
+		// cria serverSocket
 		try {
-			serverSocket = new ServerSocket(serverPort);
-		} catch (IOException e) {
+			int serverPort = Integer.parseInt(args[0]);
+			ssf = SSLServerSocketFactory.getDefault();
+			serverSocket = ssf.createServerSocket(serverPort);
+
+		} catch (IOException | NumberFormatException e) {
 			e.printStackTrace();
 		}
 
