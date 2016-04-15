@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocketFactory;
+
 import network.managers.ClientNetworkManager;
 import util.UserUtil;
 
@@ -41,10 +45,11 @@ public class Client {
 
 		// Cria Classe de comunicação entre Cliente e servidor
 		int port = Integer.parseInt(argsParser.getServerPort());
+		SocketFactory sf = SSLSocketFactory.getDefault();
 		Socket socket = null;
 
 		try {
-			socket = new Socket(argsParser.getServerIP(), port);
+			socket = sf.createSocket(argsParser.getServerIP(), port);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
