@@ -12,9 +12,9 @@ public class ClientNetworkMessage extends NetworkMessage {
 	private String username;
 
 	private String password;
-	
+
 	private String destination;
-	
+
 	private PublicKey publicKey;
 
 	public ClientNetworkMessage(String username, String password, MessageType type) {
@@ -30,18 +30,21 @@ public class ClientNetworkMessage extends NetworkMessage {
 	public String getUsername() {
 		return username;
 	}
-	
+
 	public String getDestination() {
 		return destination;
 	}
-	
+
 	public void setDestination(String destination) {
 		this.destination = destination;
 	}
 
+	public void setPublicKey(PublicKey publicKey) {
+		this.publicKey = publicKey;
+	}
+
 	@Override
 	public String toString() {
-		return "ClientMessage [username=" + username + ", password=" + password + ", messageType=" + messageType
-				+ "]";
+		return "ClientMessage [username=" + username + ", password=" + password + ", messageType=" + messageType + "]";
 	}
 }

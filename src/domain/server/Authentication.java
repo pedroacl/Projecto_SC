@@ -4,11 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 
-import interfaces.AuthenticationInterface;
 import security.SecurityUtils;
 import service.UserService;
 import util.MiscUtil;
@@ -20,7 +18,9 @@ import util.MiscUtil;
  * @author António, José e Pedro
  *
  */
-public class Authentication implements AuthenticationInterface {
+public class Authentication {
+
+	private static final String SERVER_PASSWORD = "password";
 
 	private static Authentication authentication = new Authentication();
 
@@ -51,7 +51,6 @@ public class Authentication implements AuthenticationInterface {
 	 * @return False caso a password esteja errada
 	 * @requires username != null && password != null
 	 */
-	@Override
 	public boolean authenticateUser(String username, String password) {
 		// validade do ficheiro comprometida
 		if (!validateUsersFileMac("users.txt", password))
@@ -66,8 +65,7 @@ public class Authentication implements AuthenticationInterface {
 			// adicionar user e atualizar MAC do ficheiro de passwords
 			userService.addUser(username, password);
 			SecurityUtils.updateFileMac("users.txt.mac", password);
-		}
-		else {
+		} else {
 			System.out.println("Authentication - User existe!");
 			byte[] passwordHash = SecurityUtils.getHash(userPasswordAndSalt[0] + password);
 			String hashString = MiscUtil.bytesToHex(passwordHash);
@@ -104,8 +102,9 @@ public class Authentication implements AuthenticationInterface {
 				// obter MAC original
 				BufferedReader inF = new BufferedReader(new FileReader(usersFilePath + ".mac"));
 				String orignalMACString = inF.readLine();
-				originalMac = orignalMACString.getBytes();
 				inF.close();
+
+				originalMac = orignalMACString.getBytes();
 
 				// gerar MAC atual
 				byte[] fileMAC = SecurityUtils.generateFileMac(usersFilePath, password);
@@ -130,7 +129,6 @@ public class Authentication implements AuthenticationInterface {
 	 * @return True caso utilizador exista, false caso contrario
 	 * @requires username != null
 	 */
-	@Override
 	public boolean existsUser(String username) {
 		return userService.getUserPasswordAndSalt(username) != null;
 	}
@@ -144,10 +142,10 @@ public class Authentication implements AuthenticationInterface {
 	 *            Palavra passe do utilizador
 	 * @requires username != null && password != null
 	 */
-	@Override
 	public void addUser(String username, String password) {
 		if (userService.getUserPasswordAndSalt(username) == null)
 			userService.addUser(username, password);
-	}
 
+		SecurityUtils.updateFileMac("users.txt", SERVER_PASSWORD);
+	}
 }

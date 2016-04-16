@@ -3,12 +3,10 @@ package service;
 import java.util.concurrent.ConcurrentHashMap;
 
 import dao.UserDAO;
-import domain.server.Authentication;
-import interfaces.service.UserServiceInterface;
 import security.SecurityUtils;
 import util.MiscUtil;
 
-public class UserService implements UserServiceInterface {
+public class UserService {
 
 	private static UserDAO userDAO;
 
@@ -19,12 +17,10 @@ public class UserService implements UserServiceInterface {
 		users = userDAO.getUsers();
 	}
 
-	@Override
 	public ConcurrentHashMap<String, String> getUsers() {
 		return users;
 	}
 
-	@Override
 	public void addUser(String username, String password) {
 		// adicionar salt ah password
 		int salt = SecurityUtils.generateSalt();
@@ -47,7 +43,6 @@ public class UserService implements UserServiceInterface {
 		userDAO.addUser(username, sb.toString());
 	}
 
-	@Override
 	public String[] getUserPasswordAndSalt(String username) {
 		String passwordAndSalt = users.get(username);
 

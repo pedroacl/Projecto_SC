@@ -9,7 +9,6 @@ import java.util.List;
 
 import entities.Conversation;
 import factories.ConversationFactory;
-import interfaces.dao.ConversationDAOInterface;
 import network.messages.ChatMessage;
 import network.messages.MessageType;
 import util.PersistenceUtil;
@@ -20,7 +19,7 @@ import util.PersistenceUtil;
  * 
  * @author António, José, Pedro
  */
-public class ConversationDAO implements ConversationDAOInterface {
+public class ConversationDAO {
 
 	private ConversationFactory conversationFactory;
 
@@ -37,7 +36,6 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 *         guardada
 	 * @requires chatMessage != null;
 	 */
-	@Override
 	public Long addChatMessage(ChatMessage chatMessage) {
 
 		Conversation conversation = null;
@@ -124,7 +122,6 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 * @requires username != null && toUser != null && conversationId != null
 	 * 
 	 */
-	@Override
 	public void addConversationToUser(String username, String toUser, Long conversationId) {
 		HashMap<String, Long> userConversations = null;
 		String filePath = "users/" + username + "/conversations";
@@ -153,7 +150,6 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 * @return Lista das ultimas mensagens
 	 * @requires conversationId != null
 	 */
-	@Override
 	public ChatMessage getLastChatMessage(Long conversationId) {
 		String path = "conversations/" + conversationId;
 		Conversation lastConversation = (Conversation) PersistenceUtil.readObject(path + "/conversation");
@@ -203,7 +199,6 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 *         existam para este utilizador
 	 * @requires username != null
 	 */
-	@Override
 	public ArrayList<Long> getAllConversationsFrom(String username) {
 		String path = "users/" + username + "/conversations";
 		HashMap<String, Long> conversations = (HashMap<String, Long>) PersistenceUtil.readObject(path);
@@ -222,7 +217,6 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 * @return Devolve uma lista de todas as mensagens sobre a forma de
 	 *         ChatMessages
 	 */
-	@Override
 	public List<ChatMessage> getAllMessagesFromConversation(Long conversationId) {
 		// pasta onde estao localizadas todas as mensagens da conversa
 		String path = "conversations/" + conversationId + "/messages";
@@ -269,7 +263,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 
 		// criar mensagem
 		ChatMessage chatMessage = new ChatMessage(MessageType.valueOf(messageFields.get(2)));
-		chatMessage.setContent(sb.toString());	
+		chatMessage.setContent(sb.toString());
 		chatMessage.setFromUser(messageFields.get(0));
 		chatMessage.setDestination(messageFields.get(1));
 
@@ -336,7 +330,6 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 *            Nome do utilizador com o qual username tem uma conversa
 	 * @requires username != null && fromUser != null
 	 */
-	@Override
 	public void removeConversationFromUser(String username, String fromUser) {
 		HashMap<String, Long> userConversations = null;
 		String filePath = "users/" + username + "/conversations";
@@ -358,7 +351,6 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 *            Identificador da conversa a ser removida
 	 * @requires conversationId != null
 	 */
-	@Override
 	public void removeConversation(Long conversationId) {
 		File file = new File("conversations/" + conversationId);
 		PersistenceUtil.delete(file);
@@ -369,7 +361,6 @@ public class ConversationDAO implements ConversationDAOInterface {
 	 * 
 	 * @return Devolve todas as pastas das conversas
 	 */
-	@Override
 	public File[] getConversationsFolders() {
 		File file = new File("conversations");
 
@@ -378,10 +369,11 @@ public class ConversationDAO implements ConversationDAOInterface {
 
 		return file.listFiles();
 	}
-	
+
 	/**
-	 * Guarda a chave privada, enviada por um utilizador, associada a uma mensagem ou ficheiro
-	 * esta irá ser guardada em fich.txt.key.FromUser e fich.txt.key.ToUser
+	 * Guarda a chave privada, enviada por um utilizador, associada a uma
+	 * mensagem ou ficheiro esta irá ser guardada em fich.txt.key.FromUser e
+	 * fich.txt.key.ToUser
 	 * 
 	 * @param username
 	 * @param fileName
@@ -393,7 +385,7 @@ public class ConversationDAO implements ConversationDAOInterface {
 		sb.append(fileName);
 		sb.append(".key.");
 		sb.append(username);
-		
+
 		PersistenceUtil.writeStringToFile(privateKey, sb.toString());
 	}
 }

@@ -1,7 +1,5 @@
 package service;
 
-import interfaces.service.GroupServiceInterface;
-
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,7 +11,7 @@ import entities.Group;
  * @author pedro
  *
  */
-public class GroupService implements GroupServiceInterface {
+public class GroupService {
 
 	private GroupDAO groupDAO;
 
@@ -43,7 +41,6 @@ public class GroupService implements GroupServiceInterface {
 	 * @param userToAdd
 	 * @param groupName
 	 */
-	@Override
 	public boolean addUserToGroup(String username, String userToAdd, String groupName) {
 
 		
@@ -80,7 +77,6 @@ public class GroupService implements GroupServiceInterface {
 		return false;
 	}
 
-	@Override
 	public boolean removeUserFromGroup(String username, String userToRemove, String groupName) {
 
 		// existe grupo e o utilizador eh owner
@@ -122,7 +118,6 @@ public class GroupService implements GroupServiceInterface {
 		return false;
 	}
 
-	@Override
 	public boolean existsGroup(String groupName) {
 		return groups.get(groupName) != null;
 	}
@@ -132,7 +127,6 @@ public class GroupService implements GroupServiceInterface {
 	 * @param groupName
 	 * @return
 	 */
-	@Override
 	public String getGroupOwner(String groupName) {
 		return groups.get(groupName);
 	}
@@ -140,7 +134,6 @@ public class GroupService implements GroupServiceInterface {
 	/**
 	 * 
 	 */
-	@Override
 	public Long createGroup(String groupName, String admin) {
 		groups.put(groupName, admin);
 		return groupDAO.createGroup(groupName, admin);

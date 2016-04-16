@@ -5,7 +5,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import javax.net.SocketFactory;
-import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 
 import network.managers.ClientNetworkManager;

@@ -9,7 +9,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
-import interfaces.dao.UserDAOInterface;
 import util.PersistenceUtil;
 
 /**
@@ -18,7 +17,7 @@ import util.PersistenceUtil;
  * @author António, José e Pedro
  *
  */
-public class UserDAO implements UserDAOInterface {
+public class UserDAO {
 
 	public UserDAO() {
 
@@ -29,7 +28,6 @@ public class UserDAO implements UserDAOInterface {
 	 * 
 	 * @return Devolve um HashMap de utilizadores e suas palavra-passes
 	 */
-	@Override
 	public ConcurrentHashMap<String, String> getUsers() {
 		ConcurrentHashMap<String, String> users = new ConcurrentHashMap<String, String>();
 
@@ -84,7 +82,6 @@ public class UserDAO implements UserDAOInterface {
 	 *         contrário
 	 * @requires username != null && password != null
 	 */
-	@Override
 	public void addUser(String username, String saltAndHashedPassword) {
 		// atualizar ficheiro
 		try {
@@ -107,7 +104,6 @@ public class UserDAO implements UserDAOInterface {
 	 *            Nome do utilizador a ser apagado
 	 * @requires username != null
 	 */
-	@Override
 	public void deleteUser(String username) {
 
 		File file = new File("users/" + username + ".txt");

@@ -35,6 +35,7 @@ public class Server {
 
 		ServerSocketFactory ssf = null;
 		ServerSocket serverSocket= null;
+
 		// cria serverSocket
 		try {
 			int serverPort = Integer.parseInt(args[0]);

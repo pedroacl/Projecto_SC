@@ -15,7 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import entities.Group;
 import factories.ConversationFactory;
-import interfaces.dao.GroupDAOInterface;
 import util.PersistenceUtil;
 
 /**
@@ -23,7 +22,7 @@ import util.PersistenceUtil;
  * 
  * @author António, José, Pedro
  */
-public class GroupDAO implements GroupDAOInterface {
+public class GroupDAO {
 
 	private static ConversationFactory conversationFactory;
 
@@ -42,7 +41,6 @@ public class GroupDAO implements GroupDAOInterface {
 	 *         false caso contrario
 	 * @requires username != null && groupName != null
 	 */
-	@Override
 	public boolean addUserToGroup(String username, String groupName) {
 		String filePath = "groups/" + groupName + "/group";
 
@@ -63,7 +61,6 @@ public class GroupDAO implements GroupDAOInterface {
 	 * @return HasMap com todos os grupos registados associados com os seus
 	 *         donos
 	 */
-	@Override
 	public ConcurrentHashMap<String, String> getGroups() {
 		ConcurrentHashMap<String, String> groups = new ConcurrentHashMap<String, String>();
 
@@ -112,7 +109,6 @@ public class GroupDAO implements GroupDAOInterface {
 	 * @return Devolve o id da conversação associada ao grupo
 	 * @requires groupName != null && admin != null
 	 */
-	@Override
 	public Long createGroup(String groupName, String admin) {
 
 		// adiciona uma entrada no ficheiro groups.txt
@@ -151,7 +147,6 @@ public class GroupDAO implements GroupDAOInterface {
 	 *            Nome do grupo a ser eliminado do ficheiro
 	 * @requires groupName != null
 	 */
-	@Override
 	public void deleteGroup(String groupName) {
 		// elimina entrada no ficheiro groups.txt
 		File file = new File("groups.txt");
@@ -204,7 +199,6 @@ public class GroupDAO implements GroupDAOInterface {
 	 * @return Group chamado groupNAme ou null caso nao exista esse grupo
 	 * @requires groupName != null
 	 */
-	@Override
 	public Group getGroup(String groupName) {
 		String filePath = "groups/" + groupName + "/group";
 		Group group = (Group) PersistenceUtil.readObject(filePath);
@@ -221,7 +215,6 @@ public class GroupDAO implements GroupDAOInterface {
 	 *            Nome do utilizador a ser removido
 	 * @requires group != null && userToRemove != null
 	 */
-	@Override
 	public void removeUserFromGroup(Group group, String userToRemove) {
 		group.removeMember(userToRemove);
 		PersistenceUtil.writeObject(group, "groups/" + group.getName() + "/group");
