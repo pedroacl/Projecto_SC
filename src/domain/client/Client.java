@@ -44,6 +44,10 @@ public class Client {
 
 		// Cria Classe de comunicação entre Cliente e servidor
 		int port = Integer.parseInt(argsParser.getServerPort());
+		
+		System.setProperty("javax.net.ssl.trustStore", "truststore.cliente");
+		System.setProperty("javax.net.ssl.trustStorePassword", "seguranca");
+		
 		SocketFactory sf = SSLSocketFactory.getDefault();
 		Socket socket = null;
 

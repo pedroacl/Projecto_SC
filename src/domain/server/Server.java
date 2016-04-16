@@ -35,6 +35,9 @@ public class Server {
 
 		ServerSocketFactory ssf = null;
 		ServerSocket serverSocket= null;
+		
+		System.setProperty("javax.net.ssl.keyStore", "keystore.servidor");
+		System.setProperty("javax.net.ssl.keyStorePassword", "seguranca");
 
 		// cria serverSocket
 		try {
