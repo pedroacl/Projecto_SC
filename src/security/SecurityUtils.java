@@ -19,6 +19,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
+import java.security.spec.InvalidKeySpecException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -27,6 +28,8 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 
 import util.PersistenceUtil;
 
@@ -126,8 +129,10 @@ public class SecurityUtils {
 		return signedMessage;
 	}
 
-	public void signFile() {
-		// TODO Auto-generated method stub
+	public static byte[] signFile(String message, PrivateKey privateKey) {
+		// TODO 
+		
+		return null;
 	}
 
 	/**
@@ -286,13 +291,25 @@ public class SecurityUtils {
 	 * 
 	 * @param secretKey
 	 */
-	public static byte[] generateFileMAC(String filePath, SecretKey secretKey) {
+	public static byte[] generateFileMAC(String filePath, String password) {
 		byte[] digest = null;
-		
+
 		try {
+			// byte[] salt = { (byte) 0xc9, (byte) 0x36, (byte) 0x78, (byte) 0x99, (byte) 0x52, (byte) 0x3e, (byte) 0xea,
+					// (byte) 0xf2 };
+
+			// PBEParameterSpec paramSpec = new PBEParameterSpec(salt, 20);
+			
+			PBEKeySpec keySpec = new PBEKeySpec(password.toCharArray());
+
+			// obter chave secreta atraves da password
+			SecretKeyFactory kf = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
+			SecretKey secretKey = kf.generateSecret(keySpec);
+
+			// inicializar MAC
 			Mac mac = Mac.getInstance("HmacSHA1");
 			mac.init(secretKey);
-			
+
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath));
 			String reader;
 
@@ -313,8 +330,10 @@ public class SecurityUtils {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (InvalidKeySpecException e) {
+			e.printStackTrace();
 		}
-		
+
 		return digest;
 	}
 }

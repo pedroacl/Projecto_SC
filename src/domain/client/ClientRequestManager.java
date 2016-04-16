@@ -6,11 +6,10 @@ import java.util.Set;
 import javax.crypto.SecretKey;
 
 import network.managers.ClientNetworkManager;
-import network.messages.ClientNetworkMessage;
 import network.messages.ChatMessage;
+import network.messages.ClientNetworkMessage;
 import network.messages.MessageType;
 import network.messages.NetworkMessage;
-import network.messages.ServerMessage;
 import network.messages.ServerNetworkContactTypeMessage;
 import security.SecurityUtils;
 
@@ -29,19 +28,21 @@ public class ClientRequestManager {
 	}
 
 	public NetworkMessage processRequest() {
-		
+
 		NetworkMessage networkMessage = null;
-		
+		ServerNetworkContactTypeMessage serverNetworkContactTypeMessage = null;
+		ChatMessage chatMessage = null;
+		ClientNetworkMessage clientNetworkMessage;
+
 		switch (parsedRequest.getOrder()) {
 		// client quer enviar uma mensagem
 		case "-m":
 			// enviar mensagem a perguntar o tipo do destinatario (contacto?
 			// grupo?)
 			sendAuthenticationMessage();
-			
+
 			// obter tipo de contacto
-			ServerNetworkContactTypeMessage serverNetworkContactTypeMessage = (ServerNetworkContactTypeMessage) clientNetworkManager
-					.receiveMessage();
+			serverNetworkContactTypeMessage = (ServerNetworkContactTypeMessage) clientNetworkManager.receiveMessage();
 
 			// existe contacto
 			if (serverNetworkContactTypeMessage.getMessageType() == MessageType.CONTACT) {
@@ -53,7 +54,8 @@ public class ClientRequestManager {
 				System.out.println("Client - CONTACT");
 
 				// gerar assinatura
-				byte[] clientSignature = SecurityUtils.signMessage(parsedRequest.getSpecificField(), keyPair.getPrivate());
+				byte[] clientSignature = SecurityUtils.signMessage(parsedRequest.getSpecificField(),
+						keyPair.getPrivate());
 				clientPGPMessage.setSignature(clientSignature);
 
 				// obter chave secreta
@@ -74,6 +76,7 @@ public class ClientRequestManager {
 					// publica do contacto de destino
 					byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(secretKey,
 							serverNetworkContactTypeMessage.getCertificate(username));
+
 					clientPGPMessage.putUserKey(username, wrappedSecretKey);
 				}
 
@@ -82,47 +85,46 @@ public class ClientRequestManager {
 						SecurityUtils.getCertificate(parsedRequest.getUsername()));
 
 				clientPGPMessage.putUserKey(parsedRequest.getUsername(), wrappedSecretKey);
-				
+
 				// enviar mensagem
 				clientNetworkManager.sendMessage(clientPGPMessage);
-				
-				//espera resposta
-				 networkMessage = (NetworkMessage) clientNetworkManager.receiveMessage();
-				
+
+				// espera resposta
+				networkMessage = (NetworkMessage) clientNetworkManager.receiveMessage();
+
 			} else {
-				//nao existe contact, devolve erro
+				// nao existe contact, devolve erro
 				networkMessage = serverNetworkContactTypeMessage;
-				
+
 			}
 			break;
-			
+
 		case "-f":
 			// enviar mensagem a perguntar o tipo do destinatario (user? grupo?)
 			sendAuthenticationMessage();
-			
+
 			// obter tipo de contacto
-			ServerNetworkContactTypeMessage serverNetworkContactTypeMessage = 
-					(ServerNetworkContactTypeMessage) clientNetworkManager.receiveMessage();
-			
+			serverNetworkContactTypeMessage = (ServerNetworkContactTypeMessage) clientNetworkManager.receiveMessage();
+
 			// existe contacto
 			if (serverNetworkContactTypeMessage.getMessageType() == MessageType.CONTACT) {
-				
-				ChatMessage clientPGPMessage = new ChatMessage(MessageType.FILE);
+
+				chatMessage = new ChatMessage(MessageType.FILE);
 
 				System.out.println(serverNetworkContactTypeMessage.numGroupMembers());
 
 				// contacto
 				System.out.println("Client - CONTACT");
-				
+
 				// gerar assinatura
 				byte[] clientSignature = SecurityUtils.signFile(parsedRequest.getSpecificField(), keyPair.getPrivate());
-				clientPGPMessage.setSignature(clientSignature);
+				chatMessage.setSignature(clientSignature);
 
 				// obter chave secreta
 				SecretKey secretKey = SecurityUtils.generateSecretKey();
 
 				// envia tamanho do ficheiro
-				clientPGPMessage.setFileSize(parsedRequest.getFileSize());
+				chatMessage.setFileSize(parsedRequest.getFileSize());
 
 				Set<String> groupMembers = (Set<String>) serverNetworkContactTypeMessage.getGroupMembers();
 
@@ -132,97 +134,94 @@ public class ClientRequestManager {
 					// publica do contacto de destino
 					byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(secretKey,
 							serverNetworkContactTypeMessage.getCertificate(username));
-					clientPGPMessage.putUserKey(username, wrappedSecretKey);
+					chatMessage.putUserKey(username, wrappedSecretKey);
 				}
 
 				// adicionar chave cifrada do proprio utilizador
 				byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(secretKey,
 						SecurityUtils.getCertificate(parsedRequest.getUsername()));
 
-				clientPGPMessage.putUserKey(parsedRequest.getUsername(), wrappedSecretKey);
-				
+				chatMessage.putUserKey(parsedRequest.getUsername(), wrappedSecretKey);
+
 				// enviar mensagem
-				clientNetworkManager.sendMessage(clientPGPMessage);
-				
-				//espera resposta
-				 networkMessage = (NetworkMessage) clientNetworkManager.receiveMessage();
-				 
+				clientNetworkManager.sendMessage(chatMessage);
+
+				// espera resposta
+				networkMessage = (NetworkMessage) clientNetworkManager.receiveMessage();
+
 			} else {
-				
-				//nao existe contact, devolve erro
-				networkMessage = serverNetworkContactTypeMessage;	
+
+				// nao existe contact, devolve erro
+				networkMessage = serverNetworkContactTypeMessage;
 			}
 			break;
-			
+
 		case "rLast":
-			
-			ClientNetworkMessage aux_message = new ClientNetworkMessage(parsedRequest.getUsername(),
-					parsedRequest.getPassword(),MessageType.RECEIVER);
-			
-			aux_message.setContent("recent");
-			
+
+			clientNetworkMessage = new ClientNetworkMessage(parsedRequest.getUsername(), parsedRequest.getPassword(),
+					MessageType.RECEIVER);
+
+			clientNetworkMessage.setContent("recent");
+
 			// enviar mensagem
-			clientNetworkManager.sendMessage(aux_message);
-			
-			//espera resposta
+			clientNetworkManager.sendMessage(clientNetworkMessage);
+
+			// espera resposta
 			ChatMessage chatmessage = (ChatMessage) clientNetworkManager.receiveMessage();
-			
+
 			networkMessage = chatmessage;
 			break;
-			
+
 		case "rContact":
-			
-			ClientNetworkMessage aux_message = new ClientNetworkMessage(parsedRequest.getUsername(),
-					parsedRequest.getPassword(),MessageType.RECEIVER);
-			
-			aux_message.setContent("all");
-			
+
+			clientNetworkMessage = new ClientNetworkMessage(parsedRequest.getUsername(), parsedRequest.getPassword(),
+					MessageType.RECEIVER);
+
+			clientNetworkMessage.setContent("all");
+
 			// enviar mensagem
-			clientNetworkManager.sendMessage(aux_message);
-			
-			//espera resposta
-			ChatMessage chatmessage = (ChatMessage) clientNetworkManager.receiveMessage();
-			
+			clientNetworkManager.sendMessage(clientNetworkMessage);
+
+			// espera resposta
+			chatmessage = (ChatMessage) clientNetworkManager.receiveMessage();
+
 			networkMessage = chatmessage;
 			break;
-			
+
 		case "rFile":
-			
-			ClientNetworkMessage aux_message = new ClientNetworkMessage(parsedRequest.getUsername(),
-					parsedRequest.getPassword(),MessageType.RECEIVER);
-			
-			aux_message.setContent(parsedRequest.getSpecificField());
-			
+
+			clientNetworkMessage = new ClientNetworkMessage(parsedRequest.getUsername(), parsedRequest.getPassword(),
+					MessageType.RECEIVER);
+
+			clientNetworkMessage.setContent(parsedRequest.getSpecificField());
+
 			// enviar mensagem
-			clientNetworkManager.sendMessage(aux_message);
-			
-			//recebe Resposta
-			ChatMessage chatmessage = (ChatMessage) clientNetworkManager.receiveMessage();
-			
-			
-			
-		
+			clientNetworkManager.sendMessage(clientNetworkMessage);
+
+			// recebe Resposta
+			chatmessage = (ChatMessage) clientNetworkManager.receiveMessage();
 
 		default:
 			break;
 		}
-		
+
 		return networkMessage;
 
 	}
-	
+
 	/**
-	 * @param type TODO
-	 *  
+	 * @param type
+	 * 
+	 * 
 	 */
 	private void sendAuthenticationMessage() {
-		
+
 		ClientNetworkMessage aux_message = new ClientNetworkMessage(parsedRequest.getUsername(),
-							parsedRequest.getPassword(),MessageType.AUTH);
+				parsedRequest.getPassword(), MessageType.AUTH);
 
 		aux_message.setDestination(parsedRequest.getContact());
 		System.out.println("Client - Enviar msg");
 		clientNetworkManager.sendMessage(aux_message);
-	
+
 	}
 }
