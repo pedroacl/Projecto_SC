@@ -1,12 +1,12 @@
 package service;
 
-import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
 import java.util.concurrent.ConcurrentHashMap;
 
 import dao.UserDAO;
+import domain.server.Authentication;
 import interfaces.service.UserServiceInterface;
 import security.SecurityUtils;
+import util.MiscUtil;
 
 public class UserService implements UserServiceInterface {
 
@@ -33,7 +33,7 @@ public class UserService implements UserServiceInterface {
 
 		// obter hash
 		byte[] hash = SecurityUtils.getHash(passwordAndSalt);
-		String hashString = String.format("%064x", new java.math.BigInteger(1, hash));
+		String hashString = MiscUtil.bytesToHex(hash);
 
 		// criar par salt:hashedPassword
 		StringBuilder sb = new StringBuilder(); 

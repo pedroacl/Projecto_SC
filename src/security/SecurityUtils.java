@@ -1,8 +1,10 @@
 package security;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -31,6 +33,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
+import util.MiscUtil;
 import util.PersistenceUtil;
 
 public class SecurityUtils {
@@ -134,7 +137,7 @@ public class SecurityUtils {
 		
 		return null;
 	}
-
+/*
 	/**
 	 * Cifra uma mensagem com uma chave privada
 	 * 
@@ -163,9 +166,10 @@ public class SecurityUtils {
 
 		return encryptedMessage;
 	}
-
+	
+/*
 	public static byte[] decipherWithSecretKey(byte[] cipheredMessage, SecretKey secretKey) {
-		byte[] decipheredMessage;
+		byte[] decipheredMessage = null;
 
 		try {
 			Cipher cipher = Cipher.getInstance("AES");
@@ -184,12 +188,13 @@ public class SecurityUtils {
 			e.printStackTrace();
 		}
 
-		return cipheredMessage;
+		return decipheredMessage;
 	}
+*/
 
 	public Cipher cipherWithPublicKey() {
+		// TODO
 		Cipher cipher = null;
-
 		return cipher;
 	}
 
@@ -291,7 +296,7 @@ public class SecurityUtils {
 	 * 
 	 * @param secretKey
 	 */
-	public static byte[] generateFileMAC(String filePath, String password) {
+	public static byte[] generateFileMac(String filePath, String password) {
 		byte[] digest = null;
 
 		try {
@@ -317,8 +322,8 @@ public class SecurityUtils {
 			while ((reader = bufferedReader.readLine()) != null)
 				mac.update(reader.getBytes());
 
-			mac.doFinal();
 			bufferedReader.close();
+			digest = mac.doFinal();
 
 		} catch (NoSuchAlgorithmException e1) {
 			e1.printStackTrace();
@@ -335,5 +340,34 @@ public class SecurityUtils {
 		}
 
 		return digest;
+	}
+	
+	/**
+	 * 
+	 * @param filePath
+	 */
+	public static void updateFileMac(String filePath, String password) {
+		// TODO testar
+
+		try {
+			String macFilePath = filePath + ".mac";
+			File usersMACFile = new File(macFilePath);
+
+			// abrir ficheiro em modo overwrite
+			FileWriter fileWriter = new FileWriter(usersMACFile, false);
+
+			// obter novo MAC
+			byte[] fileMac = SecurityUtils.generateFileMac(macFilePath, password);
+
+			// guardar novo MAC
+			fileWriter.write(MiscUtil.bytesToHex(fileMac));
+
+			fileWriter.close();
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

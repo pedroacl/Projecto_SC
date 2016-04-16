@@ -63,7 +63,7 @@ public class ServerClientMessageParser {
 		System.out.println("Server - Recebi msg");
 		
 		// validar MAC do ficheiro de utilizadores
-		if (authentication.validateUsersFileMAC(USERS_MAC_FILE, clientMessage.getPassword())) {
+		if (authentication.validateUsersFileMac(USERS_MAC_FILE, clientMessage.getPassword())) {
 			
 		}
 
@@ -78,10 +78,6 @@ public class ServerClientMessageParser {
 		}
 
 		System.out.println("Server - " + clientMessage);
-
-		// obter chave assimétrica do utilizador
-		KeyPair keyPair = SecurityUtils.getKeyPair();
-		PrivateKey privateKey = keyPair.getPrivate();
 
 		switch (clientMessage.getMessageType()) {
 		// mensagem de texto

@@ -6,13 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
-
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 
 import interfaces.AuthenticationInterface;
 import security.SecurityUtils;
@@ -52,14 +46,15 @@ public class Authentication implements AuthenticationInterface {
 	 * @param username
 	 *            Nome do utilizador a autenticar
 	 * @param password
-	 *            Palavra passe do servidor passada por argumentos na linha de comandos
+	 *            Palavra passe do servidor passada por argumentos na linha de
+	 *            comandos
 	 * @return False caso a password esteja errada
 	 * @requires username != null && password != null
 	 */
 	@Override
 	public boolean authenticateUser(String username, String password) {
-		// validar integridade do ficheiro MAC
-		if (!validateUsersFileMAC("users.txt", password))
+		// validade do ficheiro comprometida
+		if (!validateUsersFileMac("users.txt", password))
 			return false;
 
 		String[] userPasswordAndSalt = userService.getUserPasswordAndSalt(username);
@@ -67,9 +62,11 @@ public class Authentication implements AuthenticationInterface {
 		// user nao existe
 		if (userPasswordAndSalt == null) {
 			System.out.println("User nao existe. Adicionar " + username + "!");
+
+			// adicionar user e atualizar MAC do ficheiro de passwords
 			userService.addUser(username, password);
+			SecurityUtils.updateFileMac("users.txt.mac", password);
 		}
-		// user existe e a password eh invalida
 		else {
 			System.out.println("Authentication - User existe!");
 			byte[] passwordHash = SecurityUtils.getHash(userPasswordAndSalt[0] + password);
@@ -90,72 +87,37 @@ public class Authentication implements AuthenticationInterface {
 	 * @param password
 	 * @return
 	 */
-	public boolean validateUsersFileMAC(String usersFilePath, String password) {
+	public boolean validateUsersFileMac(String usersFilePath, String password) {
 		// TODO testar
-		byte[] originalMAC = null;
-		boolean validMAC = false;
+		byte[] originalMac = null;
+		boolean validMac = false;
 
 		try {
 			File usersMACFile = new File(usersFilePath + ".mac");
 
 			// nao existe ficheiro MAC
 			if (!usersMACFile.exists()) {
-				updateUsersFileMAC(usersFilePath, password);
+				SecurityUtils.updateFileMac(usersFilePath, password);
+				validMac = true;
 
 			} else {
-				// gerar password
-				SecretKeyFactory kf = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
-				PBEKeySpec keySpec = new PBEKeySpec(password.toCharArray());
-				SecretKey secretKey = kf.generateSecret(keySpec);
-
 				// obter MAC original
 				BufferedReader inF = new BufferedReader(new FileReader(usersFilePath + ".mac"));
 				String orignalMACString = inF.readLine();
-				originalMAC = orignalMACString.getBytes();
+				originalMac = orignalMACString.getBytes();
 				inF.close();
 
 				// gerar MAC atual
-				byte[] fileMAC = SecurityUtils.generateFileMAC(usersFilePath, password);
-				validMAC = Arrays.equals(fileMAC, originalMAC);
+				byte[] fileMAC = SecurityUtils.generateFileMac(usersFilePath, password);
+				validMac = Arrays.equals(fileMAC, originalMac);
 			}
-
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (InvalidKeySpecException e) {
-			e.printStackTrace();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		return validMAC;
-	}
-
-	/**
-	 * 
-	 * @param usersFilePath
-	 */
-	public void updateUsersFileMAC(String usersFilePath, String password) {
-		// TODO testar
-		
-		try {
-			String macFilePath = usersFilePath + ".mac";
-			File usersMACFile = new File(macFilePath);
-			
-			// abrir ficheiro em modo overwrite
-			FileWriter fileWriter = new FileWriter(usersMACFile, false);
-		
-			// obter novo MAC
-			byte[] fileMac = SecurityUtils.generateFileMAC(macFilePath, password);
-			
-			// guardar novo MAC
-			fileWriter.write(MiscUtil.bytesToHex(fileMac));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		return validMac;
 	}
 
 	/**
