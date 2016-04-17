@@ -36,6 +36,14 @@ public class ClientRequestManager {
 
 		switch (parsedRequest.getOrder()) {
 		// client quer enviar uma mensagem
+		
+		/* 
+		 * C --------AUTH------------> S
+		 *   <------Contact/NOK-------                         
+		 *   ----AD,Ks(M),Kp(Ks)----->
+		 *   <-------OK/NOK----------
+		 */
+		
 		case "-m":
 			// enviar mensagem a perguntar o tipo do destinatario (contacto?
 			// grupo?)
@@ -98,6 +106,14 @@ public class ClientRequestManager {
 
 			}
 			break;
+			
+			/* 
+			 * C --------AUTH------------> S
+			 *   <------Contact/NOK-------                         
+			 *   ----AD,Ks(M),Kp(Ks)----->
+			 *   -------file------------->
+			 *   <--------OK/NOK----------
+			 */
 
 		case "-f":
 			// enviar mensagem a perguntar o tipo do destinatario (user? grupo?)
@@ -155,6 +171,11 @@ public class ClientRequestManager {
 				networkMessage = serverNetworkContactTypeMessage;
 			}
 			break;
+			
+			/* 
+			 * C ----------RECEIVER-----------> S
+			 *   <--AD,Ks(M),K(k), M/NOK--LAST--                       
+			 */
 
 		case "rLast":
 
@@ -171,8 +192,15 @@ public class ClientRequestManager {
 
 			networkMessage = chatmessage;
 			break;
+			
+			
 
 		case "rContact":
+			
+			/* 
+			 * C -------------RECEIVER--------------> S
+			 *   <--AD,Ks(M),K(k), M/NOK--CONVERSATION--                       
+			 */
 
 			clientNetworkMessage = new ClientNetworkMessage(parsedRequest.getUsername(), parsedRequest.getPassword(),
 					MessageType.RECEIVER);
@@ -187,8 +215,17 @@ public class ClientRequestManager {
 
 			networkMessage = chatmessage;
 			break;
-
+			
+			
+			
 		case "rFile":
+			
+			/* 
+			 * C ----------RECEIVER-----------> S
+			 *   <--AD,Ks(F),K(ks)/NOK--FILE--
+			 *   <-----------F----------------
+			 *                          
+			 */	
 
 			clientNetworkMessage = new ClientNetworkMessage(parsedRequest.getUsername(), parsedRequest.getPassword(),
 					MessageType.RECEIVER);
@@ -200,6 +237,51 @@ public class ClientRequestManager {
 
 			// recebe Resposta
 			chatmessage = (ChatMessage) clientNetworkManager.receiveMessage();
+			networkMessage = chatmessage;
+			
+			break;
+		
+		case "-a":
+			/* 
+			 * C ----------ADDUSER-----------> S
+			 *   <-------------OK/NOK--------                        
+			 */	
+			
+			//preprara mensagem
+			clientNetworkMessage = new ClientNetworkMessage(parsedRequest.getUsername(), 
+					parsedRequest.getPassword(), MessageType.ADDUSER);
+			
+			clientNetworkMessage.setContent(parsedRequest.getSpecificField());
+			
+			// enviar mensagem
+			clientNetworkManager.sendMessage(clientNetworkMessage);
+			
+			// recebe Resposta
+			chatmessage = (ChatMessage) clientNetworkManager.receiveMessage();
+			networkMessage = chatmessage;
+			
+			break;
+		case "-d":
+			/* 
+			 * C ----------ADDUSER-----------> S
+			 *   <-------------OK/NOK--------                        
+			 */	
+			
+			//preprara mensagem
+			clientNetworkMessage = new ClientNetworkMessage(parsedRequest.getUsername(), 
+					parsedRequest.getPassword(), MessageType.REMOVEUSER);
+			
+			clientNetworkMessage.setContent(parsedRequest.getSpecificField());
+			
+			// enviar mensagem
+			clientNetworkManager.sendMessage(clientNetworkMessage);
+			
+			// recebe Resposta
+			chatmessage = (ChatMessage) clientNetworkManager.receiveMessage();
+			networkMessage = chatmessage;
+			
+			break;	
+			
 
 		default:
 			break;
