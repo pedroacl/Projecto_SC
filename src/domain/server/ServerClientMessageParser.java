@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.KeyPair;
-import java.security.PrivateKey;
 import java.util.ArrayList;
 
 import network.managers.ServerNetworkManager;
@@ -40,13 +38,17 @@ public class ServerClientMessageParser {
 	private final int MAX_FILE_SIZE = Integer.MAX_VALUE;
 	
 	private final String USERS_MAC_FILE = "users.mac.txt";
+	
+	private String serverPassword;
 
-	public ServerClientMessageParser(ClientNetworkMessage clientMessage, ServerNetworkManager serverNetworkManager) {
+	public ServerClientMessageParser(ClientNetworkMessage clientMessage, ServerNetworkManager serverNetworkManager, String serverPassword) {
 		this.clientMessage = clientMessage;
 		authentication = Authentication.getInstance();
 
 		conversationService = new ConversationService();
 		groupService = GroupService.getInstance();
+		
+		this.serverPassword = serverPassword;
 
 		this.serverNetworkManager = serverNetworkManager;
 	}
@@ -68,7 +70,7 @@ public class ServerClientMessageParser {
 		}
 
 		// erro de autenticacao
-		if (!authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword())) {
+		if (!authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword(), serverPassword)) {
 			
 			//preenche sermessage com indicaçao do erro
 			serverMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);

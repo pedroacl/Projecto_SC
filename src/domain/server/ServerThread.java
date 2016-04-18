@@ -4,7 +4,6 @@ import java.net.Socket;
 
 import network.managers.ServerNetworkManager;
 import network.messages.ClientNetworkMessage;
-import network.messages.NetworkMessage;
 
 /**
  * <<THREAD>> Classe que executa o pedido de um cliente num novo fio de execução
@@ -14,22 +13,27 @@ import network.messages.NetworkMessage;
  */
 public class ServerThread extends Thread {
 
-	private Socket socket;
+	private Socket	socket;
 
-	public ServerThread(Socket socket) {
+	private String	password;
+
+	public ServerThread(Socket socket, String password) {
 		this.socket = socket;
+		this.password = password;
 	}
 
 	/**
 	 * Executar thread
 	 */
 	public void run() {
-		//incializa comunicação com o cliente e recebe ClientMessage
+		// incializa comunicação com o cliente e recebe ClientMessage
 		ServerNetworkManager serverNetworkManager = new ServerNetworkManager(socket);
 		ClientNetworkMessage clientMessage = (ClientNetworkMessage) serverNetworkManager.receiveMessage();
 
 		// processa a mensagem do cliente e cria mensagem de resposta
-		ServerClientMessageParser clientMessageParser = new ServerClientMessageParser(clientMessage, serverNetworkManager);
-		NetworkMessage serverMessage = clientMessageParser.processRequest();
+		ServerClientMessageParser clientMessageParser = new ServerClientMessageParser(clientMessage,
+				serverNetworkManager, this.password);
+
+		clientMessageParser.processRequest();
 	}
 }

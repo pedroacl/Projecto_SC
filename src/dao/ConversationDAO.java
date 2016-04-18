@@ -109,7 +109,7 @@ public class ConversationDAO {
 		PersistenceUtil.writeStringToFile(chatMessage.getFromUser() + "\n" + chatMessage.getDestination() + "\n"
 				+ chatMessage.getMessageType() + "\n" + chatMessage.getContent(), pathToTxt);
 
-		// TODO persistir chave para cada utilizador TESTAR
+		// persistir chave para cada utilizador TESTAR
 		for (String username: chatMessage.getUsers()) {
 			saveUserChatMessageKey(username, messageFileName, chatMessage.getUserKey(username));
 		}

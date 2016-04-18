@@ -48,6 +48,9 @@ public class Server {
 		} catch (IOException | NumberFormatException e) {
 			e.printStackTrace();
 		}
+		
+		//TODO obter password da linha de comandos
+		String password = "1234";
 
 		// Thread Pool
 		ExecutorService executorService = Executors.newFixedThreadPool(MAX_THREADS);
@@ -65,7 +68,7 @@ public class Server {
 
 			System.out.println("Cliente ligado!");
 
-			ServerThread serverThread = new ServerThread(socket);
+			ServerThread serverThread = new ServerThread(socket, password);
 			executorService.execute(serverThread);
 		}
 

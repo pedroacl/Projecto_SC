@@ -298,6 +298,12 @@ public class SecurityUtils {
 	 */
 	public static byte[] generateFileMac(String filePath, String password) {
 		byte[] digest = null;
+		
+		File file = new File(filePath);
+
+		if (!file.exists()) {
+			return null;
+		}
 
 		try {
 			// byte[] salt = { (byte) 0xc9, (byte) 0x36, (byte) 0x78, (byte) 0x99, (byte) 0x52, (byte) 0x3e, (byte) 0xea,
@@ -343,21 +349,26 @@ public class SecurityUtils {
 	}
 	
 	/**
-	 * 
-	 * @param filePath
+	 * Atualiza o código MAC presente no ficheiro ficheiro de utilizadores
+	 * @param usersFilePath Localização do ficheiro de utilizadores
+	 * @param serverPassword Password do servidor utilizada para gerar o MAC
 	 */
-	public static void updateFileMac(String filePath, String password) {
-		// TODO testar
+	public static void updateFileMac(String usersFilePath, String serverPassword) {
+		File file = new File(usersFilePath);
+		
+		if (!file.exists()) {
+			createMacFile(usersFilePath, serverPassword);
+		}
 
 		try {
-			String macFilePath = filePath + ".mac";
+			String macFilePath = usersFilePath + ".mac";
 			File usersMACFile = new File(macFilePath);
 
 			// abrir ficheiro em modo overwrite
 			FileWriter fileWriter = new FileWriter(usersMACFile, false);
 
 			// obter novo MAC
-			byte[] fileMac = SecurityUtils.generateFileMac(macFilePath, password);
+			byte[] fileMac = SecurityUtils.generateFileMac(macFilePath, serverPassword);
 
 			// guardar novo MAC
 			fileWriter.write(MiscUtil.bytesToHex(fileMac));
@@ -369,5 +380,36 @@ public class SecurityUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Cria um ficheiro que irá guardar o MAC do ficheiro de utilizadores
+	 * @param usersFilePath Localização do ficheiro de utilizadores
+	 * @param serverPassword Password do servidor usada para gerar o MAC
+	 * @return Devolve true caso o ficheiro tenha sido criado e false caso já exista
+	 */
+	public static boolean createMacFile(String usersFilePath, String serverPassword) {
+		File file = new File(usersFilePath);
+
+		if (file.exists()) {
+			return false;
+		}
+
+		try {
+			// abrir ficheiro em modo overwrite
+			FileWriter fileWriter = new FileWriter(file, false);
+			
+			// obter mac do ficheiro de utilizadores
+			byte[] fileMac = generateFileMac(usersFilePath, serverPassword);
+			
+			// guardar mac
+			fileWriter.write(MiscUtil.bytesToHex(fileMac));
+			fileWriter.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return true;
 	}
 }

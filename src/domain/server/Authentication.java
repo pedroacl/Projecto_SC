@@ -20,8 +20,6 @@ import util.MiscUtil;
  */
 public class Authentication {
 
-	private static final String SERVER_PASSWORD = "password";
-
 	private static Authentication authentication = new Authentication();
 
 	private static UserService userService;
@@ -51,7 +49,7 @@ public class Authentication {
 	 * @return False caso a password esteja errada
 	 * @requires username != null && password != null
 	 */
-	public boolean authenticateUser(String username, String password) {
+	public boolean authenticateUser(String username, String password, String serverPassword) {
 		// validade do ficheiro comprometida
 		if (!validateUsersFileMac("users.txt", password))
 			return false;
@@ -63,7 +61,7 @@ public class Authentication {
 			System.out.println("User nao existe. Adicionar " + username + "!");
 
 			// adicionar user e atualizar MAC do ficheiro de passwords
-			userService.addUser(username, password);
+			userService.addUser(username, password, serverPassword);
 			SecurityUtils.updateFileMac("users.txt.mac", password);
 		} else {
 			System.out.println("Authentication - User existe!");
@@ -142,10 +140,12 @@ public class Authentication {
 	 *            Palavra passe do utilizador
 	 * @requires username != null && password != null
 	 */
-	public void addUser(String username, String password) {
+	/*
+	public void addUser(String username, String userPassword, String serverPassword) {
 		if (userService.getUserPasswordAndSalt(username) == null)
-			userService.addUser(username, password);
+			userService.addUser(username, userPassword);
 
-		SecurityUtils.updateFileMac("users.txt", SERVER_PASSWORD);
+		SecurityUtils.updateFileMac("users.txt", serverPassword);
 	}
+	*/
 }

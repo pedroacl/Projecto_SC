@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
+import security.SecurityUtils;
 import util.PersistenceUtil;
 
 /**
@@ -42,7 +43,6 @@ public class UserDAO {
 			System.out.println("Nao existem utilizadores adicionados.");
 			return users;
 		}
-
 		try {
 			FileReader fr = new FileReader(file);
 			br = new BufferedReader(fr);
@@ -82,7 +82,7 @@ public class UserDAO {
 	 *         contrário
 	 * @requires username != null && password != null
 	 */
-	public void addUser(String username, String saltAndHashedPassword) {
+	public void addUser(String username, String saltAndHashedPassword, String serverPassword) {
 		// atualizar ficheiro
 		try {
 			FileWriter fw = new FileWriter("users.txt", true);
@@ -91,6 +91,8 @@ public class UserDAO {
 
 			// criar directorias
 			PersistenceUtil.createFile("users/" + username + "/conversations");
+			
+			SecurityUtils.updateFileMac("users.txt", serverPassword);
 
 		} catch (IOException e) {
 			e.printStackTrace();

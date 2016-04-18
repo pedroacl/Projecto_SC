@@ -21,7 +21,7 @@ public class UserService {
 		return users;
 	}
 
-	public void addUser(String username, String password) {
+	public void addUser(String username, String password, String serverPassword) {
 		// adicionar salt ah password
 		int salt = SecurityUtils.generateSalt();
 		String saltString = Integer.toString(salt);
@@ -40,7 +40,7 @@ public class UserService {
 		users.put(username, sb.toString());
 		
 		// persistir utilizador
-		userDAO.addUser(username, sb.toString());
+		userDAO.addUser(username, sb.toString(), serverPassword);
 	}
 
 	public String[] getUserPasswordAndSalt(String username) {
