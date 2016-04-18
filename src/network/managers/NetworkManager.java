@@ -8,6 +8,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import javax.crypto.SecretKey;
+
+import network.messages.ChatMessage;
+import network.messages.ClientNetworkMessage;
 import network.messages.MessageType;
 import network.messages.NetworkMessage;
 
@@ -139,7 +143,7 @@ public abstract class NetworkManager {
 	 *         false caso contrário
 	 * @require message != null
 	 */
-	public abstract boolean sendFile(NetworkMessage message);
+	public abstract boolean sendFile(NetworkMessage message, SecretKey key);
 
 	/**
 	 * Envia uma mensagem pela rede
@@ -148,11 +152,7 @@ public abstract class NetworkManager {
 	 *            Mensagem a ser enviada
 	 */
 	public boolean sendMessage(NetworkMessage message) {
-
-		if (message.getMessageType().equals(MessageType.FILE))
-			return sendFile(message);
-		else
-			return send(message);
+		return send(message);
 	}
 
 	/**
@@ -161,7 +161,7 @@ public abstract class NetworkManager {
 	 * @param fileSize
 	 * @throws IOException
 	 */
-	protected void sendByteFile(String name, int fileSize) throws IOException {
+	protected void sendByteFile(String name, int fileSize, SecretKey Key) throws IOException {
 		int packageSize = PACKAGE_SIZE;
 
 		FileInputStream fileInputStream = new FileInputStream(name);
@@ -181,5 +181,9 @@ public abstract class NetworkManager {
 
 		out.flush();
 		fileInputStream.close();
+	}
+	
+	public boolean sendMessageAndFile(ChatMessage chatMessage, SecretKey key) {
+		return sendMessage(chatMessage) && sendFile(chatMessage,key) ;
 	}
 }

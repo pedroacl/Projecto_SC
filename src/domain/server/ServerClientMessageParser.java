@@ -69,10 +69,12 @@ public class ServerClientMessageParser {
 
 		// erro de autenticacao
 		if (!authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword())) {
-			ServerNetworkContactTypeMessage auxMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
-			auxMessage.setContent("Password errada");
+			
+			//preenche sermessage com indicaçao do erro
+			serverMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
+			serverMessage.setContent("Password errada");
+			
 			System.out.println("Server - Password errada!");
-			serverMessage = auxMessage;
 
 			return serverMessage;
 		}
@@ -88,8 +90,8 @@ public class ServerClientMessageParser {
 			// destinatario eh um utilizador ou grupo
 			if (authentication.existsUser(clientMessage.getDestination())) {
 				System.out.println("Server - MESSAGE - Existe utilizador");
-				ServerNetworkContactTypeMessage serverContactTypeMessage = new ServerNetworkContactTypeMessage(
-						MessageType.CONTACT);
+				ServerNetworkContactTypeMessage serverContactTypeMessage = 
+						new ServerNetworkContactTypeMessage(MessageType.CONTACT);
 
 				serverContactTypeMessage.addGroupMember(clientMessage.getDestination(),
 						SecurityUtils.getCertificate(clientMessage.getDestination()));

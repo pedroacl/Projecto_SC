@@ -3,6 +3,8 @@ package network.managers;
 import java.io.IOException;
 import java.net.Socket;
 
+import javax.crypto.SecretKey;
+
 import network.messages.NetworkMessage;
 
 public class ServerNetworkManager extends NetworkManager {
@@ -24,7 +26,7 @@ public class ServerNetworkManager extends NetworkManager {
 	}
 
 	@Override
-	public boolean sendFile(NetworkMessage message) {
+	public boolean sendFile(NetworkMessage message, SecretKey key) {
 		boolean isValid = false;
 	
 		String filePath = message.getContent();
@@ -35,7 +37,7 @@ public class ServerNetworkManager extends NetworkManager {
 		isValid = true;
 		
 		try {
-			sendByteFile(filePath, message.getFileSize());
+			sendByteFile(filePath, message.getFileSize(),key);
 		} catch (IOException e) {
 			isValid = false;
 			e.printStackTrace();

@@ -160,7 +160,7 @@ public class ClientRequestManager {
 				chatMessage.putUserKey(parsedRequest.getUsername(), wrappedSecretKey);
 
 				// enviar mensagem
-				clientNetworkManager.sendMessage(chatMessage);
+				clientNetworkManager.sendMessageAndFile(chatMessage, secretKey);
 
 				// espera resposta
 				networkMessage = (NetworkMessage) clientNetworkManager.receiveMessage();
