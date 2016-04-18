@@ -26,11 +26,6 @@ public class ConversationService {
 	}
 
 	public Long addChatMessage(ChatMessage chatMessage) {
-		// guardar chave privada associada ah mensagem
-		String fileName = Long.toString(chatMessage.getCreatedAt().getTime());
-		conversationDAO.saveUserFilePrivateKey(chatMessage.getFromUser(), fileName, chatMessage.getContent());
-		conversationDAO.saveUserFilePrivateKey(chatMessage.getDestination(), fileName, chatMessage.getContent());
-
 		return conversationDAO.addChatMessage(chatMessage);
 	}
 

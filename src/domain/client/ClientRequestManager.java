@@ -39,8 +39,8 @@ public class ClientRequestManager {
 		
 		/* 
 		 * C --------AUTH------------> S
-		 *   <------Contact/NOK-------                         
-		 *   ----AD,Ks(M),Kp(Ks)----->
+		 *   <------Contact/NOK------- (ServerNetworkContactTypeMessage)
+		 *   ----AD,Ks(M),Kp(Ks)-----> (ChatMessage)
 		 *   <-------OK/NOK----------
 		 */
 		

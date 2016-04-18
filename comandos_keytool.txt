@@ -18,7 +18,7 @@
 # Exportar certificado do servidor
 /usr/lib/jvm/java-8-oracle/bin/keytool -exportcert -alias server -keystore keystore.servidor -file server_cert.cer
 
-# Importar certificado do servidor 
+# Importar certificado do servidor
 /usr/lib/jvm/java-8-oracle/bin/keytool -importcert -alias server -keystore truststore.cliente -file server_cert.cer
 
 # Print do certificado

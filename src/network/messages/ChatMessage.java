@@ -11,20 +11,23 @@ public class ChatMessage extends NetworkMessage {
 	 */
 	private static final long serialVersionUID = -2504265010288468745L;
 
+	// assinatura da mensagem
 	private byte[] signature;
 
+	// mensagem cifrada
 	private byte[] message;
 	
 	private String fromUser;
 	
 	private String destination;
 
+	// username->chave secreta cifrada com a sua chave publica 
 	private HashMap<String, byte[]> users;
 	
 	private Date createdAt;
 	
-	public ChatMessage(MessageType pgpMessage) {
-		super(pgpMessage);
+	public ChatMessage(MessageType chatMessage) {
+		super(chatMessage);
 		users = new HashMap<>();
 		createdAt = new Date();
 	}
@@ -47,6 +50,10 @@ public class ChatMessage extends NetworkMessage {
 	
 	public Set<String> getUsers() {
 		return users.keySet();
+	}
+	
+	public byte[] getUserKey(String username) {
+		return users.get(username);
 	}
 
 	public void putUserKey(String user, byte[] key) {

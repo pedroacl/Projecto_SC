@@ -11,6 +11,7 @@ import entities.Conversation;
 import factories.ConversationFactory;
 import network.messages.ChatMessage;
 import network.messages.MessageType;
+import util.MiscUtil;
 import util.PersistenceUtil;
 
 /**
@@ -95,18 +96,24 @@ public class ConversationDAO {
 		if (chatMessage.getMessageType().equals(MessageType.FILE)) {
 			// verifica se existe a pasta files na directoria da conversa
 			File fileDirectory = new File("conversations/" + conversation.getId() + "/files");
+			
 			if (!fileDirectory.exists())
 				PersistenceUtil.createDir("conversations/" + conversation.getId() + "/files");
 		}
 
 		// persiste mensagem
-		String pathToTxt = "conversations/" + conversation.getId() + "/messages/"
-				+ chatMessage.getCreatedAt().getTime();
+		String messageFileName = Long.toString(chatMessage.getCreatedAt().getTime());
+		String pathToTxt = "conversations/" + conversation.getId() + "/messages/" + messageFileName;	
 
 		PersistenceUtil.createFile(pathToTxt);
 		PersistenceUtil.writeStringToFile(chatMessage.getFromUser() + "\n" + chatMessage.getDestination() + "\n"
 				+ chatMessage.getMessageType() + "\n" + chatMessage.getContent(), pathToTxt);
 
+		// TODO persistir chave para cada utilizador TESTAR
+		for (String username: chatMessage.getUsers()) {
+			saveUserChatMessageKey(username, messageFileName, chatMessage.getUserKey(username));
+		}
+		
 		return conversation.getId();
 	}
 
@@ -379,13 +386,13 @@ public class ConversationDAO {
 	 * @param fileName
 	 * @param privateKey
 	 */
-	public void saveUserFilePrivateKey(String username, String fileName, String privateKey) {
+	public void saveUserChatMessageKey(String username, String fileName, byte[] privateKey) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("keys/");
 		sb.append(fileName);
 		sb.append(".key.");
 		sb.append(username);
 
-		PersistenceUtil.writeStringToFile(privateKey, sb.toString());
+		PersistenceUtil.writeStringToFile(MiscUtil.bytesToHex(privateKey), sb.toString());
 	}
 }
