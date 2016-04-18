@@ -91,7 +91,6 @@ public class UserDAO {
 
 			// criar directorias
 			PersistenceUtil.createFile("users/" + username + "/conversations");
-			
 			SecurityUtils.updateFileMac("users.txt", serverPassword);
 
 		} catch (IOException e) {

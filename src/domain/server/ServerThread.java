@@ -2,6 +2,7 @@ package domain.server;
 
 import java.net.Socket;
 
+import exceptions.InvalidMacException;
 import network.managers.ServerNetworkManager;
 import network.messages.ClientNetworkMessage;
 
@@ -34,6 +35,10 @@ public class ServerThread extends Thread {
 		ServerClientMessageParser clientMessageParser = new ServerClientMessageParser(clientMessage,
 				serverNetworkManager, this.password);
 
-		clientMessageParser.processRequest();
+		try {
+			clientMessageParser.processRequest();
+		} catch (InvalidMacException e) {
+			e.printStackTrace();
+		}
 	}
 }

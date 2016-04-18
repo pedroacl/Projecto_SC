@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
+import exceptions.InvalidMacException;
 import network.managers.ServerNetworkManager;
 import network.messages.ChatMessage;
 import network.messages.ClientNetworkMessage;
@@ -25,29 +26,30 @@ import service.GroupService;
  */
 public class ServerClientMessageParser {
 
-	private ClientNetworkMessage clientMessage;
+	private ClientNetworkMessage	clientMessage;
 
-	private Authentication authentication;
+	private Authentication			authentication;
 
-	private GroupService groupService;
+	private GroupService			groupService;
 
-	private ConversationService conversationService;
+	private ConversationService		conversationService;
 
-	private ServerNetworkManager serverNetworkManager;
+	private ServerNetworkManager	serverNetworkManager;
 
-	private final int MAX_FILE_SIZE = Integer.MAX_VALUE;
-	
-	private final String USERS_MAC_FILE = "users.mac.txt";
-	
-	private String serverPassword;
+	private final int				MAX_FILE_SIZE	= Integer.MAX_VALUE;
 
-	public ServerClientMessageParser(ClientNetworkMessage clientMessage, ServerNetworkManager serverNetworkManager, String serverPassword) {
+	private final String			USERS_MAC_FILE	= "users.mac.txt";
+
+	private String					serverPassword;
+
+	public ServerClientMessageParser(ClientNetworkMessage clientMessage, ServerNetworkManager serverNetworkManager,
+			String serverPassword) {
 		this.clientMessage = clientMessage;
 		authentication = Authentication.getInstance();
 
 		conversationService = new ConversationService();
 		groupService = GroupService.getInstance();
-		
+
 		this.serverPassword = serverPassword;
 
 		this.serverNetworkManager = serverNetworkManager;
@@ -58,24 +60,26 @@ public class ServerClientMessageParser {
 	 * resposta
 	 * 
 	 * @return ServerMessage com a resposta do servidor ao cliente
+	 * @throws Exception 
 	 */
-	public NetworkMessage processRequest() {
+	public NetworkMessage processRequest() throws InvalidMacException {
 		NetworkMessage serverMessage = null;
 
 		System.out.println("Server - Recebi msg");
-		
+
 		// validar MAC do ficheiro de utilizadores
-		if (authentication.validateUsersFileMac(USERS_MAC_FILE, clientMessage.getPassword())) {
-			
+		if (!authentication.validateUsersFileMac(USERS_MAC_FILE, serverPassword)) {
+				throw new InvalidMacException("Integridade do ficheiro MAC comprometida!");
 		}
 
 		// erro de autenticacao
-		if (!authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword(), serverPassword)) {
-			
-			//preenche sermessage com indicaçao do erro
+		if (!authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword(),
+				serverPassword)) {
+
+			// preenche sermessage com indicaçao do erro
 			serverMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
 			serverMessage.setContent("Password errada");
-			
+
 			System.out.println("Server - Password errada!");
 
 			return serverMessage;
@@ -91,15 +95,16 @@ public class ServerClientMessageParser {
 
 			// destinatario eh um utilizador ou grupo
 			if (authentication.existsUser(clientMessage.getDestination())) {
+
 				System.out.println("Server - MESSAGE - Existe utilizador");
-				ServerNetworkContactTypeMessage serverContactTypeMessage = 
-						new ServerNetworkContactTypeMessage(MessageType.CONTACT);
+
+				ServerNetworkContactTypeMessage serverContactTypeMessage = new ServerNetworkContactTypeMessage(
+						MessageType.CONTACT);
 
 				serverContactTypeMessage.addGroupMember(clientMessage.getDestination(),
 						SecurityUtils.getCertificate(clientMessage.getDestination()));
 
 				serverMessage = serverContactTypeMessage;
-				
 
 				// group
 			} else if (groupService.existsGroup(clientMessage.getDestination())) {
@@ -123,7 +128,7 @@ public class ServerClientMessageParser {
 
 			serverNetworkManager.sendMessage(serverMessage);
 			ChatMessage clientPGPMessage = (ChatMessage) serverNetworkManager.receiveMessage();
-			
+
 			System.out.println("Server - ClientPGPMessageType: " + clientPGPMessage.getMessageType());
 			System.out.println("Server - Mensagem: " + clientPGPMessage.getMessage());
 
