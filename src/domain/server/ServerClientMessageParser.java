@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.KeyPair;
+import java.security.PrivateKey;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import exceptions.InvalidMacException;
 import network.managers.ServerNetworkManager;
 import network.messages.ChatMessage;
 import network.messages.ClientNetworkMessage;
@@ -26,33 +29,33 @@ import service.GroupService;
  */
 public class ServerClientMessageParser {
 
-	private ClientNetworkMessage	clientMessage;
+	private ClientNetworkMessage clientMessage;
 
-	private Authentication			authentication;
+	private Authentication authentication;
 
-	private GroupService			groupService;
+	private GroupService groupService;
 
-	private ConversationService		conversationService;
+	private ConversationService conversationService;
 
-	private ServerNetworkManager	serverNetworkManager;
+	private ServerNetworkManager serverNetworkManager;
+	
+	private String serverPassword;
 
-	private final int				MAX_FILE_SIZE	= Integer.MAX_VALUE;
+	private final int MAX_FILE_SIZE = Integer.MAX_VALUE;
+	
+	private final String USERS_MAC_FILE = "users.mac.txt";
 
-	private final String			USERS_MAC_FILE	= "users.mac.txt";
-
-	private String					serverPassword;
-
-	public ServerClientMessageParser(ClientNetworkMessage clientMessage, ServerNetworkManager serverNetworkManager,
-			String serverPassword) {
+	public ServerClientMessageParser(ClientNetworkMessage clientMessage, 
+			ServerNetworkManager serverNetworkManager, String serverPassword) {
 		this.clientMessage = clientMessage;
 		authentication = Authentication.getInstance();
 
 		conversationService = new ConversationService();
 		groupService = GroupService.getInstance();
 
-		this.serverPassword = serverPassword;
-
 		this.serverNetworkManager = serverNetworkManager;
+		
+		this.serverPassword = serverPassword;
 	}
 
 	/**
@@ -60,26 +63,24 @@ public class ServerClientMessageParser {
 	 * resposta
 	 * 
 	 * @return ServerMessage com a resposta do servidor ao cliente
-	 * @throws Exception 
 	 */
-	public NetworkMessage processRequest() throws InvalidMacException {
+	public NetworkMessage processRequest() {
 		NetworkMessage serverMessage = null;
 
 		System.out.println("Server - Recebi msg");
-
+		
 		// validar MAC do ficheiro de utilizadores
-		if (!authentication.validateUsersFileMac(USERS_MAC_FILE, serverPassword)) {
-				throw new InvalidMacException("Integridade do ficheiro MAC comprometida!");
+		if (authentication.validateUsersFileMac(USERS_MAC_FILE, clientMessage.getPassword())) {
+			
 		}
 
 		// erro de autenticacao
-		if (!authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword(),
-				serverPassword)) {
-
-			// preenche sermessage com indicaçao do erro
+		if (!authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword(), serverPassword)) {
+			
+			//preenche sermessage com indicaçao do erro
 			serverMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
 			serverMessage.setContent("Password errada");
-
+			
 			System.out.println("Server - Password errada!");
 
 			return serverMessage;
@@ -88,64 +89,45 @@ public class ServerClientMessageParser {
 		System.out.println("Server - " + clientMessage);
 
 		switch (clientMessage.getMessageType()) {
+		
 		// mensagem de texto
 		case MESSAGE:
-			System.out.println("Server - Message");
-			// serverMessage = saveMessage();
-
-			// destinatario eh um utilizador ou grupo
-			if (authentication.existsUser(clientMessage.getDestination())) {
-
-				System.out.println("Server - MESSAGE - Existe utilizador");
-
-				ServerNetworkContactTypeMessage serverContactTypeMessage = new ServerNetworkContactTypeMessage(
-						MessageType.CONTACT);
-
-				serverContactTypeMessage.addGroupMember(clientMessage.getDestination(),
-						SecurityUtils.getCertificate(clientMessage.getDestination()));
-
-				serverMessage = serverContactTypeMessage;
-
-				// group
-			} else if (groupService.existsGroup(clientMessage.getDestination())) {
-				ServerNetworkContactTypeMessage serverContactTypeMessage = new ServerNetworkContactTypeMessage(
-						MessageType.CONTACT);
-				// serverMessage = new
-				// ServerContactTypeMessage(MessageType.CONTACT);
-
-				serverContactTypeMessage.addGroupMember("jose", null);
-				serverContactTypeMessage.addGroupMember("pedro", null);
-				serverContactTypeMessage.addGroupMember("antonio", null);
-
-				serverMessage = serverContactTypeMessage;
-				// serverMessage.setGroupMembers(groupMembers);
-
-				// contacto
-			} else {
-				serverMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
-				serverMessage.setContent("Não existe esse contact");
-			}
-
-			serverNetworkManager.sendMessage(serverMessage);
-			ChatMessage clientPGPMessage = (ChatMessage) serverNetworkManager.receiveMessage();
-
-			System.out.println("Server - ClientPGPMessageType: " + clientPGPMessage.getMessageType());
-			System.out.println("Server - Mensagem: " + clientPGPMessage.getMessage());
-
+			
+			serverMessage = verifyContactType();
+			
+			if(!serverMessage.getMessageType().equals(MessageType.NOK))
+				//envia mensagem com indicaçao grupo ou utilizador
+				serverNetworkManager.sendMessage(serverMessage);
+				
+				//espera nova mensagem com AD, Ks(M), e Map<user,Kpub(Ks)>
+				ChatMessage clientPGPMessage = (ChatMessage) serverNetworkManager.receiveMessage();
+				clientPGPMessage.setCreatedAt(new Date());
+				
+				//guarda a mensagem
+				conversationService.addChatMessage(clientPGPMessage);
+				
+				System.out.println("Server - ClientPGPMessageType: " + clientPGPMessage.getMessageType());
+				System.out.println("Server - Mensagem: " + clientPGPMessage.getMessage());
+				
+				//cria message de resposta ok-> tudo correu bem
+				serverMessage = new ServerNetworkContactTypeMessage(MessageType.OK);
 			break;
+			
 		// mensagem contendo um ficheiro
 		case FILE:
 			serverMessage = receiveFile();
 			break;
 		// mensagem contendo diversas mensagens
 		case RECEIVER:
+			
 			switch (clientMessage.getContent()) {
+			
 			// mensagem mais recente com cada utilizador
 			case "recent":
 				ArrayList<Long> ids = conversationService.getAllConversationsFrom(clientMessage.getUsername());
 				ArrayList<ChatMessage> recent = new ArrayList<ChatMessage>();
 				for (long id : ids) {
-					recent.add(conversationService.getLastChatMessage(id));
+					recent.add(conversationService.getLastChatMessage(id));//TODO tb preencher AD e Ks
 				}
 				serverMessage = new ServerMessage(MessageType.LAST_MESSAGES);
 				// serverMessage.setMessages(recent);
@@ -164,7 +146,7 @@ public class ServerClientMessageParser {
 					// se existir conversa em comum
 					if (conversationId != -1) {
 						ArrayList<ChatMessage> messages = (ArrayList<ChatMessage>) conversationService
-								.getAllMessagesFromConversation(conversationId);
+								.getAllMessagesFromConversation(conversationId); // TODO prencher AD e KS
 
 						serverMessage = new ServerMessage(MessageType.CONVERSATION);
 						// serverMessage.setMessages(messages);
@@ -193,6 +175,9 @@ public class ServerClientMessageParser {
 						serverMessage = new ServerMessage(MessageType.FILE);
 						serverMessage.setFileSize((int) file.length());
 						serverMessage.setContent(path);
+						//get assinatura digital
+						//get SecretKey cifrada com publicKey
+						
 
 					} else {
 						serverMessage = new ServerMessage(MessageType.NOK);
@@ -280,37 +265,97 @@ public class ServerClientMessageParser {
 
 		return serverMessage;
 	}
+	
+	private NetworkMessage verifyContactType() {
+		
+		NetworkMessage serverMessage;
+		
+			// destinatario eh um utilizador
+		if (authentication.existsUser(clientMessage.getDestination())) {
+			System.out.println("Server - MESSAGE - Existe utilizador");
+			ServerNetworkContactTypeMessage serverContactTypeMessage = 
+					new ServerNetworkContactTypeMessage(MessageType.CONTACT);
+
+			serverContactTypeMessage.addGroupMember(clientMessage.getDestination(),
+					SecurityUtils.getCertificate(clientMessage.getDestination()));
+
+			serverMessage = serverContactTypeMessage;
+			
+
+		//distinataio é um gropo
+		} else if (groupService.existsGroup(clientMessage.getDestination())) {
+			
+			ServerNetworkContactTypeMessage serverContactTypeMessage = new ServerNetworkContactTypeMessage(
+					MessageType.CONTACT);
+
+			//obter membros do grupo
+			List<String> members = groupService.getGroupMembers(clientMessage.getDestination());
+			
+			//iterar sobre a lista de membros 
+			//colocando-os com o respectivo Certificados na hashMap da Message
+			//TODO
+			
+			/*
+			serverContactTypeMessage.addGroupMember("jose", null);
+			serverContactTypeMessage.addGroupMember("pedro", null);
+			serverContactTypeMessage.addGroupMember("antonio", null);
+			*/
+			serverMessage = serverContactTypeMessage;
+			// serverMessage.setGroupMembers(groupMembers);
+
+		// destinatario nao existe
+		} else {
+			serverMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
+			serverMessage.setContent("Não existe esse contact");
+		}
+		
+		return serverMessage;	
+	}
 
 	/**
-	 * Função que guarda um ficheiro vindo do utilizador
+	 * Função que  recebe e guarda um ficheiro vindo do utilizador
+	 * Servidor                     Cliente
+	 *     <---------AUTH-------------
+	 *     --------CONTACT/NOK------->
+	 *     <--FILE: AD, Ks, SizeFile---
+	 *     -----------OK/NOK---------->
+	 *     <---------Ks(FILE)----------
+	 *     --------------------------->
+	 *        
 	 */
-	private ServerMessage receiveFile() {
+	private NetworkMessage receiveFile() {
 
-		ServerMessage serverMessage;
+		NetworkMessage serverMessage;
 
-		// verifica se o user de destino existe e que o ficheiro tem tamnho
-		// válido
-		if ((authentication.existsUser(clientMessage.getDestination())
-				|| groupService.existsGroup(clientMessage.getDestination()))
-				&& clientMessage.getFileSize() < MAX_FILE_SIZE) {
-
+		// destinatario eh um utilizador ou grupo
+		serverMessage = verifyContactType();
+		
+		if(!serverMessage.getMessageType().equals(MessageType.NOK)) {
+			//envia mensagem com indicaçao grupo ou utilizador
+			serverNetworkManager.sendMessage(serverMessage);
+			
+			//espera nova mensagem com AD,e Map<user,Kpub(Ks)>, e SizeFile
+			//espera pelo ficheiro
+			ChatMessage clientPGPMessage = (ChatMessage) serverNetworkManager.receiveMessage();
+			clientPGPMessage.setCreatedAt(new Date());
+			
 			// obter nome do ficheiro
-			String fileName = extractName(clientMessage.getContent());
-
-			// cria chatMessage para persistir
-			ChatMessage chatMessage = new ChatMessage(MessageType.FILE);
-			chatMessage.setFromUser(clientMessage.getUsername());
-			chatMessage.setDestination(clientMessage.getDestination());
-			chatMessage.setContent(clientMessage.getContent());
-
+			String fileName = extractName(clientPGPMessage.getContent());
+			
+			//guarda a mensagem
+			conversationService.addChatMessage(clientPGPMessage);
+			
 			// persiste chatMessage
-			Long conversationID = conversationService.addChatMessage(chatMessage);
+			Long conversationID = conversationService.addChatMessage(clientPGPMessage);
 			String path = conversationService.getFilePath(fileName, conversationID);
-
+			
 			// confirma ao cliente que é possivel receber o ficheiro
 			serverMessage = new ServerMessage(MessageType.OK);
 			serverNetworkManager.sendMessage(serverMessage);
-
+			
+			System.out.println("Server - ClientPGPMessageType: " + clientPGPMessage.getMessageType());
+			System.out.println("Server - Mensagem: " + clientPGPMessage.getMessage());
+			
 			// recebe ficheiro
 			File file = null;
 
@@ -323,54 +368,15 @@ public class ServerClientMessageParser {
 			// verifica se o ficheiro foi bem recebido
 			if (file.length() >= clientMessage.getFileSize())
 				serverMessage = new ServerMessage(MessageType.OK);
+			
 			else {
 				serverMessage = new ServerMessage(MessageType.NOK);
 				serverMessage.setContent("Ficheiro com erro");
-
-				// Apagar ficheiro corrompido???
-				Path pathFile = file.toPath();
-				try {
-					Files.deleteIfExists(pathFile);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				//APAGAR FICHEIRO e DADOS DESTA ULTIMA MESSAGEM?
 			}
-		} else {
-			serverMessage = new ServerMessage(MessageType.NOK);
-			serverMessage.setContent("Não existe esse contact");
 		}
-
+			
 		return serverMessage;
 	}
 
-	/**
-	 * Função que processa e guarda um mensagem do utilizador
-	 */
-
-	private ServerMessage saveMessage() {
-
-		ServerMessage serverMessage;
-
-		// destinatario eh um utilizador ou grupo
-		if (authentication.existsUser(clientMessage.getDestination())
-				|| groupService.existsGroup(clientMessage.getDestination())) {
-
-			// cria chatMessage a guardar
-			ChatMessage chatMessage = new ChatMessage(MessageType.MESSAGE);
-			chatMessage.setFromUser(clientMessage.getUsername());
-			chatMessage.setDestination(clientMessage.getDestination());
-			chatMessage.setContent(clientMessage.getContent());
-
-			// persiste chatMessage
-			conversationService.addChatMessage(chatMessage);
-			serverMessage = new ServerMessage(MessageType.OK);
-
-			// destinatario nao existe
-		} else {
-			serverMessage = new ServerMessage(MessageType.NOK);
-			serverMessage.setContent("Não existe esse contact");
-		}
-
-		return serverMessage;
-	}
 }

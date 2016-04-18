@@ -1,6 +1,7 @@
 package service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import dao.GroupDAO;
@@ -137,5 +138,10 @@ public class GroupService {
 	public Long createGroup(String groupName, String admin) {
 		groups.put(groupName, admin);
 		return groupDAO.createGroup(groupName, admin);
+	}
+
+	public List<String> getGroupMembers(String groupName) {
+		Group grupo = groupDAO.getGroup(groupName);
+		return grupo.getUsers() ;
 	}
 }

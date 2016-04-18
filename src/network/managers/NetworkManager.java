@@ -183,7 +183,4 @@ public abstract class NetworkManager {
 		fileInputStream.close();
 	}
 	
-	public boolean sendMessageAndFile(ChatMessage chatMessage, SecretKey key) {
-		return sendMessage(chatMessage) && sendFile(chatMessage,key) ;
-	}
 }
