@@ -71,7 +71,9 @@ public class ServerClientMessageParser {
 		
 		// validar MAC do ficheiro de utilizadores
 		if (authentication.validateUsersFileMac(USERS_MAC_FILE, clientMessage.getPassword())) {
-			
+			serverMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
+			serverMessage.setContent("Servidor Comprometido");
+			return serverMessage;
 		}
 
 		// erro de autenticacao
@@ -94,56 +96,17 @@ public class ServerClientMessageParser {
 		
 		// mensagem de texto
 		case MESSAGE:
-			System.out.println("Server - Message");
-			// serverMessage = saveMessage();
-
+			
 			// destinatario eh um utilizador ou grupo
-			if (authentication.existsUser(clientMessage.getDestination())) {
-				System.out.println("Server - MESSAGE - Existe utilizador");
-				ServerNetworkContactTypeMessage serverContactTypeMessage = 
-						new ServerNetworkContactTypeMessage(MessageType.CONTACT);
-
-				serverContactTypeMessage.addGroupMember(clientMessage.getDestination(),
-						SecurityUtils.getCertificate(clientMessage.getDestination()));
-
-				serverMessage = serverContactTypeMessage;
-				
-
-				// group
-			} else if (groupService.existsGroup(clientMessage.getDestination())) {
-				ServerNetworkContactTypeMessage serverContactTypeMessage = new ServerNetworkContactTypeMessage(
-						MessageType.CONTACT);
-				// serverMessage = new
-				// ServerContactTypeMessage(MessageType.CONTACT);
-
-				serverContactTypeMessage.addGroupMember("jose", null);
-				serverContactTypeMessage.addGroupMember("pedro", null);
-				serverContactTypeMessage.addGroupMember("antonio", null);
-
-				serverMessage = serverContactTypeMessage;
-				// serverMessage.setGroupMembers(groupMembers);
-
-				// contacto
-			} else {
-				serverMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
-				serverMessage.setContent("Não existe esse contact");
-			}
-
-			serverNetworkManager.sendMessage(serverMessage);
-			ChatMessage clientPGPMessage = (ChatMessage) serverNetworkManager.receiveMessage();
-			
-			System.out.println("Server - ClientPGPMessageType: " + clientPGPMessage.getMessageType());
-			System.out.println("Server - Mensagem: " + clientPGPMessage.getMessage());
-
-			
 			serverMessage = verifyContactType();
 			
+
 			if(!serverMessage.getMessageType().equals(MessageType.NOK))
 				//envia mensagem com indicaçao grupo ou utilizador
 				serverNetworkManager.sendMessage(serverMessage);
 				
 				//espera nova mensagem com AD, Ks(M), e Map<user,Kpub(Ks)>
-				clientPGPMessage = (ChatMessage) serverNetworkManager.receiveMessage();
+				ChatMessage clientPGPMessage = (ChatMessage) serverNetworkManager.receiveMessage();
 				clientPGPMessage.setCreatedAt(new Date());
 				
 				//guarda a mensagem

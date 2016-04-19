@@ -56,6 +56,7 @@ public class ServerResponseParser {
 			break;
 
 		// receber um ficheiro
+			/*
 		case FILE:
 			try {
 				clientNetwork.receiveFile(serverMessage.getFileSize(), serverMessage.getContent());
@@ -64,6 +65,7 @@ public class ServerResponseParser {
 				e.printStackTrace();
 			}
 			break;
+			*/
 
 		// mensagem do servidor mal formatada
 		default:

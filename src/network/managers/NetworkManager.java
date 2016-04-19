@@ -17,13 +17,13 @@ import network.messages.NetworkMessage;
 
 public abstract class NetworkManager {
 	
-	private static final int PACKAGE_SIZE = 1024;
+	protected static final int PACKAGE_SIZE = 1024;
 
-	private Socket socket;
+	protected Socket socket;
 
-	private ObjectInputStream in;
+	protected ObjectInputStream in;
 
-	private ObjectOutputStream out;
+	protected ObjectOutputStream out;
 
 	public NetworkManager() {
 
@@ -43,6 +43,7 @@ public abstract class NetworkManager {
 			e.printStackTrace();
 		}
 	}
+	
 
 	/**
 	 * Função que pertmite fechar o socket do cliente atual
@@ -74,44 +75,8 @@ public abstract class NetworkManager {
 		return networkMessage;
 	}
 
-	/**
-	 * Obtem um ficheiro enviado pela rede baseado no seu nome e tamanho
-	 * 
-	 * @param fileSize
-	 *            Tamanho do ficheiro
-	 * @param name
-	 *            Nome do ficheiro
-	 * @return Ficheiro recebido pela rede
-	 * @throws IOException
-	 * @requires fileSize >= 0 && name != null
-	 */
-	public File receiveFile(int fileSize, String name) throws IOException {
-
-		File file = new File(name);
-		FileOutputStream fileOut = new FileOutputStream(file);
-
-		int packageSize = PACKAGE_SIZE;
-		int currentLength = 0;
-		byte[] bfile = new byte[packageSize];
-		int lido;
-
-		while (currentLength < fileSize) {
-			int resto = fileSize - currentLength;
-			int numThisTime = resto < packageSize ? resto : bfile.length;
-			lido = in.read(bfile, 0, numThisTime);
-
-			if (lido == -1) {
-				break;
-			}
-
-			fileOut.write(bfile, 0, numThisTime);
-			currentLength += lido;
-		}
-
-		fileOut.close();
-
-		return file;
-
+	public int getPackageSize() {
+		return PACKAGE_SIZE;
 	}
 
 	/**
@@ -133,17 +98,6 @@ public abstract class NetworkManager {
 		return sent;
 	}
 
-	/**
-	 * Envia um ficheiro pela rede
-	 * 
-	 * @param message
-	 *            Mensagem que contem a informação relativa ao ficheiro a ser
-	 *            enviado
-	 * @return Devolve true caso o ficheiro tenha sido enviado correctamente ou
-	 *         false caso contrário
-	 * @require message != null
-	 */
-	public abstract boolean sendFile(NetworkMessage message, SecretKey key);
 
 	/**
 	 * Envia uma mensagem pela rede
@@ -155,32 +109,5 @@ public abstract class NetworkManager {
 		return send(message);
 	}
 
-	/**
-	 * 
-	 * @param name
-	 * @param fileSize
-	 * @throws IOException
-	 */
-	protected void sendByteFile(String name, int fileSize, SecretKey Key) throws IOException {
-		int packageSize = PACKAGE_SIZE;
-
-		FileInputStream fileInputStream = new FileInputStream(name);
-		int currentLength = 0;
-		byte[] bfile;
-
-		while (currentLength < fileSize) {
-			if ((fileSize - currentLength) < packageSize)
-				bfile = new byte[(fileSize - currentLength)];
-			else
-				bfile = new byte[packageSize];
-
-			int lido = fileInputStream.read(bfile, 0, bfile.length);
-			currentLength += lido;
-			out.write(bfile, 0, bfile.length);
-		}
-
-		out.flush();
-		fileInputStream.close();
-	}
 	
 }
