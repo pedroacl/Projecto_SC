@@ -106,19 +106,21 @@ public class ConversationService {
 		return path + realFileName + extension;
 	}
 
+	/**
+	 * method to remove the key of a specific user in the conversations folder
+	 * @param userToRemove name of the user that has been removed from the goup
+	 * @param conversationId of the folder
+	 */
 	public void removeKeyUserFromFolder(String userToRemove, Long conversationId) {
-		// if group with exists
+		
 		File f = new File("/Conversations/" + conversationId.toString() + "/keys/");
 
-		// open folder with conversationId key
 		File[] listConversationKeyUser = f.listFiles();
 
-		// for each file split for the ponit
 		for (File tempFile : listConversationKeyUser) {
 			String[] temp = tempFile.getName().split(".");
 			if (userToRemove.equals(temp[temp.length - 1]))
 				tempFile.delete();
-
 		}
 
 	}
