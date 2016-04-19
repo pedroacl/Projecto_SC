@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * representação de um grupo
+ * Representação de um grupo
  * 
  * @author Pedro, Jose, Antonio
  *

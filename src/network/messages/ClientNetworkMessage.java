@@ -30,7 +30,6 @@ public class ClientNetworkMessage extends NetworkMessage {
 	public String getUsername() {
 		return username;
 	}
-
 	public String getDestination() {
 		return destination;
 	}

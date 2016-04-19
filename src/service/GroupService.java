@@ -77,7 +77,13 @@ public class GroupService {
 
 		return false;
 	}
-
+	/**
+	 * Method to remove a user from a group
+	 * @param username - user that send the message to delete the user
+	 * @param userToRemove user to be removed from the group
+	 * @param groupName name of the group  
+	 * @return
+	 */
 	public boolean removeUserFromGroup(String username, String userToRemove, String groupName) {
 
 		// existe grupo e o utilizador eh owner
@@ -96,9 +102,11 @@ public class GroupService {
 				for (String user : members)
 					conversationService.removeConversationFromUser(user, groupName);
 
+				
+				
 				// Apaga conversa da pasta conversations
 				conversationService.removeConversation(group.getConversationId());
-
+				
 				// Apaga o group do "disco"
 				groupDAO.deleteGroup(groupName);
 				groups.remove(groupName);
@@ -108,8 +116,12 @@ public class GroupService {
 			// apaga membro do grupo
 			else {
 				if(group.contains(userToRemove)) {
-					//remove a conversa do grupo das susas conversaçoes
+					//remove a conversa do grupo das suas conversaçoes
 					conversationService.removeConversationFromUser(userToRemove, groupName);
+
+					//remove the key of the user for that group					
+					conversationService.removeKeyUserFromFolder(userToRemove, group.getConversationId());
+
 					//remove utilizador do grupo e persiste informação
 					groupDAO.removeUserFromGroup(group, userToRemove);
 					return true;

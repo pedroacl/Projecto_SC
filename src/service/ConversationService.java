@@ -106,4 +106,21 @@ public class ConversationService {
 		return path + realFileName + extension;
 	}
 
+	public void removeKeyUserFromFolder(String userToRemove, Long conversationId) {
+		// if group with exists
+		File f = new File("/Conversations/" + conversationId.toString() + "/keys/");
+
+		// open folder with conversationId key
+		File[] listConversationKeyUser = f.listFiles();
+
+		// for each file split for the ponit
+		for (File tempFile : listConversationKeyUser) {
+			String[] temp = tempFile.getName().split(".");
+			if (userToRemove.equals(temp[temp.length - 1]))
+				tempFile.delete();
+
+		}
+
+	}
+
 }
