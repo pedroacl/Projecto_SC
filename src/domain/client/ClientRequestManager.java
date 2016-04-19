@@ -312,11 +312,12 @@ public class ClientRequestManager {
 	 */
 	private void sendAuthenticationMessage() {
 
+		
 		ClientNetworkMessage aux_message = new ClientNetworkMessage(parsedRequest.getUsername(),
 				parsedRequest.getPassword(), MessageType.AUTH);
-
 		aux_message.setDestination(parsedRequest.getContact());
-		System.out.println("Client - Enviar msg");
+		
+		System.out.println(" [clientRequestManager] ENVIANDO MENSAGEM DE AUTH para " + parsedRequest.getContact() );
 		clientNetworkManager.sendMessage(aux_message);
 
 	}

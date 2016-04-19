@@ -135,8 +135,10 @@ public class ServerClientMessageParser {
 				for (long id : ids) {
 					recent.add(conversationService.getLastChatMessage(id));//TODO tb preencher AD e Ks
 				}
-				serverMessage = new ServerMessage(MessageType.LAST_MESSAGES);
-				// serverMessage.setMessages(recent);
+				ServerMessage serverMessageaux = new ServerMessage(MessageType.LAST_MESSAGES);
+				serverMessageaux.setMessages(recent);
+				
+				serverMessage = serverMessageaux;
 
 				break;
 

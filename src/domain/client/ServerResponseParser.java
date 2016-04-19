@@ -3,6 +3,7 @@ package domain.client;
 import java.io.IOException;
 
 import network.managers.ClientNetworkManager;
+import network.messages.NetworkMessage;
 import network.messages.ServerMessage;
 import util.UserUtil;
 
@@ -16,13 +17,11 @@ public class ServerResponseParser {
 
 	private UserUtil userUtil;
 
-	private ClientNetworkManager clientNetwork;
 
 	private String username;
 
-	public ServerResponseParser(UserUtil userInterface, ClientNetworkManager clientNetwork, String username) {
+	public ServerResponseParser(UserUtil userInterface, String username) {
 		this.userUtil = userInterface;
-		this.clientNetwork = clientNetwork;
 		this.username = username;
 	}
 
@@ -33,7 +32,7 @@ public class ServerResponseParser {
 	 *            Mensagem que o servido enviou
 	 * @requires serverMessage != null
 	 */
-	public void ProcessMessage(ServerMessage serverMessage) {
+	public void ProcessMessage(NetworkMessage serverMessage) {
 		switch (serverMessage.getMessageType()) {
 		// operacao bem sucedida
 		case OK:
@@ -47,12 +46,12 @@ public class ServerResponseParser {
 
 		// todas as mensagens de uma conversa
 		case CONVERSATION:
-			userUtil.printChatMessages(serverMessage.getMessageList(), username);
+			userUtil.printChatMessages(((ServerMessage) serverMessage).getMessageList(), username);
 			break;
 
 		// ultima mensagem de cada conversa em que o utilizador participou
 		case LAST_MESSAGES:
-			userUtil.printContactChatMessages(serverMessage.getMessageList(), username);
+			userUtil.printContactChatMessages(((ServerMessage) serverMessage).getMessageList(), username);
 			break;
 
 		// receber um ficheiro

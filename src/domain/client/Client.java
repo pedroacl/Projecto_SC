@@ -8,6 +8,7 @@ import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 
 import network.managers.ClientNetworkManager;
+import network.messages.NetworkMessage;
 import util.UserUtil;
 
 /**
@@ -64,9 +65,15 @@ public class Client {
 
 		// Cria mensagem de comunicaçao com o pedido do cliente
 		Parsed parsedRequest = argsParser.getParsed();
+		
+		//Comunica com Servidor seguindo um protocolo dependendo do tipo de pedido do cliente
 		ClientRequestManager clientRequestManager = new ClientRequestManager(parsedRequest, clientNetwork);
-		clientRequestManager.processRequest();
-
+		
+		//recebe resultado da comunicaçao
+		NetworkMessage netWorkMessage = clientRequestManager.processRequest();
+		
+		ServerResponseParser srp = new ServerResponseParser(userInterface, argsParser.getUsername());
+		srp.ProcessMessage(netWorkMessage);
 		// Verificar tipo de mensagem
 		/*
 		*/
