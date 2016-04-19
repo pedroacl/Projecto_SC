@@ -35,10 +35,6 @@ public class ServerThread extends Thread {
 		ServerClientMessageParser clientMessageParser = new ServerClientMessageParser(clientMessage,
 				serverNetworkManager, this.password);
 
-		try {
-			clientMessageParser.processRequest();
-		} catch (InvalidMacException e) {
-			e.printStackTrace();
-		}
+		clientMessageParser.processRequest();
 	}
 }

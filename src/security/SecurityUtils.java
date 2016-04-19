@@ -133,15 +133,16 @@ public class SecurityUtils {
 	}
 
 	public static byte[] signFile(String message, PrivateKey privateKey) {
-		// TODO 
-		
+		// TODO
+
 		return null;
 	}
-/*
-	/**
-	 * Cifra uma mensagem com uma chave privada
+
+	/*
+	 * /** Cifra uma mensagem com uma chave privada
 	 * 
 	 * @param secretKey
+	 * 
 	 * @return Devolve uma mensagem cifrada com uma chave privada
 	 */
 	public static byte[] cipherWithSecretKey(byte[] message, SecretKey secretKey) {
@@ -166,8 +167,7 @@ public class SecurityUtils {
 
 		return encryptedMessage;
 	}
-	
-/*
+
 	public static byte[] decipherWithSecretKey(byte[] cipheredMessage, SecretKey secretKey) {
 		byte[] decipheredMessage = null;
 
@@ -189,13 +189,6 @@ public class SecurityUtils {
 		}
 
 		return decipheredMessage;
-	}
-*/
-
-	public Cipher cipherWithPublicKey() {
-		// TODO
-		Cipher cipher = null;
-		return cipher;
 	}
 
 	/**
@@ -298,7 +291,7 @@ public class SecurityUtils {
 	 */
 	public static byte[] generateFileMac(String filePath, String password) {
 		byte[] digest = null;
-		
+
 		File file = new File(filePath);
 
 		if (!file.exists()) {
@@ -306,11 +299,12 @@ public class SecurityUtils {
 		}
 
 		try {
-			// byte[] salt = { (byte) 0xc9, (byte) 0x36, (byte) 0x78, (byte) 0x99, (byte) 0x52, (byte) 0x3e, (byte) 0xea,
-					// (byte) 0xf2 };
+			// byte[] salt = { (byte) 0xc9, (byte) 0x36, (byte) 0x78, (byte)
+			// 0x99, (byte) 0x52, (byte) 0x3e, (byte) 0xea,
+			// (byte) 0xf2 };
 
 			// PBEParameterSpec paramSpec = new PBEParameterSpec(salt, 20);
-			
+
 			PBEKeySpec keySpec = new PBEKeySpec(password.toCharArray());
 
 			// obter chave secreta atraves da password
@@ -347,15 +341,18 @@ public class SecurityUtils {
 
 		return digest;
 	}
-	
+
 	/**
 	 * Atualiza o código MAC presente no ficheiro ficheiro de utilizadores
-	 * @param usersFilePath Localização do ficheiro de utilizadores
-	 * @param serverPassword Password do servidor utilizada para gerar o MAC
+	 * 
+	 * @param usersFilePath
+	 *            Localização do ficheiro de utilizadores
+	 * @param serverPassword
+	 *            Password do servidor utilizada para gerar o MAC
 	 */
 	public static void updateFileMac(String usersFilePath, String serverPassword) {
 		File file = new File(usersFilePath);
-		
+
 		if (!file.exists()) {
 			createMacFile(usersFilePath, serverPassword);
 		}
@@ -381,12 +378,16 @@ public class SecurityUtils {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Cria um ficheiro que irá guardar o MAC do ficheiro de utilizadores
-	 * @param usersFilePath Localização do ficheiro de utilizadores
-	 * @param serverPassword Password do servidor usada para gerar o MAC
-	 * @return Devolve true caso o ficheiro tenha sido criado e false caso já exista
+	 * 
+	 * @param usersFilePath
+	 *            Localização do ficheiro de utilizadores
+	 * @param serverPassword
+	 *            Password do servidor usada para gerar o MAC
+	 * @return Devolve true caso o ficheiro tenha sido criado e false caso já
+	 *         exista
 	 */
 	public static boolean createMacFile(String usersFilePath, String serverPassword) {
 		File file = new File(usersFilePath);
@@ -398,18 +399,18 @@ public class SecurityUtils {
 		try {
 			// abrir ficheiro em modo overwrite
 			FileWriter fileWriter = new FileWriter(file, false);
-			
+
 			// obter mac do ficheiro de utilizadores
 			byte[] fileMac = generateFileMac(usersFilePath, serverPassword);
-			
+
 			// guardar mac
 			fileWriter.write(MiscUtil.bytesToHex(fileMac));
 			fileWriter.close();
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return true;
 	}
 }

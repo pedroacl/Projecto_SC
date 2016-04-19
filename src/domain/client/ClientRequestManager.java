@@ -111,6 +111,7 @@ public class ClientRequestManager {
 			 * C --------AUTH------------> S
 			 *   <------Contact/NOK-------                         
 			 *   ----AD,Ks(M),Kp(Ks)----->
+			 *   <---------OK/NOK------------
 			 *   -------file------------->
 			 *   <--------OK/NOK----------
 			 */
@@ -159,12 +160,20 @@ public class ClientRequestManager {
 
 				chatMessage.putUserKey(parsedRequest.getUsername(), wrappedSecretKey);
 
-				// enviar mensagem
-				clientNetworkManager.sendMessageAndFile(chatMessage, secretKey);
+				// enviar mensagem 
+				clientNetworkManager.sendMessage(chatMessage);
 
-				// espera resposta
+				// espera resposta OK or NOK
 				networkMessage = (NetworkMessage) clientNetworkManager.receiveMessage();
-
+				
+				if(networkMessage.getMessageType().equals(MessageType.OK)) {
+					//enviar ficheiro
+					clientNetworkManager.sendFile(chatMessage, secretKey);
+					
+					//esperar resposta confimação
+					networkMessage = (NetworkMessage) clientNetworkManager.receiveMessage();
+				}
+				
 			} else {
 
 				// nao existe contact, devolve erro
@@ -199,7 +208,7 @@ public class ClientRequestManager {
 			
 			/* 
 			 * C -------------RECEIVER--------------> S
-			 *   <--AD,Ks(M),K(k), M/NOK--CONVERSATION--                       
+			 *   <--AD,Ks(M),K(k),M/NOK--CONVERSATION--                       
 			 */
 
 			clientNetworkMessage = new ClientNetworkMessage(parsedRequest.getUsername(), parsedRequest.getPassword(),
@@ -224,11 +233,12 @@ public class ClientRequestManager {
 			 * C ----------RECEIVER-----------> S
 			 *   <--AD,Ks(F),K(ks)/NOK--FILE--
 			 *   <-----------F----------------
-			 *                          
+			 *   ----------OK/NOK------------->                      
+			 *   <-----------OK/NOK-------------
 			 */	
 
-			clientNetworkMessage = new ClientNetworkMessage(parsedRequest.getUsername(), parsedRequest.getPassword(),
-					MessageType.RECEIVER);
+			clientNetworkMessage = new ClientNetworkMessage(parsedRequest.getUsername(), 
+					parsedRequest.getPassword(),MessageType.RECEIVER);
 
 			clientNetworkMessage.setContent(parsedRequest.getSpecificField());
 
@@ -237,7 +247,11 @@ public class ClientRequestManager {
 
 			// recebe Resposta
 			chatmessage = (ChatMessage) clientNetworkManager.receiveMessage();
-			networkMessage = chatmessage;
+			
+			//recebe file
+			//TODO
+			//clientNetworkManeger.receiveFile(chatmessage, chatmessage.getSecretKey)
+			//Sign File e compara com AD
 			
 			break;
 		
