@@ -18,6 +18,7 @@ import network.messages.MessageType;
 import network.messages.NetworkMessage;
 import network.messages.ServerNetworkContactTypeMessage;
 import security.SecurityUtils;
+import util.MiscUtil;
 
 public class ClientRequestManager {
 
@@ -60,6 +61,9 @@ public class ClientRequestManager {
 			// existe contacto
 			if (serverNetworkContactTypeMessage.getMessageType() == MessageType.CONTACT) {
 				ChatMessage clientPGPMessage = new ChatMessage(MessageType.MESSAGE);
+				
+				clientPGPMessage.setFromUser(parsedRequest.getUsername());
+				clientPGPMessage.setDestination(parsedRequest.getContact());
 
 				System.out.println(serverNetworkContactTypeMessage.numGroupMembers());
 
@@ -69,6 +73,7 @@ public class ClientRequestManager {
 				// gerar assinatura
 				byte[] clientSignature = SecurityUtils.signMessage(parsedRequest.getSpecificField(),
 						keyPair.getPrivate());
+
 				clientPGPMessage.setSignature(clientSignature);
 
 				// obter chave secreta
@@ -78,7 +83,8 @@ public class ClientRequestManager {
 				byte[] encryptedMessage = SecurityUtils.cipherWithSecretKey(parsedRequest.getSpecificField().getBytes(),
 						secretKey);
 
-				clientPGPMessage.setMessage(encryptedMessage);
+				clientPGPMessage.setContent(MiscUtil.bytesToHex(encryptedMessage));
+				System.out.println("[ClientRequestManager] cypheredMessage: " + clientPGPMessage.getContent());
 				List<String> groupMembers = serverNetworkContactTypeMessage.getGroupMembers();
 
 				// cifrar chave secreta, usada para cifrar mensagem anterior

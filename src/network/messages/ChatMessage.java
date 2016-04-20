@@ -14,9 +14,6 @@ public class ChatMessage extends NetworkMessage {
 	// assinatura da mensagem
 	private byte[] signature;
 
-	// mensagem cifrada
-	private byte[] message;
-	
 	private String fromUser;
 	
 	private String destination;
@@ -66,14 +63,6 @@ public class ChatMessage extends NetworkMessage {
 
 	public void setSignature(byte[] signature) {
 		this.signature = signature;
-	}
-
-	public byte[] getMessage() {
-		return message;
-	}
-
-	public void setMessage(byte[] message) {
-		this.message = message;
 	}
 
 	public void setFromUser(String username) {

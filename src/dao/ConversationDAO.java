@@ -11,6 +11,7 @@ import entities.Conversation;
 import factories.ConversationFactory;
 import network.messages.ChatMessage;
 import network.messages.MessageType;
+import security.SecurityUtils;
 import util.MiscUtil;
 import util.PersistenceUtil;
 
@@ -85,6 +86,8 @@ public class ConversationDAO {
 			conversation = new Conversation(chatMessage.getFromUser(), chatMessage.getDestination());
 			conversation.setId(conversationId);
 			conversation.setLastMessageDate(chatMessage.getCreatedAt());
+			
+			PersistenceUtil.createFile(filePath);
 			PersistenceUtil.writeObject(conversation, filePath);
 		} else {
 			// atualizar ultima mensagem da conversa
@@ -96,24 +99,34 @@ public class ConversationDAO {
 		if (chatMessage.getMessageType().equals(MessageType.FILE)) {
 			// verifica se existe a pasta files na directoria da conversa
 			File fileDirectory = new File("conversations/" + conversation.getId() + "/files");
-			
+
 			if (!fileDirectory.exists())
 				PersistenceUtil.createDir("conversations/" + conversation.getId() + "/files");
 		}
 
 		// persiste mensagem
 		String messageFileName = Long.toString(chatMessage.getCreatedAt().getTime());
-		String pathToTxt = "conversations/" + conversation.getId() + "/messages/" + messageFileName;	
+		String pathToTxt = "conversations/" + conversation.getId() + "/messages/" + messageFileName;
 
-		// PersistenceUtil.createFile(pathToTxt);
-		PersistenceUtil.writeStringToFile(chatMessage.getFromUser() + "\n" + chatMessage.getDestination() + "\n"
-				+ chatMessage.getMessageType() + "\n" + chatMessage.getContent(), pathToTxt);
+		StringBuilder sb = new StringBuilder();
+		sb.append(chatMessage.getFromUser());
+		sb.append("\n"); 
+		sb.append(chatMessage.getDestination());
+		sb.append("\n");
+		sb.append(chatMessage.getMessageType()); 
+		sb.append("\n");
+		sb.append(chatMessage.getContent());
+		sb.append("\n");
+		
+		PersistenceUtil.writeStringToFile(sb.toString(), pathToTxt);
 
 		// persistir chave para cada utilizador TESTAR
-		for (String username: chatMessage.getUsers()) {
-			saveUserChatMessageKey(username, messageFileName, chatMessage.getUserKey(username));
+		for (String username : chatMessage.getUsers()) {
+			String keyPath = "conversations/" + conversation.getId() + "/keys/" + messageFileName + ".key." + username;
+			String userKey = MiscUtil.bytesToHex(chatMessage.getUserKey(username));
+			PersistenceUtil.writeStringToFile(userKey, keyPath);
 		}
-		
+
 		return conversation.getId();
 	}
 
@@ -375,24 +388,5 @@ public class ConversationDAO {
 			return null;
 
 		return file.listFiles();
-	}
-
-	/**
-	 * Guarda a chave privada, enviada por um utilizador, associada a uma
-	 * mensagem ou ficheiro esta irá ser guardada em fich.txt.key.FromUser e
-	 * fich.txt.key.ToUser
-	 * 
-	 * @param username
-	 * @param fileName
-	 * @param privateKey
-	 */
-	public void saveUserChatMessageKey(String username, String fileName, byte[] privateKey) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("keys/");
-		sb.append(fileName);
-		sb.append(".key.");
-		sb.append(username);
-		
-		PersistenceUtil.writeStringToFile(MiscUtil.bytesToHex(privateKey), sb.toString());
 	}
 }

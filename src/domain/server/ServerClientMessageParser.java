@@ -106,6 +106,8 @@ public class ServerClientMessageParser {
 
 			// espera nova mensagem com AD, Ks(M), e Map<user,Kpub(Ks)>
 			ChatMessage clientPGPMessage = (ChatMessage) serverNetworkManager.receiveMessage();
+			System.out.println("[ServerClientMessageParser] message: " + clientPGPMessage.getContent());
+			
 			clientPGPMessage.setCreatedAt(new Date());
 
 			// guarda a mensagem
