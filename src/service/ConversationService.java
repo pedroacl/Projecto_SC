@@ -26,7 +26,6 @@ public class ConversationService {
 	}
 
 	public Long addChatMessage(ChatMessage chatMessage) {
-		System.out.println("[ConversationService.addChatMessage] chatMessage: " + chatMessage.getContent());
 		return conversationDAO.addChatMessage(chatMessage);
 	}
 

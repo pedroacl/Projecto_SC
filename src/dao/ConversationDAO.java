@@ -104,7 +104,7 @@ public class ConversationDAO {
 				PersistenceUtil.createDir("conversations/" + conversation.getId() + "/files");
 		}
 
-		// persiste mensagem
+		// persistir mensagem
 		String messageFileName = Long.toString(chatMessage.getCreatedAt().getTime());
 		String pathToTxt = "conversations/" + conversation.getId() + "/messages/" + messageFileName;
 
@@ -119,6 +119,10 @@ public class ConversationDAO {
 		sb.append("\n");
 		
 		PersistenceUtil.writeStringToFile(sb.toString(), pathToTxt);
+		
+		String signaturePath = "conversations/" + conversation.getId() + "/signatures/" + messageFileName + ".sig";
+		String signature = MiscUtil.bytesToHex(chatMessage.getSignature());
+		PersistenceUtil.writeStringToFile(signature, signaturePath);
 
 		// persistir chave para cada utilizador TESTAR
 		for (String username : chatMessage.getUsers()) {
