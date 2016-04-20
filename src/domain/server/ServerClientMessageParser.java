@@ -91,12 +91,14 @@ public class ServerClientMessageParser {
 		System.out.println("Server - " + clientMessage);
 
 		switch (clientMessage.getMessageType()) {
-
 		// mensagem de texto
 		case MESSAGE:
+			
+			System.out.println("[ServerClientMessageParser] MESSAGE");
 
 			// destinatario eh um utilizador ou grupo
-			serverMessage = verifyContactType();
+			ServerNetworkContactTypeMessage auxServerNetworkContactTypeMessage = (ServerNetworkContactTypeMessage) verifyContactType();
+			serverMessage = auxServerNetworkContactTypeMessage;
 
 			if (!serverMessage.getMessageType().equals(MessageType.NOK))
 				// envia mensagem com indicaçao grupo ou utilizador

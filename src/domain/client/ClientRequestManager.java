@@ -47,7 +47,7 @@ public class ClientRequestManager {
 		case "-m":
 			// enviar mensagem a perguntar o tipo do destinatario (contacto?
 			// grupo?)
-			sendAuthenticationMessage();
+			sendAuthenticationMessage(MessageType.MESSAGE);
 
 			// obter tipo de contacto
 			serverNetworkContactTypeMessage = (ServerNetworkContactTypeMessage) clientNetworkManager.receiveMessage();
@@ -118,7 +118,7 @@ public class ClientRequestManager {
 
 		case "-f":
 			// enviar mensagem a perguntar o tipo do destinatario (user? grupo?)
-			sendAuthenticationMessage();
+			sendAuthenticationMessage(MessageType.FILE);
 
 			// obter tipo de contacto
 			serverNetworkContactTypeMessage = (ServerNetworkContactTypeMessage) clientNetworkManager.receiveMessage();
@@ -310,10 +310,10 @@ public class ClientRequestManager {
 	 * 
 	 * 
 	 */
-	private void sendAuthenticationMessage() {
+	private void sendAuthenticationMessage(MessageType messageType) {
 		
 		ClientNetworkMessage aux_message = new ClientNetworkMessage(parsedRequest.getUsername(),
-				parsedRequest.getPassword(), MessageType.AUTH);
+				parsedRequest.getPassword(), messageType);
 
 		aux_message.setDestination(parsedRequest.getContact());
 		
