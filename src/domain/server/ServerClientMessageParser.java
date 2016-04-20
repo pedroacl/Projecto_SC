@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import exceptions.InvalidMacException;
+import exceptions.InvalidPasswordException;
 import network.managers.ServerNetworkManager;
 import network.messages.ChatMessage;
 import network.messages.ClientNetworkMessage;
@@ -68,11 +69,19 @@ public class ServerClientMessageParser {
 			authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword());
 
 		} catch (InvalidMacException e) {
+			System.out.println("Mac inválido");
 			// preenche sermessage com indicaçao do erro
 			serverMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
-			serverMessage.setContent("Password errada");
+			serverMessage.setContent("MAC inválido");
 
+			e.printStackTrace();
+
+			return serverMessage;
+
+		} catch (InvalidPasswordException e) {
+			serverMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
 			System.out.println("[ServerClientMessageParser] - Password errada!");
+			serverMessage.setContent("Password errada");
 
 			e.printStackTrace();
 

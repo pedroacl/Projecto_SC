@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import exceptions.InvalidMacException;
+import exceptions.InvalidPasswordException;
 import security.SecurityUtils;
 import service.UserService;
 import util.MiscUtil;
@@ -40,9 +41,11 @@ public class Authentication {
 	 *            comandos
 	 * @return False caso a password esteja errada
 	 * @throws InvalidMacException
+	 * @throws InvalidPasswordException
 	 * @requires username != null && password != null
 	 */
-	public boolean authenticateUser(String username, String password) throws InvalidMacException {
+	public void authenticateUser(String username, String password)
+			throws InvalidMacException, InvalidPasswordException {
 		// validade do ficheiro comprometida
 		validateUsersFileMac("users.txt", password);
 
@@ -64,10 +67,10 @@ public class Authentication {
 			System.out.println("Hash guardada: " + userPasswordAndSalt[1]);
 			System.out.println("Hash gerada:   " + hashString);
 
-			return userPasswordAndSalt[1].equals(hashString);
+			if (!userPasswordAndSalt[1].equals(hashString)) {
+				throw new InvalidPasswordException();
+			}
 		}
-
-		return false;
 	}
 
 	/**
@@ -77,12 +80,8 @@ public class Authentication {
 	 * @return
 	 * @throws InvalidMacException
 	 */
-	public boolean validateUsersFileMac(String filePath, String password) throws InvalidMacException {
+	public void validateUsersFileMac(String filePath, String password) throws InvalidMacException {
 		System.out.println("[Authentication.validateUsersFileMac] filePath: " + filePath);
-
-		// TODO testar
-		byte[] originalMac = null;
-		boolean validMac = false;
 
 		try {
 			File usersFileMacPath = new File(filePath + ".mac");
@@ -91,33 +90,30 @@ public class Authentication {
 			if (!usersFileMacPath.exists()) {
 				System.out.println("Ficheiro MAC não existe");
 				SecurityUtils.updateFileMac(filePath, password);
-				validMac = true;
 
 			} else {
+				System.out.println("[Authentication.validateUsersFileMac] ficheiro MAC existe");
+
 				// obter MAC original
 				BufferedReader inF = new BufferedReader(new FileReader(usersFileMacPath));
-				String orignalMAC = inF.readLine();
+				String originalMAC = inF.readLine();
 				inF.close();
 
 				// gerar MAC atual
-				byte[] currentMac = SecurityUtils.generateFileMac(filePath, password);
-				String currentMacString = MiscUtil.bytesToHex(currentMac);
+				String currentMacString = MiscUtil.bytesToHex(SecurityUtils.generateFileMac(filePath, password));
 
-				if (!currentMac.equals("test"))
-					throw new InvalidMacException("MAC inválido");
-
-				System.out.println("MAC original: " + orignalMAC);
+				System.out.println("MAC original: " + originalMAC);
 				System.out.println("MAC gerado: " + currentMacString);
-
-				// validMac = Arrays.equals(fileMAC, originalMac);
+				
+				if (!originalMAC.equals(currentMacString)) {
+					throw new InvalidMacException();
+				} 
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		return validMac;
 	}
 
 	/**
@@ -133,21 +129,4 @@ public class Authentication {
 	public boolean existsUser(String username) {
 		return userService.getUserPasswordAndSalt(username) != null;
 	}
-
-	/**
-	 * Adiciona um utilizador ao sistema
-	 * 
-	 * @param username
-	 *            Utilizador a ser adicionado
-	 * @param password
-	 *            Palavra passe do utilizador
-	 * @requires username != null && password != null
-	 */
-	/*
-	 * public void addUser(String username, String userPassword, String
-	 * serverPassword) { if (userService.getUserPasswordAndSalt(username) ==
-	 * null) userService.addUser(username, userPassword);
-	 * 
-	 * SecurityUtils.updateFileMac("users.txt", serverPassword); }
-	 */
 }
