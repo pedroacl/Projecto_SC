@@ -105,7 +105,7 @@ public class ConversationDAO {
 		String messageFileName = Long.toString(chatMessage.getCreatedAt().getTime());
 		String pathToTxt = "conversations/" + conversation.getId() + "/messages/" + messageFileName;	
 
-		PersistenceUtil.createFile(pathToTxt);
+		// PersistenceUtil.createFile(pathToTxt);
 		PersistenceUtil.writeStringToFile(chatMessage.getFromUser() + "\n" + chatMessage.getDestination() + "\n"
 				+ chatMessage.getMessageType() + "\n" + chatMessage.getContent(), pathToTxt);
 
@@ -392,7 +392,7 @@ public class ConversationDAO {
 		sb.append(fileName);
 		sb.append(".key.");
 		sb.append(username);
-
+		
 		PersistenceUtil.writeStringToFile(MiscUtil.bytesToHex(privateKey), sb.toString());
 	}
 }

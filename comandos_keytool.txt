@@ -1,9 +1,16 @@
 # Adicionar entry ah keystore
-/usr/lib/jvm/java-8-oracle/bin/keytool -keystore keystore.jks -genkey -alias maria
+/usr/lib/jvm/java-8-oracle/bin/keytool -keystore keystore.cliente -genkey -alias maria
 (pass = seguranca)
 
-# Gerar certificado auto assinado (RSA)
-/usr/lib/jvm/java-8-oracle/bin/keytool -genkey -keyalg RSA -alias maria -keystore keystore.jks -validity 360 -keysize 2048
+
+####
+# Adicionar chaves assimetricas do cliente
+####
+
+/usr/lib/jvm/java-8-oracle/bin/keytool -genkey -keyalg RSA -alias maria -keystore keystore.cliente -validity 360 -keysize 2048
+
+/usr/lib/jvm/java-8-oracle/bin/keytool -genkey -keyalg RSA -alias sara -keystore keystore.cliente -validity 360 -keysize 2048
+
 
 # Gerar chave secreta (JCEKS)
 /usr/lib/jvm/java-8-oracle/bin/keytool –genseckey maria –alias secKey -storetype storetype JCEKS
@@ -11,11 +18,20 @@
 # Remover chave
 /usr/lib/jvm/java-8-oracle/bin/keytool -delete -alias maria -keystore keystore.jks
 
-# Gerar keypair
+
+###
+# Gerar keystore e truststore para TLS
+###
+
 /usr/lib/jvm/java-8-oracle/bin/keytool -genkeypair -alias server -keyalg RSA -keysize 2048 -keystore keystore.servidor
+
 /usr/lib/jvm/java-8-oracle/bin/keytool -genkeypair -alias maria -keyalg RSA -keysize 2048 -keystore truststore.cliente
 
+
+####
 # Exportar certificado do servidor
+####
+
 /usr/lib/jvm/java-8-oracle/bin/keytool -exportcert -alias server -keystore keystore.servidor -file server_cert.cer
 
 # Importar certificado do servidor

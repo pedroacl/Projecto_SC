@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -78,8 +79,6 @@ public class ClientRequestManager {
 						secretKey);
 
 				clientPGPMessage.setMessage(encryptedMessage);
-				System.out.println("Client - " + encryptedMessage);
-
 				List<String> groupMembers = serverNetworkContactTypeMessage.getGroupMembers();
 
 				// cifrar chave secreta, usada para cifrar mensagem anterior

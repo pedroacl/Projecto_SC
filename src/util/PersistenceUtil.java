@@ -24,7 +24,7 @@ import java.util.List;
  *
  */
 public class PersistenceUtil {
-	private static final String KEYSTORE_PATH = "keystore.jks";
+	private static final String KEYSTORE_PATH = "keystore.cliente";
 
 	/**
 	 * Elimina um determinado ficheiro ou pasta
@@ -97,7 +97,7 @@ public class PersistenceUtil {
 	 */
 	public static void writeObject(Object obj, String filePath) {
 		File file = new File(filePath);
-
+		
 		try {
 			// preparar streams
 			FileOutputStream fileOutputStream = new FileOutputStream(file);
@@ -164,18 +164,20 @@ public class PersistenceUtil {
 	 * @param path
 	 *            Directoria da string a ser persistida
 	 */
-	public static void writeStringToFile(String content, String path) {
+	public static void writeStringToFile(String content, String filePath) {
 
+		FileWriter fileWriter;
+		
+		File file = new File(filePath);
+		
+		if (!file.exists()) {
+			PersistenceUtil.createFile(filePath);
+		}
+		
 		try {
-			BufferedWriter outF = new BufferedWriter(new FileWriter(path));
-
-			// persistir string
-			outF.write(content);
-
-			// fechar writer
-			outF.flush();
-			outF.close();
-
+			fileWriter = new FileWriter(filePath, false);
+			fileWriter.write(content);
+			fileWriter.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -236,12 +238,12 @@ public class PersistenceUtil {
 	 * 
 	 * @param userPassword
 	 *            Password de acesso à keystore
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static KeyStore getKeyStore(String keystorePassword) throws IOException {
 		FileInputStream fileInputStream = null;
 		KeyStore keyStore = null;
-	
+
 		try {
 			fileInputStream = new FileInputStream(KEYSTORE_PATH);
 			keyStore = KeyStore.getInstance("JKS");

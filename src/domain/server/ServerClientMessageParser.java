@@ -111,9 +111,6 @@ public class ServerClientMessageParser {
 			// guarda a mensagem
 			conversationService.addChatMessage(clientPGPMessage);
 
-			System.out.println("Server - ClientPGPMessageType: " + clientPGPMessage.getMessageType());
-			System.out.println("Server - Mensagem: " + clientPGPMessage.getMessage());
-
 			// cria message de resposta ok-> tudo correu bem
 			serverMessage = new ServerNetworkContactTypeMessage(MessageType.OK);
 			break;
@@ -287,7 +284,6 @@ public class ServerClientMessageParser {
 
 		// destinatario eh um utilizador
 		if (authentication.existsUser(clientMessage.getDestination())) {
-			System.out.println("Server - MESSAGE - Existe utilizador");
 			ServerNetworkContactTypeMessage serverContactTypeMessage = new ServerNetworkContactTypeMessage(
 					MessageType.CONTACT);
 
@@ -361,9 +357,6 @@ public class ServerClientMessageParser {
 			// confirma ao cliente que é possivel receber o ficheiro
 			serverMessage = new ServerMessage(MessageType.OK);
 			serverNetworkManager.sendMessage(serverMessage);
-
-			System.out.println("Server - ClientPGPMessageType: " + clientPGPMessage.getMessageType());
-			System.out.println("Server - Mensagem: " + clientPGPMessage.getMessage());
 
 			// recebe ficheiro
 			File file = null;
