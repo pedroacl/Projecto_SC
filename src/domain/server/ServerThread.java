@@ -17,11 +17,11 @@ public class ServerThread extends Thread {
 
 	private Socket	socket;
 
-	private String	password;
+	private Authentication authentication;
 
-	public ServerThread(Socket socket, String password) {
+	public ServerThread(Socket socket, Authentication authentication) {
 		this.socket = socket;
-		this.password = password;
+		this.authentication = authentication;
 	}
 
 	/**
@@ -38,7 +38,7 @@ public class ServerThread extends Thread {
 		
 		// processa a mensagem do cliente e cria mensagem de resposta
 		ServerClientMessageParser clientMessageParser = new ServerClientMessageParser(clientMessage,
-				serverNetworkManager, this.password);
+				serverNetworkManager, authentication);
 
 		NetworkMessage  netMsg= clientMessageParser.processRequest();
 		

@@ -51,7 +51,7 @@ public class Server {
 		
 		//TODO obter password da linha de comandos
 		String password = "1234";
-
+		
 		// Thread Pool
 		ExecutorService executorService = Executors.newFixedThreadPool(MAX_THREADS);
 
@@ -68,7 +68,8 @@ public class Server {
 
 			System.out.println("Cliente ligado!");
 
-			ServerThread serverThread = new ServerThread(socket, password);
+			Authentication authentication = new Authentication(password);
+			ServerThread serverThread = new ServerThread(socket, authentication);
 			executorService.execute(serverThread);
 		}
 

@@ -1,8 +1,5 @@
 package domain.client;
 
-import java.io.IOException;
-
-import network.managers.ClientNetworkManager;
 import network.messages.NetworkMessage;
 import network.messages.ServerMessage;
 import util.UserUtil;
@@ -15,13 +12,10 @@ import util.UserUtil;
  */
 public class ServerResponseParser {
 
-	private UserUtil userUtil;
-
-
 	private String username;
 
-	public ServerResponseParser(UserUtil userInterface, String username) {
-		this.userUtil = userInterface;
+	public ServerResponseParser(String username) {
+		// this.userUtil = userInterface;
 		this.username = username;
 	}
 
@@ -36,22 +30,22 @@ public class ServerResponseParser {
 		switch (serverMessage.getMessageType()) {
 		// operacao bem sucedida
 		case OK:
-			userUtil.print("OK");
+			UserUtil.print("OK");
 			break;
 
 		// mensagem de erro
 		case NOK:
-			userUtil.print(serverMessage.getContent());
+			UserUtil.print(serverMessage.getContent());
 			break;
 
 		// todas as mensagens de uma conversa
 		case CONVERSATION:
-			userUtil.printChatMessages(((ServerMessage) serverMessage).getMessageList(), username);
+			UserUtil.printChatMessages(((ServerMessage) serverMessage).getMessageList(), username);
 			break;
 
 		// ultima mensagem de cada conversa em que o utilizador participou
 		case LAST_MESSAGES:
-			userUtil.printContactChatMessages(((ServerMessage) serverMessage).getMessageList(), username);
+			UserUtil.printContactChatMessages(((ServerMessage) serverMessage).getMessageList(), username);
 			break;
 
 		// receber um ficheiro
@@ -68,7 +62,7 @@ public class ServerResponseParser {
 
 		// mensagem do servidor mal formatada
 		default:
-			userUtil.print("Mensagem invalida");
+			UserUtil.print("Mensagem invalida");
 			break;
 		}
 	}

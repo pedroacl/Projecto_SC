@@ -289,12 +289,13 @@ public class SecurityUtils {
 	 * 
 	 * @param secretKey
 	 */
-	public static byte[] generateFileMac(String filePath, String password) {
+	public static byte[] generateFileMac(String filePath, String serverPassword) {
 		byte[] digest = null;
 
 		File file = new File(filePath);
 
 		if (!file.exists()) {
+			System.out.println("[generateFileMac] Ficheiro nao existe (" + filePath + ")");
 			return null;
 		}
 
@@ -305,7 +306,7 @@ public class SecurityUtils {
 
 			// PBEParameterSpec paramSpec = new PBEParameterSpec(salt, 20);
 
-			PBEKeySpec keySpec = new PBEKeySpec(password.toCharArray());
+			PBEKeySpec keySpec = new PBEKeySpec(serverPassword.toCharArray());
 
 			// obter chave secreta atraves da password
 			SecretKeyFactory kf = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
@@ -345,27 +346,27 @@ public class SecurityUtils {
 	/**
 	 * Atualiza o código MAC presente no ficheiro ficheiro de utilizadores
 	 * 
-	 * @param usersFilePath
+	 * @param filePath
 	 *            Localização do ficheiro de utilizadores
 	 * @param serverPassword
 	 *            Password do servidor utilizada para gerar o MAC
 	 */
-	public static void updateFileMac(String usersFilePath, String serverPassword) {
-		File file = new File(usersFilePath);
+	public static void updateFileMac(String filePath, String serverPassword) {
+		System.out.println("[SecurityUtils.updateFileMac] filePath: " + filePath);
 
-		if (!file.exists()) {
-			createMacFile(usersFilePath, serverPassword);
+		File macFilePath = new File(filePath + ".mac");
+
+		if (!macFilePath.exists()) {
+			System.out.println("[SecurityUtils.updateFileMac] Nao existe MAC file");
+			createMacFile(filePath, serverPassword);
 		}
 
 		try {
-			String macFilePath = usersFilePath + ".mac";
-			File usersMACFile = new File(macFilePath);
-
 			// abrir ficheiro em modo overwrite
-			FileWriter fileWriter = new FileWriter(usersMACFile, false);
+			FileWriter fileWriter = new FileWriter(macFilePath, false);
 
 			// obter novo MAC
-			byte[] fileMac = SecurityUtils.generateFileMac(macFilePath, serverPassword);
+			byte[] fileMac = SecurityUtils.generateFileMac(filePath, serverPassword);
 
 			// guardar novo MAC
 			fileWriter.write(MiscUtil.bytesToHex(fileMac));
@@ -389,8 +390,9 @@ public class SecurityUtils {
 	 * @return Devolve true caso o ficheiro tenha sido criado e false caso já
 	 *         exista
 	 */
-	public static boolean createMacFile(String usersFilePath, String serverPassword) {
-		File file = new File(usersFilePath);
+	public static boolean createMacFile(String filePath, String serverPassword) {
+		System.out.println("[SecurityUtils.creatMacFile] " + filePath);
+		File file = new File(filePath + ".mac");
 
 		if (file.exists()) {
 			return false;
@@ -401,7 +403,7 @@ public class SecurityUtils {
 			FileWriter fileWriter = new FileWriter(file, false);
 
 			// obter mac do ficheiro de utilizadores
-			byte[] fileMac = generateFileMac(usersFilePath, serverPassword);
+			byte[] fileMac = generateFileMac(filePath, serverPassword);
 
 			// guardar mac
 			fileWriter.write(MiscUtil.bytesToHex(fileMac));

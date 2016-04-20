@@ -16,7 +16,7 @@ public class UserUtil {
 	/**
 	 * Imprime a mensagem de como usar a aplicação
 	 */
-	public void printArgsUsage() {
+	public static void printArgsUsage() {
 		System.out.println("Como usar:");
 		System.out.println("myWhats <localUser> <serverAddress> [ -p <password> ] "
 				+ "[ -m <contact> <message> | -f <contact> <file>  | -r contact file  |  "
@@ -27,7 +27,7 @@ public class UserUtil {
 	 * Imprime uma mensagem de acordo com o seu conteúdo
 	 * @param string Conteúdo da mensagem
 	 */
-	public void print(String string) {
+	public static void print(String string) {
 		if (string.equals("OK")) {
 			System.out.println("Operacao realizada com sucesso: " + string);
 		} else {
@@ -40,7 +40,7 @@ public class UserUtil {
 	 * @param chatMessages Lista de mensagens trocadas com o utilizador
 	 * @param username Nome do utilizador que participou nas mensagens
 	 */
-	public void printContactChatMessages(List<ChatMessage> chatMessages, String username) {
+	public static void printContactChatMessages(List<ChatMessage> chatMessages, String username) {
 		for (ChatMessage cm : chatMessages)
 			printContactChatMessage(cm, username, true);
 	}
@@ -50,7 +50,7 @@ public class UserUtil {
 	 * @param chatMessages Lista de mensagens a serem mostradas
 	 * @param username Nome do utilizador que participou nas mensagens
 	 */
-	public void printChatMessages(List<ChatMessage> chatMessages, String username) {
+	public static void printChatMessages(List<ChatMessage> chatMessages, String username) {
 		for (ChatMessage cm : chatMessages)
 			printContactChatMessage(cm, username, false);
 	}
@@ -61,7 +61,7 @@ public class UserUtil {
 	 * @param username Nome do utilizador quem enviou a mensagem
 	 * @param isContact Utilizador é ou não um contacto
 	 */
-	private void printContactChatMessage(ChatMessage chatMessage, String username, boolean isContact) {
+	private static void printContactChatMessage(ChatMessage chatMessage, String username, boolean isContact) {
 		StringBuilder sb = new StringBuilder();
 
 		if (isContact)
@@ -89,7 +89,7 @@ public class UserUtil {
 	 * Pede a password ao utilizador
 	 * @return Devolve a password introduzida pelo utilizador
 	 */
-	public String askForPassword () {
+	public static String askForPassword () {
 		Scanner sc = new Scanner(System.in);
 		
 		System.out.println("Qual a sua password?");

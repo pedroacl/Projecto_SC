@@ -40,7 +40,7 @@ public class Client {
 
 		// verifica se o utlizador preencheu password
 		if (!argsParser.passwordFilled()) {
-			argsParser.setPassword(userInterface.askForPassword());
+			argsParser.setPassword(UserUtil.askForPassword());
 		}
 
 		// Cria Classe de comunicação entre Cliente e servidor
@@ -72,7 +72,7 @@ public class Client {
 		//recebe resultado da comunicaçao
 		NetworkMessage netWorkMessage = clientRequestManager.processRequest();
 		
-		ServerResponseParser srp = new ServerResponseParser(userInterface, argsParser.getUsername());
+		ServerResponseParser srp = new ServerResponseParser(argsParser.getUsername());
 		srp.ProcessMessage(netWorkMessage);
 		// Verificar tipo de mensagem
 		/*
