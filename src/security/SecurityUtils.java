@@ -229,7 +229,7 @@ public class SecurityUtils {
 		return wrappedKey;
 	}
 
-	public static SecretKey unwrapSecretKey(String username, char[] keyPassword, byte[] wrappedKey) {
+	public static SecretKey unwrapSecretKey(String username, char[] keyPassword, byte[] wrappedKey) throws IOException {
 		Key unwrappedSecretKey = null;
 
 		try {
@@ -262,16 +262,14 @@ public class SecurityUtils {
 	 * Obtem uma chave publica guardada na keystore
 	 * 
 	 * @param username
+	 * @throws KeyStoreException 
+	 * @throws IOException 
 	 */
-	public static Certificate getCertificate(String username) {
+	public static Certificate getCertificate(String username) throws KeyStoreException, IOException {
 		Certificate certificate = null;
 
-		try {
-			KeyStore keyStore = PersistenceUtil.getKeyStore(KEYSTORE_PASSWORD);
-			certificate = keyStore.getCertificate(username);
-		} catch (KeyStoreException e) {
-			e.printStackTrace();
-		}
+		KeyStore keyStore = PersistenceUtil.getKeyStore(KEYSTORE_PASSWORD);
+		certificate = keyStore.getCertificate(username);
 
 		return certificate;
 	}

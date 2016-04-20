@@ -3,10 +3,12 @@ package domain.client;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.KeyStoreException;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 
+import exceptions.AliasNotFoundException;
 import network.managers.ClientNetworkManager;
 import network.messages.NetworkMessage;
 import util.UserUtil;
@@ -45,10 +47,10 @@ public class Client {
 
 		// Cria Classe de comunicação entre Cliente e servidor
 		int port = Integer.parseInt(argsParser.getServerPort());
-		
+
 		System.setProperty("javax.net.ssl.trustStore", "truststore.cliente");
 		System.setProperty("javax.net.ssl.trustStorePassword", "seguranca");
-		
+
 		SocketFactory sf = SSLSocketFactory.getDefault();
 		Socket socket = null;
 
@@ -65,15 +67,30 @@ public class Client {
 
 		// Cria mensagem de comunicaçao com o pedido do cliente
 		Parsed parsedRequest = argsParser.getParsed();
-		
-		//Comunica com Servidor seguindo um protocolo dependendo do tipo de pedido do cliente
+
+		// Comunica com Servidor seguindo um protocolo dependendo do tipo de
+		// pedido do cliente
 		ClientRequestManager clientRequestManager = new ClientRequestManager(parsedRequest, clientNetwork);
-		
-		//recebe resultado da comunicaçao
-		NetworkMessage netWorkMessage = clientRequestManager.processRequest();
-		
-		ServerResponseParser srp = new ServerResponseParser(argsParser.getUsername());
-		srp.ProcessMessage(netWorkMessage);
+
+		// recebe resultado da comunicaçao
+		NetworkMessage netWorkMessage;
+
+		try {
+			netWorkMessage = clientRequestManager.processRequest();
+
+			ServerResponseParser srp = new ServerResponseParser(argsParser.getUsername());
+			srp.ProcessMessage(netWorkMessage);
+
+		} catch (AliasNotFoundException e) {
+			e.printStackTrace();
+		} catch (KeyStoreException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			clientNetwork.close();
+		}
+
 		// Verificar tipo de mensagem
 		/*
 		*/

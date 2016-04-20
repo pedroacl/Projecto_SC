@@ -291,8 +291,7 @@ public class ServerClientMessageParser {
 			ServerNetworkContactTypeMessage serverContactTypeMessage = new ServerNetworkContactTypeMessage(
 					MessageType.CONTACT);
 
-			serverContactTypeMessage.addGroupMember(clientMessage.getDestination(),
-					SecurityUtils.getCertificate(clientMessage.getDestination()));
+			serverContactTypeMessage.addGroupMember(clientMessage.getDestination());
 
 			serverMessage = serverContactTypeMessage;
 
