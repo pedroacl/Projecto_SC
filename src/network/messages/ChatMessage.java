@@ -9,46 +9,56 @@ public class ChatMessage extends NetworkMessage {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -2504265010288468745L;
+	private static final long		serialVersionUID	= -2504265010288468745L;
+
+	private byte[]					cypheredMessage;
 
 	// assinatura da mensagem
-	private byte[] signature;
+	private byte[]					signature;
 
-	private String fromUser;
-	
-	private String destination;
+	private String					fromUser;
 
-	// username->chave secreta cifrada com a sua chave publica 
-	private HashMap<String, byte[]> users;
-	
-	private Date createdAt;
-	
+	private String					destination;
+
+	// username->chave secreta cifrada com a sua chave publica
+	private HashMap<String, byte[]>	users;
+
+	private Date					createdAt;
+
 	public ChatMessage(MessageType chatMessage) {
 		super(chatMessage);
 		users = new HashMap<>();
 		createdAt = new Date();
 	}
-	
+
+	public byte[] getCypheredMessage() {
+		return cypheredMessage;
+	}
+
+	public void setCypheredMessage(byte[] cypheredMessage) {
+		this.cypheredMessage = cypheredMessage;
+	}
+
 	public String getDestination() {
 		return destination;
 	}
-	
+
 	public String getFromUser() {
 		return fromUser;
 	}
-	
+
 	public Date getCreatedAt() {
 		return createdAt;
 	}
-	
+
 	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
 	}
-	
+
 	public Set<String> getUsers() {
 		return users.keySet();
 	}
-	
+
 	public byte[] getUserKey(String username) {
 		return users.get(username);
 	}

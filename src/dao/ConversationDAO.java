@@ -1,6 +1,7 @@
 package dao;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -183,12 +184,36 @@ public class ConversationDAO {
 			return null;
 
 		// atualizar data da ultima mensagem enviada
-		long date = lastConversation.getLastMessageDate().getTime();
-		ArrayList<String> texto = (ArrayList<String>) PersistenceUtil.readFromFile(path + "/messages/" + date);
+		String chatMessageName = Long.toString(lastConversation.getLastMessageDate().getTime());
+		ArrayList<String> texto = (ArrayList<String>) PersistenceUtil.readFromFile(path + "/messages/" + chatMessageName);
+
+		// converter chat message
 		ChatMessage lastMessage = makeChatMessage(texto);
 		lastMessage.setCreatedAt(lastConversation.getLastMessageDate());
+		
+		// obter signature da mensagem
+		lastMessage.setSignature(getChatMessageSignature(conversationId, chatMessageName));
 
 		return lastMessage;
+	}
+
+	/**
+	 * Obtém assinatura digital de uma chat message
+	 * @param conversationId Id da conversa
+	 * @param chatMessageName Nome da chat message que corresponde ao seu timestamp
+	 * @return Devolve a assinatura da mensagem, caso esta exista, ou null caso contrário
+	 */
+	private byte[] getChatMessageSignature(Long conversationId, String chatMessageName) {
+		String filePath = "conversations/" + conversationId + "/signatures/" + chatMessageName + ".sig";
+		String signature = null;
+
+		try {
+			signature = PersistenceUtil.readStringFromFile(filePath);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return MiscUtil.hexToBytes(signature);
 	}
 
 	/**
@@ -287,7 +312,7 @@ public class ConversationDAO {
 
 		// criar mensagem
 		ChatMessage chatMessage = new ChatMessage(MessageType.valueOf(messageFields.get(2)));
-		chatMessage.setContent(sb.toString());
+		chatMessage.setCypheredMessage(MiscUtil.hexToBytes(sb.toString()));
 		chatMessage.setFromUser(messageFields.get(0));
 		chatMessage.setDestination(messageFields.get(1));
 

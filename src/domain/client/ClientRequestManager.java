@@ -83,7 +83,7 @@ public class ClientRequestManager {
 				byte[] encryptedMessage = SecurityUtils.cipherWithSecretKey(parsedRequest.getSpecificField().getBytes(),
 						secretKey);
 
-				clientPGPMessage.setContent(MiscUtil.bytesToHex(encryptedMessage));
+				clientPGPMessage.setCypheredMessage(encryptedMessage);
 				System.out.println("[ClientRequestManager] cypheredMessage: " + clientPGPMessage.getContent());
 				List<String> groupMembers = serverNetworkContactTypeMessage.getGroupMembers();
 

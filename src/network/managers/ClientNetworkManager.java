@@ -8,10 +8,8 @@ import java.net.Socket;
 
 import javax.crypto.SecretKey;
 
-import security.SecurityUtils;
-import network.messages.MessageType;
 import network.messages.NetworkMessage;
-import network.messages.ServerMessage;
+import security.SecurityUtils;
 
 public class ClientNetworkManager extends NetworkManager {
 

@@ -15,7 +15,6 @@ import network.messages.MessageType;
 import network.messages.NetworkMessage;
 import network.messages.ServerMessage;
 import network.messages.ServerNetworkContactTypeMessage;
-import security.SecurityUtils;
 import service.ConversationService;
 import service.GroupService;
 

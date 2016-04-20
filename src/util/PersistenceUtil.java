@@ -261,4 +261,22 @@ public class PersistenceUtil {
 		return keyStore;
 	}
 
+	/**
+	 * 
+	 * @param filePath
+	 * @return
+	 * @throws IOException 
+	 */
+	public static String readStringFromFile(String filePath) throws IOException {
+		String line = null;
+
+		File file = new File(filePath);
+		FileReader fileReader = new FileReader(file);
+		BufferedReader bufferedReader = new BufferedReader(fileReader);
+			
+		line = bufferedReader.readLine();
+		bufferedReader.close();
+		
+		return line;
+	}
 }

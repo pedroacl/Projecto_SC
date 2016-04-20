@@ -10,9 +10,9 @@ public class NetworkMessage implements Serializable {
 
 	private int fileSize;
 	
-	protected MessageType messageType;
-	
 	private String content;
+
+	protected MessageType messageType;
 	
 	public NetworkMessage(MessageType messageType) {
 		this.messageType = messageType;

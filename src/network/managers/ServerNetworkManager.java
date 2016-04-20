@@ -9,6 +9,7 @@ import java.net.Socket;
 import javax.crypto.SecretKey;
 
 import network.messages.NetworkMessage;
+import util.MiscUtil;
 
 public class ServerNetworkManager extends NetworkManager {
 
@@ -32,7 +33,7 @@ public class ServerNetworkManager extends NetworkManager {
 	public boolean sendFile(NetworkMessage message) {
 		boolean isValid = false;
 	
-		String filePath = message.getContent();
+		String filePath = (message.getContent());
 		message.setContent(extractName(filePath));
 		
 		send(message);

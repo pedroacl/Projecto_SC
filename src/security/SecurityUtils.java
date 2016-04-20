@@ -402,6 +402,8 @@ public class SecurityUtils {
 
 			// obter mac do ficheiro de utilizadores
 			byte[] fileMac = generateFileMac(filePath, serverPassword);
+			
+			System.out.println("!!!!" + fileMac == null);
 
 			// guardar mac
 			fileWriter.write(MiscUtil.bytesToHex(fileMac));

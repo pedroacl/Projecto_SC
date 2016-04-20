@@ -21,6 +21,8 @@ import util.MiscUtil;
  */
 public class Authentication {
 
+	private static final String	USERS_FILE_PATH	= "users.txt";
+
 	private static UserService	userService;
 
 	private String				serverPassword;
@@ -46,21 +48,40 @@ public class Authentication {
 	 */
 	public void authenticateUser(String username, String password)
 			throws InvalidMacException, InvalidPasswordException {
+
 		// validade do ficheiro comprometida
-		validateUsersFileMac("users.txt", password);
+		String filePath = USERS_FILE_PATH;
+		File file = new File(filePath);
 
-		String[] userPasswordAndSalt = userService.getUserPasswordAndSalt(username);
+		String[] userPasswordAndSalt = null;
 
+		// ficheiros users.txt nao existe
+		if (!file.exists()) {
+			System.out.println("Nao existe ficheiro users");
+
+			// criar ficheiro e adicionar user
+			userService.addUser(username, password, serverPassword);
+			
+			// gerar MAC file
+			SecurityUtils.generateFileMac(filePath, serverPassword);
+		}
 		// user nao existe
-		if (userPasswordAndSalt == null) {
+		else if ((userPasswordAndSalt = userService.getUserPasswordAndSalt(username)) == null) {
 			System.out.println("User nao existe. Adicionar " + username + "!");
+
+			validateUsersFileMac(filePath, password);
 
 			// adicionar user e atualizar MAC do ficheiro de passwords
 			userService.addUser(username, password, serverPassword);
+
+			// atualizar MAC do ficheiro
 			SecurityUtils.updateFileMac("users.txt", password);
 
 		} else {
 			System.out.println("Authentication - User existe!");
+
+			validateUsersFileMac(filePath, password);
+
 			byte[] passwordHash = SecurityUtils.getHash(userPasswordAndSalt[0] + password);
 			String hashString = MiscUtil.bytesToHex(passwordHash);
 
@@ -71,6 +92,7 @@ public class Authentication {
 				throw new InvalidPasswordException();
 			}
 		}
+
 	}
 
 	/**
@@ -100,14 +122,16 @@ public class Authentication {
 				inF.close();
 
 				// gerar MAC atual
+				System.out.println(filePath);
+				System.out.println(password);
 				String currentMacString = MiscUtil.bytesToHex(SecurityUtils.generateFileMac(filePath, password));
 
 				System.out.println("MAC original: " + originalMAC);
 				System.out.println("MAC gerado: " + currentMacString);
-				
+
 				if (!originalMAC.equals(currentMacString)) {
 					throw new InvalidMacException();
-				} 
+				}
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
