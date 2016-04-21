@@ -55,8 +55,8 @@ public class ConversationService {
 		return conversationDAO.getAllConversationsFrom(username);
 	}
 
-	public ChatMessage getLastChatMessage(long conversationId) {
-		return conversationDAO.getLastChatMessage(conversationId);
+	public ChatMessage getLastChatMessage(String username, long conversationId) {
+		return conversationDAO.getLastChatMessage(username, conversationId);
 	}
 
 	public Long getConversationInCommom(String username, String destination) {

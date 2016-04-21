@@ -28,6 +28,9 @@ public class ServerResponseParser {
 	 * @requires serverMessage != null
 	 */
 	public void ProcessMessage(NetworkMessage serverMessage) {
+		
+		System.out.println("[ServerResponseParser] serverMessage: " + serverMessage);
+		
 		switch (serverMessage.getMessageType()) {
 		// operacao bem sucedida
 		case OK:

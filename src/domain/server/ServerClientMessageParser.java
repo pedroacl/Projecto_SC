@@ -27,21 +27,21 @@ import service.GroupService;
  */
 public class ServerClientMessageParser {
 
-	private ClientNetworkMessage	clientMessage;
+	private ClientNetworkMessage clientMessage;
 
-	private Authentication			authentication;
+	private Authentication authentication;
 
-	private GroupService			groupService;
+	private GroupService groupService;
 
-	private ConversationService		conversationService;
+	private ConversationService conversationService;
 
-	private ServerNetworkManager	serverNetworkManager;
+	private ServerNetworkManager serverNetworkManager;
 
-	private final int				MAX_FILE_SIZE	= Integer.MAX_VALUE;
+	private final int MAX_FILE_SIZE = Integer.MAX_VALUE;
 
-	private final String			USERS_FILE		= "users.txt";
+	private final String USERS_FILE = "users.txt";
 
-	private final String			GROUPS_FILE		= "groups.txt";
+	private final String GROUPS_FILE = "groups.txt";
 
 	public ServerClientMessageParser(ClientNetworkMessage clientMessage, ServerNetworkManager serverNetworkManager,
 			Authentication authentication) {
@@ -131,19 +131,21 @@ public class ServerClientMessageParser {
 		case RECEIVER:
 
 			switch (clientMessage.getContent()) {
-
 			// mensagem mais recente com cada utilizador
 			case "recent":
-				ArrayList<Long> ids = conversationService.getAllConversationsFrom(clientMessage.getUsername());
+				System.out.println("[ServerClientMessageParser] pedido do tipo -r");
+				
+				ArrayList<Long> conversationsIds = conversationService.getAllConversationsFrom(clientMessage.getUsername());
 				ArrayList<ChatMessage> recent = new ArrayList<ChatMessage>();
-				for (long id : ids) {
-					recent.add(conversationService.getLastChatMessage(id));// TODO
-																			// tb
-																			// preencher
-																			// AD
-																			// e
-																			// Ks
+
+				for (long conversationId : conversationsIds) {
+					ChatMessage lastChatMessage = conversationService.getLastChatMessage(clientMessage.getUsername(),
+							conversationId);
+
+					if (lastChatMessage != null)
+						recent.add(lastChatMessage);
 				}
+
 				ServerMessage serverMessageaux = new ServerMessage(MessageType.LAST_MESSAGES);
 				serverMessageaux.setMessages(recent);
 
@@ -243,7 +245,8 @@ public class ServerClientMessageParser {
 
 	/**
 	 * Função que remove um utilizador de um grupo
-	 * @throws InvalidMacException 
+	 * 
+	 * @throws InvalidMacException
 	 * 
 	 */
 	private ServerMessage removeUserFromGroup() throws InvalidMacException {
@@ -283,11 +286,12 @@ public class ServerClientMessageParser {
 
 	/**
 	 * Função que permite adicionar um utilizador a um determinado grupo
-	 * @throws InvalidMacException 
+	 * 
+	 * @throws InvalidMacException
 	 */
 	private ServerMessage addUserToGroup() throws InvalidMacException {
 		ServerMessage serverMessage = new ServerMessage(MessageType.OK);
-		
+
 		SecurityUtils.validateFileMac(GROUPS_FILE, authentication.getServerPassword());
 
 		if (authentication.existsUser(clientMessage.getDestination()) && groupService.addUserToGroup(

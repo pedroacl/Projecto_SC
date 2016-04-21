@@ -267,10 +267,9 @@ public class PersistenceUtil {
 	 * @return
 	 * @throws IOException 
 	 */
-	public static String readStringFromFile(String filePath) throws IOException {
+	public static String readStringFromFile(File file) throws IOException {
 		String line = null;
 
-		File file = new File(filePath);
 		FileReader fileReader = new FileReader(file);
 		BufferedReader bufferedReader = new BufferedReader(fileReader);
 			

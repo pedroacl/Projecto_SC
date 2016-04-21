@@ -87,7 +87,7 @@ public class ConversationDAO {
 			conversation = new Conversation(chatMessage.getFromUser(), chatMessage.getDestination());
 			conversation.setId(conversationId);
 			conversation.setLastMessageDate(chatMessage.getCreatedAt());
-			
+
 			PersistenceUtil.createFile(filePath);
 			PersistenceUtil.writeObject(conversation, filePath);
 		} else {
@@ -111,16 +111,16 @@ public class ConversationDAO {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append(chatMessage.getFromUser());
-		sb.append("\n"); 
+		sb.append("\n");
 		sb.append(chatMessage.getDestination());
 		sb.append("\n");
-		sb.append(chatMessage.getMessageType()); 
+		sb.append(chatMessage.getMessageType());
 		sb.append("\n");
 		sb.append(chatMessage.getContent());
 		sb.append("\n");
-		
+
 		PersistenceUtil.writeStringToFile(sb.toString(), pathToTxt);
-		
+
 		String signaturePath = "conversations/" + conversation.getId() + "/signatures/" + messageFileName + ".sig";
 		String signature = MiscUtil.bytesToHex(chatMessage.getSignature());
 		PersistenceUtil.writeStringToFile(signature, signaturePath);
@@ -175,7 +175,9 @@ public class ConversationDAO {
 	 * @return Lista das ultimas mensagens
 	 * @requires conversationId != null
 	 */
-	public ChatMessage getLastChatMessage(Long conversationId) {
+	public ChatMessage getLastChatMessage(String username, Long conversationId) {
+		ChatMessage lastMessage = null;
+
 		String path = "conversations/" + conversationId;
 		Conversation lastConversation = (Conversation) PersistenceUtil.readObject(path + "/conversation");
 
@@ -183,36 +185,67 @@ public class ConversationDAO {
 		if (lastConversation == null)
 			return null;
 
-		// atualizar data da ultima mensagem enviada
+		// obter nome da ultima mensagem
 		String chatMessageName = Long.toString(lastConversation.getLastMessageDate().getTime());
-		ArrayList<String> texto = (ArrayList<String>) PersistenceUtil.readFromFile(path + "/messages/" + chatMessageName);
 
-		// converter chat message
-		ChatMessage lastMessage = makeChatMessage(texto);
-		lastMessage.setCreatedAt(lastConversation.getLastMessageDate());
-		
-		// obter signature da mensagem
-		lastMessage.setSignature(getChatMessageSignature(conversationId, chatMessageName));
+		// obter key da mensagem
+		byte[] userChatMessageKey = getUserChatMessageKey(username, conversationId, chatMessageName);
+
+		// user presente no grupo
+		if (userChatMessageKey != null) {
+
+			ArrayList<String> texto = (ArrayList<String>) PersistenceUtil
+					.readFromFile(path + "/messages/" + chatMessageName);
+
+			// converter chat message
+			lastMessage = makeChatMessage(texto);
+			lastMessage.setCreatedAt(lastConversation.getLastMessageDate());
+
+			// obter signature da mensagem
+			lastMessage.setSignature(getChatMessageSignature(conversationId, chatMessageName));
+			lastMessage.setCypheredMessageKey(userChatMessageKey);
+		}
 
 		return lastMessage;
 	}
 
+	private byte[] getUserChatMessageKey(String username, long conversationId, String chatMessageName) {
+		String filePath = "conversations/" + conversationId + "/keys/" + chatMessageName + ".key." + username;
+
+		File file = new File(filePath);
+		byte[] keyBytes = null;
+
+		try {
+			String keyString = PersistenceUtil.readStringFromFile(file);
+			keyBytes = MiscUtil.hexToBytes(keyString);
+
+		} catch (IOException e) {
+			return null;
+		}
+
+		return keyBytes;
+	}
+
 	/**
 	 * Obtém assinatura digital de uma chat message
-	 * @param conversationId Id da conversa
-	 * @param chatMessageName Nome da chat message que corresponde ao seu timestamp
-	 * @return Devolve a assinatura da mensagem, caso esta exista, ou null caso contrário
+	 * 
+	 * @param conversationId
+	 *            Id da conversa
+	 * @param chatMessageName
+	 *            Nome da chat message que corresponde ao seu timestamp
+	 * @return Devolve a assinatura da mensagem, caso esta exista, ou null caso
+	 *         contrário
 	 */
 	private byte[] getChatMessageSignature(Long conversationId, String chatMessageName) {
 		String filePath = "conversations/" + conversationId + "/signatures/" + chatMessageName + ".sig";
 		String signature = null;
 
 		try {
-			signature = PersistenceUtil.readStringFromFile(filePath);
+			signature = PersistenceUtil.readStringFromFile(new File(filePath));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return MiscUtil.hexToBytes(signature);
 	}
 
