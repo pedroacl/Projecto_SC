@@ -15,6 +15,7 @@ import network.messages.MessageType;
 import network.messages.NetworkMessage;
 import network.messages.ServerMessage;
 import network.messages.ServerNetworkContactTypeMessage;
+import security.SecurityUtils;
 import service.ConversationService;
 import service.GroupService;
 
@@ -38,7 +39,9 @@ public class ServerClientMessageParser {
 
 	private final int				MAX_FILE_SIZE	= Integer.MAX_VALUE;
 
-	private final String			USERS_MAC_FILE	= "users.mac.txt";
+	private final String			USERS_FILE		= "users.txt";
+
+	private final String			GROUPS_FILE		= "groups.txt";
 
 	public ServerClientMessageParser(ClientNetworkMessage clientMessage, ServerNetworkManager serverNetworkManager,
 			Authentication authentication) {
@@ -210,12 +213,22 @@ public class ServerClientMessageParser {
 			break;
 		// adicionar utilizador
 		case ADDUSER:
-			serverMessage = addUserToGroup();
+			try {
+				serverMessage = addUserToGroup();
+			} catch (InvalidMacException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			break;
 
 		// remover utilizador
 		case REMOVEUSER:
-			serverMessage = removeUserFromGroup();
+			try {
+				serverMessage = removeUserFromGroup();
+			} catch (InvalidMacException e) {
+				e.printStackTrace();
+			}
+
 			break;
 
 		// mensagem mal formatada
@@ -230,13 +243,15 @@ public class ServerClientMessageParser {
 
 	/**
 	 * Função que remove um utilizador de um grupo
+	 * @throws InvalidMacException 
 	 * 
 	 */
-	private ServerMessage removeUserFromGroup() {
+	private ServerMessage removeUserFromGroup() throws InvalidMacException {
 		ServerMessage serverMessage = new ServerMessage(MessageType.OK);
 
 		// utilizador a ser removido existe
 		if (authentication.existsUser(clientMessage.getDestination())) {
+			SecurityUtils.validateFileMac(GROUPS_FILE, this.authentication.getServerPassword());
 
 			if (!groupService.removeUserFromGroup(clientMessage.getUsername(), clientMessage.getDestination(),
 					clientMessage.getContent())) {
@@ -268,9 +283,12 @@ public class ServerClientMessageParser {
 
 	/**
 	 * Função que permite adicionar um utilizador a um determinado grupo
+	 * @throws InvalidMacException 
 	 */
-	private ServerMessage addUserToGroup() {
+	private ServerMessage addUserToGroup() throws InvalidMacException {
 		ServerMessage serverMessage = new ServerMessage(MessageType.OK);
+		
+		SecurityUtils.validateFileMac(GROUPS_FILE, authentication.getServerPassword());
 
 		if (authentication.existsUser(clientMessage.getDestination()) && groupService.addUserToGroup(
 				clientMessage.getUsername(), clientMessage.getDestination(), clientMessage.getContent())) {

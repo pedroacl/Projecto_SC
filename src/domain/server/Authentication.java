@@ -1,10 +1,6 @@
 package domain.server;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 
 import exceptions.InvalidMacException;
 import exceptions.InvalidPasswordException;
@@ -30,6 +26,10 @@ public class Authentication {
 	public Authentication(String serverPassword) {
 		this.serverPassword = serverPassword;
 		userService = new UserService();
+	}
+	
+	public String getServerPassword() {
+		return this.serverPassword;
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class Authentication {
 
 			// criar ficheiro e adicionar user
 			userService.addUser(username, password, serverPassword);
-			
+
 			// gerar MAC file
 			SecurityUtils.generateFileMac(filePath, serverPassword);
 		}
@@ -69,7 +69,7 @@ public class Authentication {
 		else if ((userPasswordAndSalt = userService.getUserPasswordAndSalt(username)) == null) {
 			System.out.println("User nao existe. Adicionar " + username + "!");
 
-			validateUsersFileMac(filePath, password);
+			SecurityUtils.validateFileMac(filePath, password);
 
 			// adicionar user e atualizar MAC do ficheiro de passwords
 			userService.addUser(username, password, serverPassword);
@@ -80,7 +80,7 @@ public class Authentication {
 		} else {
 			System.out.println("Authentication - User existe!");
 
-			validateUsersFileMac(filePath, password);
+			SecurityUtils.validateFileMac(filePath, password);
 
 			byte[] passwordHash = SecurityUtils.getHash(userPasswordAndSalt[0] + password);
 			String hashString = MiscUtil.bytesToHex(passwordHash);
@@ -93,51 +93,6 @@ public class Authentication {
 			}
 		}
 
-	}
-
-	/**
-	 * 
-	 * @param usersFilePath
-	 * @param password
-	 * @return
-	 * @throws InvalidMacException
-	 */
-	public void validateUsersFileMac(String filePath, String password) throws InvalidMacException {
-		System.out.println("[Authentication.validateUsersFileMac] filePath: " + filePath);
-
-		try {
-			File usersFileMacPath = new File(filePath + ".mac");
-
-			// nao existe ficheiro MAC
-			if (!usersFileMacPath.exists()) {
-				System.out.println("Ficheiro MAC não existe");
-				SecurityUtils.updateFileMac(filePath, password);
-
-			} else {
-				System.out.println("[Authentication.validateUsersFileMac] ficheiro MAC existe");
-
-				// obter MAC original
-				BufferedReader inF = new BufferedReader(new FileReader(usersFileMacPath));
-				String originalMAC = inF.readLine();
-				inF.close();
-
-				// gerar MAC atual
-				System.out.println(filePath);
-				System.out.println(password);
-				String currentMacString = MiscUtil.bytesToHex(SecurityUtils.generateFileMac(filePath, password));
-
-				System.out.println("MAC original: " + originalMAC);
-				System.out.println("MAC gerado: " + currentMacString);
-
-				if (!originalMAC.equals(currentMacString)) {
-					throw new InvalidMacException();
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**

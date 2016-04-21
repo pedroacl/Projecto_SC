@@ -6,6 +6,7 @@ import java.util.List;
 
 import dao.ConversationDAO;
 import network.messages.ChatMessage;
+import security.SecurityUtils;
 import util.PersistenceUtil;
 
 /**
@@ -16,7 +17,7 @@ import util.PersistenceUtil;
 public class ConversationService {
 
 	private static ConversationDAO conversationDAO;
-
+	
 	public ConversationService() {
 		conversationDAO = new ConversationDAO();
 	}

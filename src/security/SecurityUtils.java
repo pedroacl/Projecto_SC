@@ -33,6 +33,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
+import exceptions.InvalidMacException;
 import util.MiscUtil;
 import util.PersistenceUtil;
 
@@ -262,8 +263,8 @@ public class SecurityUtils {
 	 * Obtem uma chave publica guardada na keystore
 	 * 
 	 * @param username
-	 * @throws KeyStoreException 
-	 * @throws IOException 
+	 * @throws KeyStoreException
+	 * @throws IOException
 	 */
 	public static Certificate getCertificate(String username) throws KeyStoreException, IOException {
 		Certificate certificate = null;
@@ -281,6 +282,51 @@ public class SecurityUtils {
 	public static int generateSalt() {
 		final SecureRandom randomNumber = new SecureRandom();
 		return (randomNumber.nextInt(900000) + 100000);
+	}
+
+	/**
+	 * 
+	 * @param usersFilePath
+	 * @param password
+	 * @return
+	 * @throws InvalidMacException
+	 */
+	public static void validateFileMac(String filePath, String password) throws InvalidMacException {
+		System.out.println("[Authentication.validateUsersFileMac] filePath: " + filePath);
+
+		try {
+			File usersFileMacPath = new File(filePath + ".mac");
+
+			// nao existe ficheiro MAC
+			if (!usersFileMacPath.exists()) {
+				System.out.println("Ficheiro MAC não existe");
+				SecurityUtils.updateFileMac(filePath, password);
+
+			} else {
+				System.out.println("[Authentication.validateUsersFileMac] ficheiro MAC existe");
+
+				// obter MAC original
+				BufferedReader inF = new BufferedReader(new FileReader(usersFileMacPath));
+				String originalMAC = inF.readLine();
+				inF.close();
+
+				// gerar MAC atual
+				System.out.println(filePath);
+				System.out.println(password);
+				String currentMacString = MiscUtil.bytesToHex(SecurityUtils.generateFileMac(filePath, password));
+
+				System.out.println("MAC original: " + originalMAC);
+				System.out.println("MAC gerado: " + currentMacString);
+
+				if (!originalMAC.equals(currentMacString)) {
+					throw new InvalidMacException();
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -402,7 +448,7 @@ public class SecurityUtils {
 
 			// obter mac do ficheiro de utilizadores
 			byte[] fileMac = generateFileMac(filePath, serverPassword);
-			
+
 			System.out.println("!!!!" + fileMac == null);
 
 			// guardar mac
