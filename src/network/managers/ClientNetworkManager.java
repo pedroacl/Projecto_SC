@@ -88,7 +88,7 @@ public class ClientNetworkManager extends NetworkManager {
 			int lido = fileInputStream.read(bfile, 0, bfile.length);
 			currentLength += lido;
 			
-			bfile = SecurityUtils.cipherWithSecretKey(bfile, key);
+			bfile = SecurityUtils.cipherWithSessionKey(bfile, key);
 			
 			out.write(bfile, 0, bfile.length);
 		}

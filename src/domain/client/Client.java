@@ -77,9 +77,11 @@ public class Client {
 
 		try {
 			netWorkMessage = clientRequestManager.processRequest();
+			
+			System.out.println("[Client] networkMessage: " + netWorkMessage);
 
 			ServerResponseParser srp = new ServerResponseParser(argsParser.getUsername());
-			srp.ProcessMessage(netWorkMessage);
+			srp.processMessage(netWorkMessage);
 
 		} catch (AliasNotFoundException e) {
 			e.printStackTrace();

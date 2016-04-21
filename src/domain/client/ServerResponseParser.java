@@ -27,7 +27,7 @@ public class ServerResponseParser {
 	 *            Mensagem que o servido enviou
 	 * @requires serverMessage != null
 	 */
-	public void ProcessMessage(NetworkMessage serverMessage) {
+	public void processMessage(NetworkMessage serverMessage) {
 		
 		System.out.println("[ServerResponseParser] serverMessage: " + serverMessage);
 		

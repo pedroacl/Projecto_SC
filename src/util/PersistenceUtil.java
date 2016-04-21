@@ -233,33 +233,7 @@ public class PersistenceUtil {
 		return input;
 	}
 
-	/**
-	 * Obter keystore guardada num ficheiro
-	 * 
-	 * @param userPassword
-	 *            Password de acesso à keystore
-	 * @throws IOException
-	 */
-	public static KeyStore getKeyStore(String keystorePassword) throws IOException {
-		FileInputStream fileInputStream = null;
-		KeyStore keyStore = null;
 
-		try {
-			fileInputStream = new FileInputStream(KEYSTORE_PATH);
-			keyStore = KeyStore.getInstance("JKS");
-			keyStore.load(fileInputStream, keystorePassword.toCharArray());
-			fileInputStream.close();
-
-		} catch (KeyStoreException e) {
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (CertificateException e) {
-			e.printStackTrace();
-		}
-
-		return keyStore;
-	}
 
 	/**
 	 * 

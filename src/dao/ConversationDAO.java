@@ -116,7 +116,10 @@ public class ConversationDAO {
 		sb.append("\n");
 		sb.append(chatMessage.getMessageType());
 		sb.append("\n");
-		sb.append(chatMessage.getContent());
+		
+		String cypheredMessage = MiscUtil.bytesToHex(chatMessage.getCypheredMessage());
+		
+		sb.append(cypheredMessage);
 		sb.append("\n");
 
 		PersistenceUtil.writeStringToFile(sb.toString(), pathToTxt);
@@ -337,6 +340,8 @@ public class ConversationDAO {
 	private ChatMessage makeChatMessage(ArrayList<String> messageFields) {
 		StringBuilder sb = new StringBuilder();
 
+		System.out.println("[ConversationDAO.makeChatMessage] messageFields" + messageFields);
+
 		// iterar atributos da mensagem
 		for (int i = 0; i < messageFields.size(); i++) {
 			if (i > 2)
@@ -345,6 +350,9 @@ public class ConversationDAO {
 
 		// criar mensagem
 		ChatMessage chatMessage = new ChatMessage(MessageType.valueOf(messageFields.get(2)));
+
+		System.out.println("[ConversationDAO.makeChatMessage]" + sb.toString());
+
 		chatMessage.setCypheredMessage(MiscUtil.hexToBytes(sb.toString()));
 		chatMessage.setFromUser(messageFields.get(0));
 		chatMessage.setDestination(messageFields.get(1));

@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import javax.crypto.SecretKey;
 
@@ -16,6 +14,7 @@ import network.messages.ChatMessage;
 import network.messages.ClientNetworkMessage;
 import network.messages.MessageType;
 import network.messages.NetworkMessage;
+import network.messages.ServerMessage;
 import network.messages.ServerNetworkContactTypeMessage;
 import security.SecurityUtils;
 import util.MiscUtil;
@@ -41,6 +40,11 @@ public class ClientRequestManager {
 		ChatMessage chatMessage = null;
 		ClientNetworkMessage clientNetworkMessage;
 
+		System.out.println("[ClientRequestManager.processRequest] " + parsedRequest.getOrder());
+		
+		String username = parsedRequest.getUsername();
+		String userPassword = parsedRequest.getPassword();
+		
 		switch (parsedRequest.getOrder()) {
 		// client quer enviar uma mensagem
 
@@ -80,7 +84,7 @@ public class ClientRequestManager {
 				SecretKey secretKey = SecurityUtils.generateSecretKey();
 
 				// cifrar mensagem com chave secreta
-				byte[] encryptedMessage = SecurityUtils.cipherWithSecretKey(parsedRequest.getSpecificField().getBytes(),
+				byte[] encryptedMessage = SecurityUtils.cipherWithSessionKey(parsedRequest.getSpecificField().getBytes(),
 						secretKey);
 
 				clientPGPMessage.setCypheredMessage(encryptedMessage);
@@ -88,19 +92,16 @@ public class ClientRequestManager {
 				List<String> groupMembers = serverNetworkContactTypeMessage.getGroupMembers();
 
 				// cifrar chave secreta, usada para cifrar mensagem anterior
-				for (String username : groupMembers) {
+				for (String groupMember : groupMembers) {
 					// wrap da chave secreta a ser enviada com a chave
 					// publica do contacto de destino
-					Certificate certificate = SecurityUtils.getCertificate(username);
-					byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(secretKey, certificate);
+					byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(groupMember, userPassword, secretKey);
 
 					clientPGPMessage.putUserKey(username, wrappedSecretKey);
 				}
 
 				// adicionar chave cifrada do proprio utilizador
-				byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(secretKey,
-						SecurityUtils.getCertificate(parsedRequest.getUsername()));
-
+				byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(username, userPassword, secretKey);
 				clientPGPMessage.putUserKey(parsedRequest.getUsername(), wrappedSecretKey);
 
 				// enviar mensagem
@@ -152,23 +153,15 @@ public class ClientRequestManager {
 				List<String> groupMembers = (List<String>) serverNetworkContactTypeMessage.getGroupMembers();
 
 				// cifrar chave secreta, usada para cifrar ficheiro
-				for (String username : groupMembers) {
-					// obter certificado
-					Certificate certificate = SecurityUtils.getCertificate(username);
-					
-					if (certificate == null) {
-						throw new AliasNotFoundException("Não existe alias para o user " + username);
-					}
-
+				for (String groupMember : groupMembers) {
 					// wrap da chave secreta a ser enviada com a chave
 					// publica do contacto de destino
-					byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(secretKey, certificate);
-					chatMessage.putUserKey(username, wrappedSecretKey);
+					byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(groupMember, userPassword, secretKey);
+					chatMessage.putUserKey(groupMember, wrappedSecretKey);
 				}
 
 				// adicionar chave cifrada do proprio utilizador
-				byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(secretKey,
-						SecurityUtils.getCertificate(parsedRequest.getUsername()));
+				byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(username, userPassword, secretKey);
 
 				chatMessage.putUserKey(parsedRequest.getUsername(), wrappedSecretKey);
 
@@ -197,23 +190,29 @@ public class ClientRequestManager {
 		 * C ----------RECEIVER-----------> S <--AD,Ks(M),K(k), M/NOK--LAST--
 		 */
 
-		case "rLast":
+		case "-rLast":
+			
+			System.out.println("-rLast");
 
 			clientNetworkMessage = new ClientNetworkMessage(parsedRequest.getUsername(), parsedRequest.getPassword(),
 					MessageType.RECEIVER);
 
 			clientNetworkMessage.setContent("recent");
 
+			System.out.println("[ClientRequestManager] rLast antes: " + clientNetworkMessage);
+
 			// enviar mensagem
 			clientNetworkManager.sendMessage(clientNetworkMessage);
 
 			// espera resposta
-			ChatMessage chatmessage = (ChatMessage) clientNetworkManager.receiveMessage();
+			ServerMessage serverMessage = (ServerMessage) clientNetworkManager.receiveMessage();
 
-			networkMessage = chatmessage;
+			System.out.println("[ClientRequestManager] rLast depois: " + clientNetworkMessage);
+
+			networkMessage = serverMessage;
 			break;
 
-		case "rContact":
+		case "-rContact":
 
 			/*
 			 * C -------------RECEIVER--------------> S
@@ -229,12 +228,12 @@ public class ClientRequestManager {
 			clientNetworkManager.sendMessage(clientNetworkMessage);
 
 			// espera resposta
-			chatmessage = (ChatMessage) clientNetworkManager.receiveMessage();
+			ChatMessage chatmessage = (ChatMessage) clientNetworkManager.receiveMessage();
 
 			networkMessage = chatmessage;
 			break;
 
-		case "rFile":
+		case "-rFile":
 
 			/*
 			 * C ----------RECEIVER-----------> S <--AD,Ks(F),K(ks)/NOK--FILE--

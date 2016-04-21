@@ -2,6 +2,7 @@ package security;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -21,6 +22,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 
 import javax.crypto.BadPaddingException;
@@ -38,8 +40,6 @@ import util.MiscUtil;
 import util.PersistenceUtil;
 
 public class SecurityUtils {
-	private static final String KEYSTORE_PASSWORD = "seguranca";
-
 	/**
 	 * Gera uma sintese SHA 256 baseada numa string message
 	 * 
@@ -139,6 +139,23 @@ public class SecurityUtils {
 		return null;
 	}
 
+	public static String decipherChatMessage(String username, String userPassword, byte[] wrappedSessionKey,
+			byte[] cipheredMessage) {
+
+		String decipheredChatMessage = null;
+
+		try {
+			SecretKey sessionKey = unwrapSessionKey(username, userPassword, wrappedSessionKey);
+			byte[] decipheredChatMessageBytes = decipherWithSessionKey(cipheredMessage, sessionKey);
+			decipheredChatMessage = MiscUtil.bytesToHex(decipheredChatMessageBytes);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return decipheredChatMessage;
+	}
+
 	/*
 	 * /** Cifra uma mensagem com uma chave privada
 	 * 
@@ -146,7 +163,7 @@ public class SecurityUtils {
 	 * 
 	 * @return Devolve uma mensagem cifrada com uma chave privada
 	 */
-	public static byte[] cipherWithSecretKey(byte[] message, SecretKey secretKey) {
+	public static byte[] cipherWithSessionKey(byte[] message, SecretKey secretKey) {
 		byte[] encryptedMessage = null;
 
 		try {
@@ -169,7 +186,7 @@ public class SecurityUtils {
 		return encryptedMessage;
 	}
 
-	public static byte[] decipherWithSecretKey(byte[] cipheredMessage, SecretKey secretKey) {
+	private static byte[] decipherWithSessionKey(byte[] cipheredMessage, SecretKey secretKey) {
 		byte[] decipheredMessage = null;
 
 		try {
@@ -201,11 +218,13 @@ public class SecurityUtils {
 	 * @param secretKey
 	 * @return Devolve a chave privada cifrada
 	 */
-	public static byte[] wrapSecretKey(SecretKey secretKey, Certificate certificate) {
+	public static byte[] wrapSecretKey(String username, String userPassword, SecretKey secretKey) {
 		byte[] wrappedKey = null;
 
 		try {
 			// obter certificado
+			Certificate certificate = SecurityUtils.getCertificate(username, userPassword);
+
 			// KeyStore keystore =
 			// PersistenceUtil.getKeyStore(KEYSTORE_PASSWORD);
 			// Certificate certificate = keystore.getCertificate(username);
@@ -225,18 +244,23 @@ public class SecurityUtils {
 			e.printStackTrace();
 		} catch (IllegalBlockSizeException e) {
 			e.printStackTrace();
+		} catch (KeyStoreException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
 		return wrappedKey;
 	}
 
-	public static SecretKey unwrapSecretKey(String username, char[] keyPassword, byte[] wrappedKey) throws IOException {
+	public static SecretKey unwrapSessionKey(String username, String userPassword, byte[] wrappedKey)
+			throws IOException {
 		Key unwrappedSecretKey = null;
 
 		try {
 			// obter keystore
-			KeyStore keystore = PersistenceUtil.getKeyStore(KEYSTORE_PASSWORD);
-			Key privateKey = keystore.getKey(username, keyPassword);
+			KeyStore keystore = getKeyStore(username, userPassword);
+			Key privateKey = keystore.getKey(username, userPassword.toCharArray());
 
 			// inicializar cifra
 			Cipher cipher = Cipher.getInstance("RSA");
@@ -266,10 +290,11 @@ public class SecurityUtils {
 	 * @throws KeyStoreException
 	 * @throws IOException
 	 */
-	public static Certificate getCertificate(String username) throws KeyStoreException, IOException {
+	public static Certificate getCertificate(String username, String userPassword)
+			throws KeyStoreException, IOException {
 		Certificate certificate = null;
 
-		KeyStore keyStore = PersistenceUtil.getKeyStore(KEYSTORE_PASSWORD);
+		KeyStore keyStore = getKeyStore(username, userPassword);
 		certificate = keyStore.getCertificate(username);
 
 		return certificate;
@@ -460,5 +485,33 @@ public class SecurityUtils {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Obter keystore guardada num ficheiro
+	 * 
+	 * @param userPassword
+	 *            Password de acesso à keystore
+	 * @throws IOException
+	 */
+	private static KeyStore getKeyStore(String username, String userPassword) throws IOException {
+		FileInputStream fileInputStream = null;
+		KeyStore keyStore = null;
+
+		try {
+			fileInputStream = new FileInputStream("keystore." + username);
+			keyStore = KeyStore.getInstance("JKS");
+			keyStore.load(fileInputStream, userPassword.toCharArray());
+			fileInputStream.close();
+
+		} catch (KeyStoreException e) {
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (CertificateException e) {
+			e.printStackTrace();
+		}
+
+		return keyStore;
 	}
 }
