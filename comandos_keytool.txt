@@ -16,13 +16,13 @@
 # Gerar keystores dos users
 ###
 
-# Maria
+# Maria (pass: mariamaria)
 /usr/lib/jvm/java-8-oracle/bin/keytool -genkey -keyalg RSA -alias maria -keystore keystore.maria -validity 360 -keysize 2048
 
-# Sara
+# Sara (pass: sarasara)
 /usr/lib/jvm/java-8-oracle/bin/keytool -genkey -keyalg RSA -alias sara -keystore keystore.sara -validity 360 -keysize 2048
 
-# Pedro
+# Pedro (pass: pedropedro)
 /usr/lib/jvm/java-8-oracle/bin/keytool -genkey -keyalg RSA -alias pedro -keystore keystore.pedro -validity 360 -keysize 2048
 
 
@@ -81,7 +81,7 @@
 /usr/lib/jvm/java-8-oracle/bin/keytool -printcert -file X509_certificate.cer
 
 # Conteudo de um alias
-/usr/lib/jvm/java-8-oracle/bin/keytool -list -alias maria -keystore keystore.jks
+/usr/lib/jvm/java-8-oracle/bin/keytool -list -alias maria -keystore keystore.maria
 
 # Criar certificado
 /usr/lib/jvm/java-8-oracle/bin/keytool -keystore clientkeystore -certreq -alias client -keyalg rsa -file client.csr

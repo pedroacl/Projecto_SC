@@ -11,11 +11,11 @@ import util.UserUtil;
  * @author Pedro, José e António
  *
  */
-public class ServerResponseParser {
+public class ClientServerResponseParser {
 
 	private String username;
 
-	public ServerResponseParser(String username) {
+	public ClientServerResponseParser(String username) {
 		// this.userUtil = userInterface;
 		this.username = username;
 	}
@@ -49,6 +49,7 @@ public class ServerResponseParser {
 
 		// ultima mensagem de cada conversa em que o utilizador participou
 		case LAST_MESSAGES:
+			System.out.println("[ClientServerResponseParser] LAST_MESSAGES");
 			UserUtil.printContactChatMessages(((ServerMessage) serverMessage).getMessageList(), username);
 			break;
 

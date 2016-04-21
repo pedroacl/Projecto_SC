@@ -32,13 +32,13 @@ public class UserService {
 		String hashString = MiscUtil.bytesToHex(hash);
 
 		// criar par salt:hashedPassword
-		StringBuilder sb = new StringBuilder(); 
+		StringBuilder sb = new StringBuilder();
 		sb.append(saltString);
 		sb.append(":");
 		sb.append(hashString);
 
 		users.put(username, sb.toString());
-		
+
 		// persistir utilizador
 		userDAO.addUser(username, sb.toString(), serverPassword);
 	}

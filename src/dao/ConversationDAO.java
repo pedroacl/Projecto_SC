@@ -128,7 +128,9 @@ public class ConversationDAO {
 		String signature = MiscUtil.bytesToHex(chatMessage.getSignature());
 		PersistenceUtil.writeStringToFile(signature, signaturePath);
 
-		// persistir chave para cada utilizador TESTAR
+		// persistir chave para cada utilizador 
+		System.out.println("[ConversationDAO.addChatMessage] users length: " + chatMessage.getUsers().size());
+		
 		for (String username : chatMessage.getUsers()) {
 			String keyPath = "conversations/" + conversation.getId() + "/keys/" + messageFileName + ".key." + username;
 			String userKey = MiscUtil.bytesToHex(chatMessage.getUserKey(username));

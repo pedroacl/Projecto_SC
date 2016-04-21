@@ -210,18 +210,18 @@ public class SecurityUtils {
 	/**
 	 * Função que cifra a chave privada a ser enviada
 	 * 
-	 * @param username
+	 * @param alias
 	 *            Nome do dono da chave publica a ser usada para cifrar
 	 * 
 	 * @param secretKey
 	 * @return Devolve a chave privada cifrada
 	 */
-	public static byte[] wrapSecretKey(String username, String userPassword, SecretKey secretKey) {
+	public static byte[] wrapSecretKey(String username, String alias, String userPassword, SecretKey secretKey) {
 		byte[] wrappedKey = null;
 
 		try {
 			// obter certificado
-			Certificate certificate = SecurityUtils.getCertificate(username, userPassword);
+			Certificate certificate = SecurityUtils.getCertificate(username, alias, userPassword);
 
 			// KeyStore keystore =
 			// PersistenceUtil.getKeyStore(KEYSTORE_PASSWORD);
@@ -288,12 +288,12 @@ public class SecurityUtils {
 	 * @throws KeyStoreException
 	 * @throws IOException
 	 */
-	public static Certificate getCertificate(String username, String userPassword)
+	public static Certificate getCertificate(String username, String alias, String userPassword)
 			throws KeyStoreException, IOException {
 		Certificate certificate = null;
 
 		KeyStore keyStore = getKeyStore(username, userPassword);
-		certificate = keyStore.getCertificate(username);
+		certificate = keyStore.getCertificate(alias);
 
 		return certificate;
 	}
@@ -493,11 +493,13 @@ public class SecurityUtils {
 	 * @throws IOException
 	 */
 	private static KeyStore getKeyStore(String username, String userPassword) throws IOException {
-		FileInputStream fileInputStream = null;
 		KeyStore keyStore = null;
 
+		System.out.println("[SecurityUtils.getKeystore] username: " + username);
+		System.out.println("[SecurityUtils.getKeystore] userPassword: " + userPassword);
+
 		try {
-			fileInputStream = new FileInputStream("keystore." + username);
+			FileInputStream fileInputStream = new FileInputStream("keystore." + username);
 			keyStore = KeyStore.getInstance("JKS");
 			keyStore.load(fileInputStream, userPassword.toCharArray());
 			fileInputStream.close();

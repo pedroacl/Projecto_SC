@@ -75,12 +75,12 @@ public class Authentication {
 			userService.addUser(username, userPassword, serverPassword);
 
 			// atualizar MAC do ficheiro
-			SecurityUtils.updateFileMac("users.txt", userPassword);
+			SecurityUtils.updateFileMac("users.txt", serverPassword);
 
 		} else {
 			System.out.println("Authentication - User existe!");
 
-			SecurityUtils.validateFileMac(filePath, userPassword);
+			SecurityUtils.validateFileMac(filePath, serverPassword);
 
 			byte[] passwordHash = SecurityUtils.getHash(userPasswordAndSalt[0] + userPassword);
 			String hashString = MiscUtil.bytesToHex(passwordHash);

@@ -47,7 +47,9 @@ public class UserUtil {
 	 *            Nome do utilizador que participou nas mensagens
 	 */
 	public static void printContactChatMessages(List<ChatMessage> chatMessages, String username) {
-		for (ChatMessage cm : chatMessages)
+		System.out.println("[UserUtil.printContactChatMessages] chatMessages size: " + chatMessages.size());
+		
+		for (ChatMessage cm : chatMessages) 
 			printContactChatMessage(cm, username, true);
 	}
 
