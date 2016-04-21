@@ -84,7 +84,7 @@ public class ClientRequestManager {
 						secretKey);
 
 				clientPGPMessage.setCypheredMessage(encryptedMessage);
-				System.out.println("[ClientRequestManager] cypheredMessage: " + clientPGPMessage.getContent());
+				System.out.println("[ClientRequestManager] cypheredMessage: " + MiscUtil.bytesToHex(clientPGPMessage.getCypheredMessage()));
 				List<String> groupMembers = serverNetworkContactTypeMessage.getGroupMembers();
 
 				// cifrar chave secreta, usada para cifrar mensagem anterior

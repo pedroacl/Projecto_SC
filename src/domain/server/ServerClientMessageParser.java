@@ -92,28 +92,32 @@ public class ServerClientMessageParser {
 		switch (clientMessage.getMessageType()) {
 		// mensagem de texto
 		case MESSAGE:
-			
+
 			System.out.println("[ServerClientMessageParser] MESSAGE");
 
 			// destinatario eh um utilizador ou grupo
 			ServerNetworkContactTypeMessage auxServerNetworkContactTypeMessage = (ServerNetworkContactTypeMessage) verifyContactType();
 			serverMessage = auxServerNetworkContactTypeMessage;
 
-			if (!serverMessage.getMessageType().equals(MessageType.NOK))
+			if (!serverMessage.getMessageType().equals(MessageType.NOK)) {
 				// envia mensagem com indicaçao grupo ou utilizador
 				serverNetworkManager.sendMessage(serverMessage);
 
-			// espera nova mensagem com AD, Ks(M), e Map<user,Kpub(Ks)>
-			ChatMessage clientPGPMessage = (ChatMessage) serverNetworkManager.receiveMessage();
-			System.out.println("[ServerClientMessageParser] message: " + clientPGPMessage.getContent());
-			
-			clientPGPMessage.setCreatedAt(new Date());
+				System.out.println(serverMessage.getMessageType());
 
-			// guarda a mensagem
-			conversationService.addChatMessage(clientPGPMessage);
+				// espera nova mensagem com AD, Ks(M), e Map<user,Kpub(Ks)>
+				ChatMessage clientPGPMessage = (ChatMessage) serverNetworkManager.receiveMessage();
+				System.out.println("[ServerClientMessageParser] message: " + clientPGPMessage.getCypheredMessage());
 
-			// cria message de resposta ok-> tudo correu bem
-			serverMessage = new ServerNetworkContactTypeMessage(MessageType.OK);
+				clientPGPMessage.setCreatedAt(new Date());
+
+				// guarda a mensagem
+				conversationService.addChatMessage(clientPGPMessage);
+
+				// cria message de resposta ok-> tudo correu bem
+				serverMessage = new ServerNetworkContactTypeMessage(MessageType.OK);
+			}
+
 			break;
 
 		// mensagem contendo um ficheiro
