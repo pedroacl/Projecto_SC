@@ -24,6 +24,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Base64;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -144,6 +145,8 @@ public class SecurityUtils {
 
 		try {
 			SecretKey sessionKey = unwrapSessionKey(username, userPassword, wrappedSessionKey);
+			System.out.println("[SecurityUtils.decipherChatMessage] SecretKey" + Base64.getEncoder().encodeToString(sessionKey.getEncoded()));
+			
 			byte[] decipheredChatMessageBytes = decipherWithSessionKey(cipheredMessage, sessionKey);
 			decipheredChatMessage = MiscUtil.bytesToHex(decipheredChatMessageBytes);
 
@@ -258,13 +261,14 @@ public class SecurityUtils {
 		try {
 			// obter keystore
 			KeyStore keystore = getKeyStore(username, userPassword);
-			Key privateKey = keystore.getKey(username, userPassword.toCharArray());
+			Key privateKey = (PrivateKey) keystore.getKey(username, userPassword.toCharArray());
 
 			// inicializar cifra
 			Cipher cipher = Cipher.getInstance("RSA");
 			cipher.init(Cipher.UNWRAP_MODE, privateKey);
 
 			unwrappedSecretKey = cipher.unwrap(wrappedKey, "RSA", Cipher.SECRET_KEY);
+
 
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();

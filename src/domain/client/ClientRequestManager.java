@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
+import java.util.Base64;
 import java.util.List;
 
 import javax.crypto.SecretKey;
@@ -82,16 +83,18 @@ public class ClientRequestManager {
 					clientPGPMessage.setSignature(clientSignature);
 
 					// obter chave secreta
-					SecretKey secretKey = SecurityUtils.generateSecretKey();
+					SecretKey sessionKey = SecurityUtils.generateSecretKey();
+					System.out.println("[ClientRequestManager -m] SecretKey" + Base64.getEncoder().encodeToString(sessionKey.getEncoded()));
 
-					// cifrar mensagem com chave secreta
+					// cifrar mensagem com chave de sessão
 					byte[] encryptedMessage = SecurityUtils
-							.cipherWithSessionKey(parsedRequest.getSpecificField().getBytes(), secretKey);
+							.cipherWithSessionKey(parsedRequest.getSpecificField().getBytes(), sessionKey);
 
 					clientPGPMessage.setCypheredMessage(encryptedMessage);
+
 					System.out.println("[ClientRequestManager] cypheredMessage: "
 							+ MiscUtil.bytesToHex(clientPGPMessage.getCypheredMessage()));
-					
+
 					List<String> groupMembers = serverNetworkContactTypeMessage.getGroupMembers();
 
 					// cifrar chave secreta, usada para cifrar mensagem anterior
@@ -99,15 +102,15 @@ public class ClientRequestManager {
 						// wrap da chave secreta a ser enviada com a chave
 						// publica do contacto de destino
 						byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(username, groupMember, userPassword,
-								secretKey);
+								sessionKey);
 
 						clientPGPMessage.putUserKey(groupMember, wrappedSecretKey);
 					}
 
 					// adicionar chave cifrada do proprio utilizador
-					byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(username, username, userPassword, secretKey);
+					byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(username, username, userPassword, sessionKey);
 					clientPGPMessage.putUserKey(parsedRequest.getUsername(), wrappedSecretKey);
-					
+
 					// enviar mensagem
 					clientNetworkManager.sendMessage(clientPGPMessage);
 
@@ -208,15 +211,20 @@ public class ClientRequestManager {
 
 				clientNetworkMessage.setContent("recent");
 
-				System.out.println("[ClientRequestManager] rLast antes: " + clientNetworkMessage);
-
 				// enviar mensagem
 				clientNetworkManager.sendMessage(clientNetworkMessage);
 
 				// espera resposta
 				ServerMessage serverMessage = (ServerMessage) clientNetworkManager.receiveMessage();
 
-				System.out.println("[ClientRequestManager] rLast depois: " + clientNetworkMessage);
+				System.out.println("[ClientRequestManager] cipheredKey: "
+						+ MiscUtil.bytesToHex(serverMessage.getMessageList().get(0).getCypheredMessageKey()));
+
+				String decipheredMessage = SecurityUtils.decipherChatMessage(username, userPassword,
+						serverMessage.getMessageList().get(0).getCypheredMessageKey(),
+						serverMessage.getMessageList().get(0).getCypheredMessage());
+				
+				System.out.println("MENSAGEM DECIFRADA ->>>>> " + decipheredMessage);
 
 				networkMessage = serverMessage;
 				break;
