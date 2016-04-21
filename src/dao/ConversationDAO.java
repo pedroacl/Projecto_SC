@@ -12,9 +12,9 @@ import entities.Conversation;
 import factories.ConversationFactory;
 import network.messages.ChatMessage;
 import network.messages.MessageType;
-import security.SecurityUtils;
 import util.MiscUtil;
 import util.PersistenceUtil;
+import util.SecurityUtils;
 
 /**
  * Classe que persiste conversações, isto é, gere as pastas das conversações e

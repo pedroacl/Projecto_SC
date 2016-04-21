@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import dao.GroupDAO;
 import entities.Group;
-import security.SecurityUtils;
+import util.SecurityUtils;
 
 /**
  * 

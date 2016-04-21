@@ -9,7 +9,7 @@ import java.net.Socket;
 import javax.crypto.SecretKey;
 
 import network.messages.NetworkMessage;
-import security.SecurityUtils;
+import util.SecurityUtils;
 
 public class ClientNetworkManager extends NetworkManager {
 

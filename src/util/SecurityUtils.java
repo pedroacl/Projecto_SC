@@ -1,4 +1,4 @@
-package security;
+package util;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -36,8 +36,6 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 import exceptions.InvalidMacException;
-import util.MiscUtil;
-import util.PersistenceUtil;
 
 public class SecurityUtils {
 	/**
@@ -312,11 +310,11 @@ public class SecurityUtils {
 	/**
 	 * 
 	 * @param usersFilePath
-	 * @param password
+	 * @param serverPassword
 	 * @return
 	 * @throws InvalidMacException
 	 */
-	public static void validateFileMac(String filePath, String password) throws InvalidMacException {
+	public static void validateFileMac(String filePath, String serverPassword) throws InvalidMacException {
 		System.out.println("[Authentication.validateUsersFileMac] filePath: " + filePath);
 
 		try {
@@ -325,7 +323,7 @@ public class SecurityUtils {
 			// nao existe ficheiro MAC
 			if (!usersFileMacPath.exists()) {
 				System.out.println("Ficheiro MAC não existe");
-				SecurityUtils.updateFileMac(filePath, password);
+				SecurityUtils.updateFileMac(filePath, serverPassword);
 
 			} else {
 				System.out.println("[Authentication.validateUsersFileMac] ficheiro MAC existe");
@@ -337,8 +335,8 @@ public class SecurityUtils {
 
 				// gerar MAC atual
 				System.out.println(filePath);
-				System.out.println(password);
-				String currentMacString = MiscUtil.bytesToHex(SecurityUtils.generateFileMac(filePath, password));
+				System.out.println(serverPassword);
+				String currentMacString = MiscUtil.bytesToHex(SecurityUtils.generateFileMac(filePath, serverPassword));
 
 				System.out.println("MAC original: " + originalMAC);
 				System.out.println("MAC gerado: " + currentMacString);

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import network.messages.ChatMessage;
-import security.SecurityUtils;
 
 /**
  * Classe que trata da interacção com o utilizador

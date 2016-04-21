@@ -9,8 +9,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
-import security.SecurityUtils;
 import util.PersistenceUtil;
+import util.SecurityUtils;
 
 /**
  * Classe que gere os utilizadores e que trata da sua persistencia no disco

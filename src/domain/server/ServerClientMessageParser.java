@@ -15,9 +15,9 @@ import network.messages.MessageType;
 import network.messages.NetworkMessage;
 import network.messages.ServerMessage;
 import network.messages.ServerNetworkContactTypeMessage;
-import security.SecurityUtils;
 import service.ConversationService;
 import service.GroupService;
+import util.SecurityUtils;
 
 /**
  * Classe que analisa a mensagem de rede com o pedido do cliente

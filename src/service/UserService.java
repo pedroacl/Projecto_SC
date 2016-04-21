@@ -3,8 +3,8 @@ package service;
 import java.util.concurrent.ConcurrentHashMap;
 
 import dao.UserDAO;
-import security.SecurityUtils;
 import util.MiscUtil;
+import util.SecurityUtils;
 
 public class UserService {
 
@@ -21,11 +21,11 @@ public class UserService {
 		return users;
 	}
 
-	public void addUser(String username, String password, String serverPassword) {
+	public void addUser(String username, String userPassword, String serverPassword) {
 		// adicionar salt ah password
 		int salt = SecurityUtils.generateSalt();
 		String saltString = Integer.toString(salt);
-		String passwordAndSalt = saltString + password;
+		String passwordAndSalt = saltString + userPassword;
 
 		// obter hash
 		byte[] hash = SecurityUtils.getHash(passwordAndSalt);

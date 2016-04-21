@@ -3,14 +3,6 @@
 (pass = seguranca)
 
 
-####
-# Adicionar chaves assimetricas do cliente
-####
-
-/usr/lib/jvm/java-8-oracle/bin/keytool -genkey -keyalg RSA -alias maria -keystore keystore.cliente -validity 360 -keysize 2048
-
-/usr/lib/jvm/java-8-oracle/bin/keytool -genkey -keyalg RSA -alias sara -keystore keystore.cliente -validity 360 -keysize 2048
-
 
 # Gerar chave secreta (JCEKS)
 /usr/lib/jvm/java-8-oracle/bin/keytool –genseckey maria –alias secKey -storetype storetype JCEKS
@@ -19,13 +11,56 @@
 /usr/lib/jvm/java-8-oracle/bin/keytool -delete -alias maria -keystore keystore.jks
 
 
+
+###
+# Gerar keystores dos users
+###
+
+# Maria
+/usr/lib/jvm/java-8-oracle/bin/keytool -genkey -keyalg RSA -alias maria -keystore keystore.maria -validity 360 -keysize 2048
+
+# Sara
+/usr/lib/jvm/java-8-oracle/bin/keytool -genkey -keyalg RSA -alias sara -keystore keystore.sara -validity 360 -keysize 2048
+
+# Pedro
+/usr/lib/jvm/java-8-oracle/bin/keytool -genkey -keyalg RSA -alias pedro -keystore keystore.pedro -validity 360 -keysize 2048
+
+
+###
+# Exportar certificados dos users
+###
+
+/usr/lib/jvm/java-8-oracle/bin/keytool -exportcert -alias maria -keystore keystore.maria -file cert_maria.cer && /usr/lib/jvm/java-8-oracle/bin/keytool -exportcert -alias sara -keystore keystore.sara -file cert_sara.cer && /usr/lib/jvm/java-8-oracle/bin/keytool -exportcert -alias pedro -keystore keystore.pedro -file cert_pedro.cer
+
+
+
+###
+# Importar certificados dos users
+###
+
+# Keystore da Maria
+/usr/lib/jvm/java-8-oracle/bin/keytool -importcert -alias sara -keystore keystore.maria -file cert_sara.cer &&
+/usr/lib/jvm/java-8-oracle/bin/keytool -importcert -alias pedro -keystore keystore.maria -file cert_pedro.cer
+
+# Keystore da Sara
+/usr/lib/jvm/java-8-oracle/bin/keytool -importcert -alias maria -keystore keystore.sara -file cert_maria.cer &&
+/usr/lib/jvm/java-8-oracle/bin/keytool -importcert -alias pedro -keystore keystore.sara -file cert_pedro.cer
+
+# Keystore do Pedro
+/usr/lib/jvm/java-8-oracle/bin/keytool -importcert -alias maria -keystore keystore.pedro -file cert_maria.cer &&
+/usr/lib/jvm/java-8-oracle/bin/keytool -importcert -alias sara -keystore keystore.pedro -file cert_sara.cer
+
+
 ###
 # Gerar keystore e truststore para TLS
 ###
 
+# Servidor
 /usr/lib/jvm/java-8-oracle/bin/keytool -genkeypair -alias server -keyalg RSA -keysize 2048 -keystore keystore.servidor
 
+# Cliente (truststore)
 /usr/lib/jvm/java-8-oracle/bin/keytool -genkeypair -alias maria -keyalg RSA -keysize 2048 -keystore truststore.cliente
+
 
 
 ####
@@ -34,7 +69,12 @@
 
 /usr/lib/jvm/java-8-oracle/bin/keytool -exportcert -alias server -keystore keystore.servidor -file server_cert.cer
 
+
+
+###
 # Importar certificado do servidor
+###
+
 /usr/lib/jvm/java-8-oracle/bin/keytool -importcert -alias server -keystore truststore.cliente -file server_cert.cer
 
 # Print do certificado

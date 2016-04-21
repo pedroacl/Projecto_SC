@@ -4,9 +4,9 @@ import java.io.File;
 
 import exceptions.InvalidMacException;
 import exceptions.InvalidPasswordException;
-import security.SecurityUtils;
 import service.UserService;
 import util.MiscUtil;
+import util.SecurityUtils;
 
 /**
  * <<SINGLETON>> Classe que verifica existencia dos utilizadores e que trata da
@@ -38,7 +38,7 @@ public class Authentication {
 	 * 
 	 * @param username
 	 *            Nome do utilizador a autenticar
-	 * @param password
+	 * @param userPassword
 	 *            Palavra passe do servidor passada por argumentos na linha de
 	 *            comandos
 	 * @return False caso a password esteja errada
@@ -46,7 +46,7 @@ public class Authentication {
 	 * @throws InvalidPasswordException
 	 * @requires username != null && password != null
 	 */
-	public void authenticateUser(String username, String password)
+	public void authenticateUser(String username, String userPassword)
 			throws InvalidMacException, InvalidPasswordException {
 
 		// validade do ficheiro comprometida
@@ -60,7 +60,7 @@ public class Authentication {
 			System.out.println("Nao existe ficheiro users");
 
 			// criar ficheiro e adicionar user
-			userService.addUser(username, password, serverPassword);
+			userService.addUser(username, userPassword, serverPassword);
 
 			// gerar MAC file
 			SecurityUtils.generateFileMac(filePath, serverPassword);
@@ -69,20 +69,20 @@ public class Authentication {
 		else if ((userPasswordAndSalt = userService.getUserPasswordAndSalt(username)) == null) {
 			System.out.println("User nao existe. Adicionar " + username + "!");
 
-			SecurityUtils.validateFileMac(filePath, password);
+			SecurityUtils.validateFileMac(filePath, serverPassword);
 
 			// adicionar user e atualizar MAC do ficheiro de passwords
-			userService.addUser(username, password, serverPassword);
+			userService.addUser(username, userPassword, serverPassword);
 
 			// atualizar MAC do ficheiro
-			SecurityUtils.updateFileMac("users.txt", password);
+			SecurityUtils.updateFileMac("users.txt", userPassword);
 
 		} else {
 			System.out.println("Authentication - User existe!");
 
-			SecurityUtils.validateFileMac(filePath, password);
+			SecurityUtils.validateFileMac(filePath, userPassword);
 
-			byte[] passwordHash = SecurityUtils.getHash(userPasswordAndSalt[0] + password);
+			byte[] passwordHash = SecurityUtils.getHash(userPasswordAndSalt[0] + userPassword);
 			String hashString = MiscUtil.bytesToHex(passwordHash);
 
 			System.out.println("Hash guardada: " + userPasswordAndSalt[1]);

@@ -6,8 +6,8 @@ import java.util.List;
 
 import dao.ConversationDAO;
 import network.messages.ChatMessage;
-import security.SecurityUtils;
 import util.PersistenceUtil;
+import util.SecurityUtils;
 
 /**
  * 
