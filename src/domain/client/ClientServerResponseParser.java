@@ -29,7 +29,7 @@ public class ClientServerResponseParser {
 	 */
 	public void processMessage(NetworkMessage serverMessage) {
 		
-		System.out.println("[ServerResponseParser] serverMessage: " + serverMessage);
+		System.out.println("[ClientServerResponseParser] serverMessage: " + serverMessage);
 		
 		switch (serverMessage.getMessageType()) {
 		// operacao bem sucedida
@@ -44,7 +44,9 @@ public class ClientServerResponseParser {
 
 		// todas as mensagens de uma conversa
 		case CONVERSATION:
-			UserUtil.printChatMessages(((ServerMessage) serverMessage).getMessageList(), username);
+			ServerMessage trueMessage = (ServerMessage) serverMessage;
+			System.out.println("[ClientServerResponseParser] Lista: " + trueMessage.getMessageList());
+			UserUtil.printChatMessages(trueMessage.getMessageList(), username);
 			break;
 
 		// ultima mensagem de cada conversa em que o utilizador participou

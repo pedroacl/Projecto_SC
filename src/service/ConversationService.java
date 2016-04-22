@@ -63,8 +63,8 @@ public class ConversationService {
 		return conversationDAO.getConversationInCommom(username, destination);
 	}
 
-	public List<ChatMessage> getAllMessagesFromConversation(Long conversationId) {
-		return conversationDAO.getAllMessagesFromConversation(conversationId);
+	public List<ChatMessage> getAllMessagesFromConversation(String username, Long conversationId) {
+		return conversationDAO.getAllMessagesFromConversation(username,conversationId);
 	}
 
 	public String existsFile(String username, String destination, String fileName) {

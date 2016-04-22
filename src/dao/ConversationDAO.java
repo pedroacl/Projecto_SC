@@ -298,13 +298,14 @@ public class ConversationDAO {
 
 	/**
 	 * Obtem todas as mensagens associadas a uma conversação
+	 * @param username 
 	 * 
 	 * @param consersationId
 	 *            Identificador da conversa de onde se quer as mensagens
 	 * @return Devolve uma lista de todas as mensagens sobre a forma de
 	 *         ChatMessages
 	 */
-	public List<ChatMessage> getAllMessagesFromConversation(Long conversationId) {
+	public List<ChatMessage> getAllMessagesFromConversation(String username, Long conversationId) {
 		// pasta onde estao localizadas todas as mensagens da conversa
 		String path = "conversations/" + conversationId + "/messages";
 		File file = new File(path);
@@ -316,14 +317,28 @@ public class ConversationDAO {
 
 		// percorrer todos os ficheiros das mensagens
 		for (int i = 0; i < filesIn.length; i++) {
-			// ler conteudo da mensagem
-			ArrayList<String> texto = (ArrayList<String>) PersistenceUtil.readFromFile(path + "/" + filesIn[i]);
-			ChatMessage k = makeChatMessage(texto);
-
-			// definir data de inicio da conversa atraves do seu nome de
-			// ficheiro
-			k.setCreatedAt(new Date(Long.parseLong(filesIn[i])));
-			allMessages.add(k);
+			
+			//vai buscar a key
+			byte [] key = getUserChatMessageKey(username, conversationId, filesIn[i]);
+			
+			if(key != null) {
+				
+				//vai buscar a assinatura digital
+				byte [] signature = getChatMessageSignature(conversationId,filesIn[i]);
+				
+			
+				// ler conteudo da mensagem
+				ArrayList<String> texto = (ArrayList<String>) PersistenceUtil.readFromFile(path + "/" + filesIn[i]);
+				ChatMessage k = makeChatMessage(texto);
+	
+				// definir data de inicio da conversa atraves do seu nome de
+				// ficheiro
+				k.setCreatedAt(new Date(Long.parseLong(filesIn[i])));
+				k.setCypheredMessageKey(key);
+				k.setSignature(signature);
+				
+				allMessages.add(k);
+			}
 		}
 
 		return allMessages;

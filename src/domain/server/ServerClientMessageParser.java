@@ -155,6 +155,7 @@ public class ServerClientMessageParser {
 
 			// todas as mensagens trocadas com um utilizador
 			case "all":
+				
 				// destinatario eh utilizador ou grupo
 				if (authentication.existsUser(clientMessage.getDestination())
 						|| groupService.existsGroup(clientMessage.getDestination())) {
@@ -165,14 +166,13 @@ public class ServerClientMessageParser {
 					// se existir conversa em comum
 					if (conversationId != -1) {
 						ArrayList<ChatMessage> messages = (ArrayList<ChatMessage>) conversationService
-								.getAllMessagesFromConversation(conversationId); // TODO
-																					// prencher
-																					// AD
-																					// e
-																					// KS
+								.getAllMessagesFromConversation(clientMessage.getUsername(),conversationId);														
 
-						serverMessage = new ServerMessage(MessageType.CONVERSATION);
-						// serverMessage.setMessages(messages);
+						ServerMessage serverMessageaux2 = new ServerMessage(MessageType.CONVERSATION);
+						serverMessageaux2.setMessages(messages);
+						
+						serverMessage = serverMessageaux2;
+						
 					} else {
 						serverMessage = new ServerMessage(MessageType.NOK);
 						serverMessage.setContent("Não há registos desta conversa");
