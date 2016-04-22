@@ -3,7 +3,6 @@ package domain.client;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
-import java.security.cert.Certificate;
 import java.util.Base64;
 import java.util.List;
 
@@ -219,14 +218,15 @@ public class ClientRequestManager {
 
 				System.out.println("[ClientRequestManager] cipheredKey: "
 						+ MiscUtil.bytesToHex(serverMessage.getMessageList().get(0).getCypheredMessageKey()));
-				/*
+				
 				String decipheredMessage = SecurityUtils.decipherChatMessage(username, userPassword,
 						serverMessage.getMessageList().get(0).getCypheredMessageKey(),
 						serverMessage.getMessageList().get(0).getCypheredMessage());
 				
 				System.out.println("MENSAGEM DECIFRADA ->>>>> " + decipheredMessage);
-				*/
+				
 				networkMessage = serverMessage;
+				
 				break;
 
 			case "-rContact":

@@ -2,7 +2,6 @@ package domain.client;
 
 import network.messages.NetworkMessage;
 import network.messages.ServerMessage;
-import util.MiscUtil;
 import util.UserUtil;
 
 /**

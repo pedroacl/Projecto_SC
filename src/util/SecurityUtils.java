@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyPair;
@@ -140,6 +141,14 @@ public class SecurityUtils {
 		return null;
 	}
 
+	/**
+	 * 
+	 * @param username
+	 * @param userPassword
+	 * @param wrappedSessionKey
+	 * @param cipheredMessage
+	 * @return
+	 */
 	public static String decipherChatMessage(String username, String userPassword, byte[] wrappedSessionKey,
 			byte[] cipheredMessage) {
 
@@ -151,13 +160,8 @@ public class SecurityUtils {
 					+ Base64.getEncoder().encodeToString(sessionKey.getEncoded()));
 
 			byte[] decipheredChatMessageBytes = decipherWithSessionKey(cipheredMessage, sessionKey);
+			decipheredChatMessage = new String(decipheredChatMessageBytes, StandardCharsets.UTF_8);
 			
-			String test = new String(decipheredChatMessageBytes, "UTF-8");
-			System.out.println("!!!!!! ->>" + test);
-			
-			
-			decipheredChatMessage = MiscUtil.bytesToHex(decipheredChatMessageBytes);
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -165,12 +169,12 @@ public class SecurityUtils {
 		return decipheredChatMessage;
 	}
 
-	/*
-	 * /** Cifra uma mensagem com uma chave privada
+	
+	/**
 	 * 
+	 * @param message
 	 * @param secretKey
-	 * 
-	 * @return Devolve uma mensagem cifrada com uma chave privada
+	 * @return
 	 */
 	public static byte[] cipherWithSessionKey(byte[] message, SecretKey secretKey) {
 		byte[] encryptedMessage = null;
@@ -200,14 +204,12 @@ public class SecurityUtils {
 	private static byte[] decipherWithSessionKey(byte[] cipheredMessage, SecretKey secretKey) {
 		byte[] decipheredMessage = null;
 		
-		printSecretKey(secretKey);
-
 		try {
 			Cipher cipher = Cipher.getInstance("AES");
 
 			byte[] keyEncoded = secretKey.getEncoded();
-			SecretKeySpec keySpec2 = new SecretKeySpec(keyEncoded, "AES");
-			cipher.init(Cipher.DECRYPT_MODE, keySpec2);
+			SecretKeySpec keySpec = new SecretKeySpec(keyEncoded, "AES");
+			cipher.init(Cipher.DECRYPT_MODE, keySpec);
 			
 			decipheredMessage = cipher.doFinal(cipheredMessage);
 
