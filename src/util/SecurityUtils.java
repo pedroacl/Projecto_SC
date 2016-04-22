@@ -35,6 +35,8 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.DatatypeConverter;
 
 import exceptions.InvalidMacException;
 
@@ -145,9 +147,15 @@ public class SecurityUtils {
 
 		try {
 			SecretKey sessionKey = unwrapSessionKey(username, userPassword, wrappedSessionKey);
-			System.out.println("[SecurityUtils.decipherChatMessage] SecretKey" + Base64.getEncoder().encodeToString(sessionKey.getEncoded()));
-			
+			System.out.println("[SecurityUtils.decipherChatMessage] SecretKey"
+					+ Base64.getEncoder().encodeToString(sessionKey.getEncoded()));
+
 			byte[] decipheredChatMessageBytes = decipherWithSessionKey(cipheredMessage, sessionKey);
+			
+			String test = new String(decipheredChatMessageBytes, "UTF-8");
+			System.out.println("!!!!!! ->>" + test);
+			
+			
 			decipheredChatMessage = MiscUtil.bytesToHex(decipheredChatMessageBytes);
 
 		} catch (IOException e) {
@@ -192,7 +200,11 @@ public class SecurityUtils {
 
 		try {
 			Cipher cipher = Cipher.getInstance("AES");
-			cipher.init(Cipher.DECRYPT_MODE, secretKey);
+
+			byte[] keyEncoded = secretKey.getEncoded();
+			SecretKeySpec keySpec2 = new SecretKeySpec(keyEncoded, "AES");
+			cipher.init(Cipher.DECRYPT_MODE, keySpec2);
+			
 			decipheredMessage = cipher.doFinal(cipheredMessage);
 
 		} catch (NoSuchAlgorithmException e) {
@@ -268,7 +280,6 @@ public class SecurityUtils {
 			cipher.init(Cipher.UNWRAP_MODE, privateKey);
 
 			unwrappedSecretKey = cipher.unwrap(wrappedKey, "RSA", Cipher.SECRET_KEY);
-
 
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
