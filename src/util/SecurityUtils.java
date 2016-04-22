@@ -166,6 +166,8 @@ public class SecurityUtils {
 	 */
 	public static byte[] cipherWithSessionKey(byte[] message, SecretKey secretKey) {
 		byte[] encryptedMessage = null;
+		
+		printSecretKey(secretKey);
 
 		try {
 			Cipher cipher = Cipher.getInstance("AES");
@@ -189,6 +191,8 @@ public class SecurityUtils {
 
 	private static byte[] decipherWithSessionKey(byte[] cipheredMessage, SecretKey secretKey) {
 		byte[] decipheredMessage = null;
+		
+		printSecretKey(secretKey);
 
 		try {
 			Cipher cipher = Cipher.getInstance("AES");
@@ -517,5 +521,19 @@ public class SecurityUtils {
 		}
 
 		return keyStore;
+	}
+	
+	public static void printSecretKey(SecretKey key)  {
+		byte [] chave = key.getEncoded();
+		
+		StringBuilder sb = new StringBuilder("------------------> ");
+		
+		for(int i = 0; i < chave.length; i++) {
+		
+			sb.append(chave[i]);
+		}
+		
+		System.out.println(sb.toString());
+
 	}
 }

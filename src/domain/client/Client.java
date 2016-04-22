@@ -72,11 +72,14 @@ public class Client {
 		// pedido do cliente
 		ClientRequestManager clientRequestManager = new ClientRequestManager(parsedRequest, clientNetwork);
 
-		// recebe resultado da comunicaçao
+		
 		NetworkMessage netWorkMessage;
 
 		try {
+			// recebe resultado da comunicaçao
 			netWorkMessage = clientRequestManager.processRequest();
+			
+			System.out.println("[Client] " + netWorkMessage.getMessageType() );
 			
 			ClientServerResponseParser srp = new ClientServerResponseParser(argsParser.getUsername());
 			srp.processMessage(netWorkMessage);

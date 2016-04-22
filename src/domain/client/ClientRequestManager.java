@@ -219,13 +219,13 @@ public class ClientRequestManager {
 
 				System.out.println("[ClientRequestManager] cipheredKey: "
 						+ MiscUtil.bytesToHex(serverMessage.getMessageList().get(0).getCypheredMessageKey()));
-
+				/*
 				String decipheredMessage = SecurityUtils.decipherChatMessage(username, userPassword,
 						serverMessage.getMessageList().get(0).getCypheredMessageKey(),
 						serverMessage.getMessageList().get(0).getCypheredMessage());
 				
 				System.out.println("MENSAGEM DECIFRADA ->>>>> " + decipheredMessage);
-
+				*/
 				networkMessage = serverMessage;
 				break;
 
@@ -238,16 +238,17 @@ public class ClientRequestManager {
 
 				clientNetworkMessage = new ClientNetworkMessage(parsedRequest.getUsername(),
 						parsedRequest.getPassword(), MessageType.RECEIVER);
-
+				
+				clientNetworkMessage.setDestination(parsedRequest.getContact());
 				clientNetworkMessage.setContent("all");
 
 				// enviar mensagem
 				clientNetworkManager.sendMessage(clientNetworkMessage);
 
 				// espera resposta
-				ChatMessage chatmessage = (ChatMessage) clientNetworkManager.receiveMessage();
+				ServerMessage serverMessage2 = (ServerMessage) clientNetworkManager.receiveMessage();
 
-				networkMessage = chatmessage;
+				networkMessage = serverMessage2;
 				break;
 
 			case "-rFile":
@@ -268,7 +269,7 @@ public class ClientRequestManager {
 				clientNetworkManager.sendMessage(clientNetworkMessage);
 
 				// recebe Resposta
-				chatmessage = (ChatMessage) clientNetworkManager.receiveMessage();
+				ChatMessage chatmessage2 = (ChatMessage) clientNetworkManager.receiveMessage();
 
 				// recebe file
 				// TODO
@@ -294,7 +295,7 @@ public class ClientRequestManager {
 				clientNetworkManager.sendMessage(clientNetworkMessage);
 
 				// recebe Resposta
-				chatmessage = (ChatMessage) clientNetworkManager.receiveMessage();
+				ChatMessage chatmessage = (ChatMessage) clientNetworkManager.receiveMessage();
 				networkMessage = chatmessage;
 
 				break;
@@ -314,8 +315,8 @@ public class ClientRequestManager {
 				clientNetworkManager.sendMessage(clientNetworkMessage);
 
 				// recebe Resposta
-				chatmessage = (ChatMessage) clientNetworkManager.receiveMessage();
-				networkMessage = chatmessage;
+				ChatMessage chatmessage3 = (ChatMessage) clientNetworkManager.receiveMessage();
+				networkMessage = chatmessage3;
 
 				break;
 
