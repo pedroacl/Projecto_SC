@@ -124,9 +124,12 @@ public class ClientRequestManager {
 				break;
 
 			/*
-			 * C --------AUTH------------> S <------Contact/NOK-------
-			 * ----AD,Ks(M),Kp(Ks)-----> <---------OK/NOK------------
-			 * -------file-------------> <--------OK/NOK----------
+			 * C --------AUTH------------> S 
+			 * <------Contact/NOK-------
+			 * ----AD,Ks(M),Kp(Ks)-----> 
+			 * <---------OK/NOK------------
+			 * -------Ks(file)-------------> 
+			 * <--------OK/NOK-----------
 			 */
 
 			case "-f":
@@ -142,22 +145,23 @@ public class ClientRequestManager {
 				if (serverNetworkContactTypeMessage.getMessageType() == MessageType.CONTACT) {
 
 					chatMessage = new ChatMessage(MessageType.FILE);
-
-					System.out.println(serverNetworkContactTypeMessage.numGroupMembers());
-
+					
 					// contacto
-					System.out.println("Client - CONTACT");
+					System.out.println("[ClientRequestManager] -f " + serverNetworkContactTypeMessage.numGroupMembers());
 
 					// gerar assinatura
 					byte[] clientSignature = SecurityUtils.signFile(parsedRequest.getSpecificField(),
 							keyPair.getPrivate());
-					chatMessage.setSignature(clientSignature);
+					chatMessage.setSignature(new byte[5]);
 
 					// obter chave secreta
 					SecretKey secretKey = SecurityUtils.generateSecretKey();
 
 					// envia tamanho do ficheiro
 					chatMessage.setFileSize(parsedRequest.getFileSize());
+					
+					//envia nome do ficheiro
+					chatMessage.setContent(parsedRequest.getSpecificField());
 
 					List<String> groupMembers = (List<String>) serverNetworkContactTypeMessage.getGroupMembers();
 
@@ -255,7 +259,8 @@ public class ClientRequestManager {
 
 				/*
 				 * C ----------RECEIVER-----------> S
-				 * <--AD,Ks(F),K(ks)/NOK--FILE-- <-----------F----------------
+				 * <--AD,Ks(F),K(ks)/NOK--FILE--
+				 *  <-----------F----------------
 				 * ----------OK/NOK------------->
 				 * <-----------OK/NOK-------------
 				 */

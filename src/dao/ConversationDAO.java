@@ -117,9 +117,13 @@ public class ConversationDAO {
 		sb.append(chatMessage.getMessageType());
 		sb.append("\n");
 		
-		String cypheredMessage = MiscUtil.bytesToHex(chatMessage.getCypheredMessage());
+		String content;
+		if(chatMessage.getMessageType().equals(MessageType.FILE))
+			content = chatMessage.getContent();
+		else
+			content = MiscUtil.bytesToHex(chatMessage.getCypheredMessage());
 		
-		sb.append(cypheredMessage);
+		sb.append(content);
 		sb.append("\n");
 
 		PersistenceUtil.writeStringToFile(sb.toString(), pathToTxt);

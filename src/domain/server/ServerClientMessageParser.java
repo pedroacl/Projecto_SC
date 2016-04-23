@@ -349,10 +349,13 @@ public class ServerClientMessageParser {
 	}
 
 	/**
-	 * Função que recebe e guarda um ficheiro vindo do utilizador Servidor
-	 * Cliente <---------AUTH------------- --------CONTACT/NOK-------> <--FILE:
-	 * AD, Ks, SizeFile--- -----------OK/NOK---------->
-	 * <---------Ks(FILE)---------- --------------------------->
+	 * Função que recebe e guarda um ficheiro vindo do utilizador 
+	 * Servidor	<---------FILE--------------Cliente
+	 * 			---------CONTACT/NOK-------> 
+	 *         	<--FILE: AD, Ks, SizeFile---
+	 *          -----------OK/NOK---------->
+	 * 			<---------Ks(FILE)---------- 
+	 * 			--------------------------->
 	 * 
 	 */
 	private NetworkMessage receiveFile() {
@@ -373,9 +376,9 @@ public class ServerClientMessageParser {
 
 			// obter nome do ficheiro
 			String fileName = extractName(clientPGPMessage.getContent());
+			
+			System.out.println("[ServerClientMessageParser]: fileName= " + fileName);
 
-			// guarda a mensagem
-			conversationService.addChatMessage(clientPGPMessage);
 
 			// persiste chatMessage
 			Long conversationID = conversationService.addChatMessage(clientPGPMessage);
