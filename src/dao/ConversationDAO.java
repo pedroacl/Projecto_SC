@@ -117,11 +117,7 @@ public class ConversationDAO {
 		sb.append(chatMessage.getMessageType());
 		sb.append("\n");
 		
-		String content;
-		if(chatMessage.getMessageType().equals(MessageType.FILE))
-			content = chatMessage.getContent();
-		else
-			content = MiscUtil.bytesToHex(chatMessage.getCypheredMessage());
+		String content = MiscUtil.bytesToHex(chatMessage.getCypheredMessage());
 		
 		sb.append(content);
 		sb.append("\n");

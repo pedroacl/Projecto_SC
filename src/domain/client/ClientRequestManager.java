@@ -145,6 +145,8 @@ public class ClientRequestManager {
 				if (serverNetworkContactTypeMessage.getMessageType() == MessageType.CONTACT) {
 
 					chatMessage = new ChatMessage(MessageType.FILE);
+					chatMessage.setDestination(parsedRequest.getContact());
+					chatMessage.setFromUser(username);
 					
 					// contacto
 					System.out.println("[ClientRequestManager] -f " + serverNetworkContactTypeMessage.numGroupMembers());
@@ -161,7 +163,12 @@ public class ClientRequestManager {
 					chatMessage.setFileSize(parsedRequest.getFileSize());
 					
 					//envia nome do ficheiro
-					chatMessage.setContent(parsedRequest.getSpecificField());
+					// cifrar mensagem com chave de sessão
+					byte[] encryptedMessage = SecurityUtils
+							.cipherWithSessionKey(MiscUtil.extractName(parsedRequest.getSpecificField()).getBytes(), secretKey);
+					
+					chatMessage.setCypheredMessage(encryptedMessage);
+					chatMessage.setContent(MiscUtil.extractName(parsedRequest.getSpecificField()));
 
 					List<String> groupMembers = (List<String>) serverNetworkContactTypeMessage.getGroupMembers();
 
@@ -187,7 +194,7 @@ public class ClientRequestManager {
 
 					if (networkMessage.getMessageType().equals(MessageType.OK)) {
 						// enviar ficheiro
-						clientNetworkManager.sendFile(chatMessage, secretKey);
+						clientNetworkManager.sendFile(parsedRequest.getSpecificField(), parsedRequest.getFileSize(), secretKey);
 
 						// esperar resposta confimação
 						networkMessage = (NetworkMessage) clientNetworkManager.receiveMessage();

@@ -17,6 +17,7 @@ import network.messages.ServerMessage;
 import network.messages.ServerNetworkContactTypeMessage;
 import service.ConversationService;
 import service.GroupService;
+import util.MiscUtil;
 import util.SecurityUtils;
 
 /**
@@ -134,6 +135,8 @@ public class ServerClientMessageParser {
 			// mensagem mais recente com cada utilizador
 			case "recent":
 				System.out.println("[ServerClientMessageParser] pedido do tipo -r");
+				
+				System.out.println("[ServerClientMessageParser]: "+ clientMessage.getUsername());
 				
 				ArrayList<Long> conversationsIds = conversationService.getAllConversationsFrom(clientMessage.getUsername());
 				ArrayList<ChatMessage> recent = new ArrayList<ChatMessage>();
@@ -272,17 +275,6 @@ public class ServerClientMessageParser {
 
 	}
 
-	/**
-	 * Função que obtem o nome do ficheiro presente num path
-	 * 
-	 * @param absolutePath
-	 *            Caminho absoluto
-	 * @return Devolve o nome do ficheiro
-	 */
-	private String extractName(String absolutePath) {
-		String[] splitName = absolutePath.split("/");
-		return splitName[splitName.length - 1];
-	}
 
 	/**
 	 * Função que permite adicionar um utilizador a um determinado grupo
@@ -375,10 +367,10 @@ public class ServerClientMessageParser {
 			clientPGPMessage.setCreatedAt(new Date());
 
 			// obter nome do ficheiro
-			String fileName = extractName(clientPGPMessage.getContent());
+			String fileName = clientPGPMessage.getContent();
 			
-			System.out.println("[ServerClientMessageParser]: fileName= " + fileName);
-
+			System.out.println("[ServerClientMessageParser]: fileName: " + fileName);
+			System.out.println("[ServerClientMessageParser]: Destination: " + clientPGPMessage.getDestination());
 
 			// persiste chatMessage
 			Long conversationID = conversationService.addChatMessage(clientPGPMessage);

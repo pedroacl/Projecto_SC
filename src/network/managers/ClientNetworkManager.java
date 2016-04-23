@@ -22,11 +22,11 @@ public class ClientNetworkManager extends NetworkManager {
 	 * @param message
 	 * @return
 	 */
-	public boolean sendFile(NetworkMessage message, SecretKey key) {
+	public boolean sendFile(String filePath, int fileSize, SecretKey key) {
 		boolean isValid = true;
 
 		try {
-			sendByteFile(message.getContent(), message.getFileSize(), key);
+			sendByteFile(filePath, fileSize, key);
 		} catch (IOException e) {
 			e.printStackTrace();
 			isValid = false;
