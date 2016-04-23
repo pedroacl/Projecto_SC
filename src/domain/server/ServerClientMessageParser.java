@@ -384,14 +384,18 @@ public class ServerClientMessageParser {
 			File file = null;
 
 			try {
-				file = serverNetworkManager.receiveFile(clientMessage.getFileSize(), path);
+				file = serverNetworkManager.receiveFile(clientPGPMessage .getFileSize(), path);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
+			
+			System.out.println("[ServerClientMessageParser] FILE:"+ file.length() );
 
 			// verifica se o ficheiro foi bem recebido
-			if (file.length() >= clientMessage.getFileSize())
+			if (file.length() >= clientMessage.getFileSize()) {
+				System.out.println("[ServerClientMessageParser] FILE: sadsad");
 				serverMessage = new ServerMessage(MessageType.OK);
+			}
 
 			else {
 				serverMessage = new ServerMessage(MessageType.NOK);

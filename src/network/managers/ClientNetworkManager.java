@@ -2,10 +2,16 @@ package network.managers;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
+import javax.crypto.Cipher;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 import network.messages.NetworkMessage;
@@ -74,11 +80,40 @@ public class ClientNetworkManager extends NetworkManager {
 	
 	private void sendByteFile(String name, int fileSize, SecretKey key) throws IOException {
 		int packageSize = PACKAGE_SIZE;
-
+		
+		System.out.println("NOME= " + name  );
+		
+		Cipher cipher = null;
+		try {
+			cipher = Cipher.getInstance("AES");
+			cipher.init(Cipher.ENCRYPT_MODE, key);
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//Stream para ler do ficheiro
 		FileInputStream fileInputStream = new FileInputStream(name);
+		
+		//Stream para cifrar e enviar para o socket;
+		CipherOutputStream cos = new CipherOutputStream(out, cipher);
+		
 		int currentLength = 0;
-		byte[] bfile;
-
+		int i = 0;
+		byte[] bfile = new byte [packageSize] ;
+		
+		while ((i = fileInputStream.read(bfile)) != -1) {
+			System.out.println("li= " + i  );
+			cos.write(bfile, 0, i);	
+		}
+		cos.flush();
+		/*
 		while (currentLength < fileSize) {
 			if ((fileSize - currentLength) < packageSize)
 				bfile = new byte[(fileSize - currentLength)];
@@ -94,6 +129,8 @@ public class ClientNetworkManager extends NetworkManager {
 		}
 
 		out.flush();
+		*/
+		
 		fileInputStream.close();
 	}
 

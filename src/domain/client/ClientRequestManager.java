@@ -154,7 +154,7 @@ public class ClientRequestManager {
 					// gerar assinatura
 					byte[] clientSignature = SecurityUtils.signFile(parsedRequest.getSpecificField(),
 							keyPair.getPrivate());
-					chatMessage.setSignature(new byte[5]);
+					chatMessage.setSignature(new byte[5]); // TODO
 
 					// obter chave secreta
 					SecretKey secretKey = SecurityUtils.generateSecretKey();

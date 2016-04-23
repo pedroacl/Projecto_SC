@@ -85,7 +85,8 @@ public class ServerNetworkManager extends NetworkManager {
 	 * @requires fileSize >= 0 && name != null
 	 */
 	public File receiveFile(int fileSize, String name) throws IOException {
-
+		
+		System.out.println("[ServerNetworkManager] fileSize= " + fileSize + " e path= " + name);
 		File file = new File(name);
 		FileOutputStream fileOut = new FileOutputStream(file);
 
@@ -97,15 +98,19 @@ public class ServerNetworkManager extends NetworkManager {
 		while (currentLength < fileSize) {
 			int resto = fileSize - currentLength;
 			int numThisTime = resto < packageSize ? resto : bfile.length;
+			System.out.println("[ServerNetworkManager] numthistime= " + numThisTime );
 			lido = in.read(bfile, 0, numThisTime);
-
+			System.out.println("[ServerNetworkManager] li= " + lido  );
 			if (lido == -1) {
 				break;
 			}
 
 			fileOut.write(bfile, 0, numThisTime);
 			currentLength += lido;
+			System.out.println("[ServerNetworkManager] currentLength= " + currentLength );
 		}
+		
+		System.out.println("[ServerNetworkManager] close ");
 
 		fileOut.close();
 
