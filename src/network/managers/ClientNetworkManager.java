@@ -68,8 +68,11 @@ public class ClientNetworkManager extends NetworkManager {
 		System.out.println("[ClientNetworkMAnager] receiveFile fileSize = " + fileSize);
 
 		while (currentLength < fileSize) {
+			
 			int resto = fileSize - currentLength;
 			int numThisTime = resto < packageSize ? resto : bfile.length;
+			
+			
 			lido = in.read(bfile, 0, numThisTime);
 			System.out.println("[ClientNetworkMAnager] receiveFile lido = " + lido);
 			
@@ -125,43 +128,12 @@ public class ClientNetworkManager extends NetworkManager {
 		
 		//Stream para ler do ficheiro
 		FileInputStream fileInputStream = new FileInputStream(name);
+		
 		int currentLength = 0;
-		int i = 0;
 		byte[] bfile = new byte [packageSize] ;
-		
-		
-		/*
-		//Stream para cifrar e enviar para o socket;
-		CipherOutputStream cos = new CipherOutputStream(out, cipher);
-		
-		
-		
-		while ((i = fileInputStream.read(bfile)) != -1) {
-			System.out.println("li= " + i  );
-			currentLength  += i; 
-			cos.write(bfile, 0, i);	
-		}
-		System.out.println("[ClientNetworkMAnager] sendByteFile total = " + currentLength);
-		cos.flush();
-		*/
-		
-		/*
-		while (currentLength < fileSize) {
-			if ((fileSize - currentLength) < packageSize)
-				bfile = new byte[(fileSize - currentLength)];
-			else
-				bfile = new byte[packageSize];
-
-			int lido = fileInputStream.read(bfile, 0, bfile.length);
-			currentLength += lido;
-			
-			//bfile = SecurityUtils.cipherWithSessionKey(bfile, key);
-			
-			out.write(bfile, 0, bfile.length);
-		}
-	*/
-
 		byte [] ciphered = null;
+		
+		
 		while (currentLength < fileSize) {
 			if ((fileSize - currentLength) < packageSize)
 				bfile = new byte[(fileSize - currentLength)];
@@ -173,7 +145,7 @@ public class ClientNetworkManager extends NetworkManager {
 			System.out.println("[ClientNetworkMAnager] sendByteFile lido  = " + lido);
 			
 			
-			if(bfile.length == packageSize)
+			if(fileSize - currentLength > packageSize)
 				ciphered = cipher.update(bfile);
 			else
 				try {
