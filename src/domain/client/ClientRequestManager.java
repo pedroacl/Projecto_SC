@@ -2,6 +2,7 @@ package domain.client;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
 import java.util.Arrays;
@@ -276,7 +277,8 @@ public class ClientRequestManager {
 
 				clientNetworkMessage = new ClientNetworkMessage(parsedRequest.getUsername(),
 						parsedRequest.getPassword(), MessageType.RECEIVER);
-
+				clientNetworkMessage.setDestination(parsedRequest.getContact());
+				
 				clientNetworkMessage.setContent(parsedRequest.getSpecificField());
 
 				// enviar mensagem
@@ -290,21 +292,27 @@ public class ClientRequestManager {
 						(username, userPassword, chatmessage2.getCypheredMessageKey());
 				
 				//recebe ficheiro
-				File newfile = clientNetworkManager.receiveFile(chatmessage2.getFileSize(), 
+			File newfile = null;
+			try {
+				newfile = clientNetworkManager.receiveFile(chatmessage2.getFileSize(), 
 						chatmessage2.getContent(), sessionKey);
+			} catch (GeneralSecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 				
 				//verifica se está tudo ok
 				byte [] assinatura = SecurityUtils.signFile(newfile.getAbsolutePath(), username);
 				
 				boolean equalSign = Arrays.equals(assinatura, chatmessage2.getSignature());
 				
-				if(true) 	
+				if(false) 	//TODO
 					chatmessage2 = new ChatMessage (MessageType.OK);
-				else
+				else 
 					chatmessage2 = new ChatMessage (MessageType.NOK);
 				
 				// enviar mensagem
-				clientNetworkManager.sendMessage(chatMessage);
+				clientNetworkManager.sendMessage(chatmessage2);
 				
 				//recebe resposta 
 				networkMessage = (ServerMessage) clientNetworkManager.receiveMessage();

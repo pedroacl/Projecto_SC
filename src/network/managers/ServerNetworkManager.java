@@ -49,6 +49,7 @@ public class ServerNetworkManager extends NetworkManager {
 				bfile = new byte[packageSize];
 
 			int lido = fileInputStream.read(bfile, 0, bfile.length);
+			System.out.println("[ServerNetworkManager] sendByteFle, lido=  " + lido);
 			currentLength += lido;
 			out.write(bfile, 0, bfile.length);
 		}
@@ -78,6 +79,8 @@ public class ServerNetworkManager extends NetworkManager {
 		int currentLength = 0;
 		byte[] bfile = new byte[packageSize];
 		int lido;
+		int padding = fileSize % 16 == 0 ? 0: 16-(fileSize % 16);
+		int realSize = fileSize + padding; 
 		int i= 0;
 		
 		/*
@@ -88,8 +91,9 @@ public class ServerNetworkManager extends NetworkManager {
 		}
 		*/
 		
-		while (currentLength < fileSize) {
-			int resto = fileSize - currentLength;
+		System.out.println("[ServerNetworkManager] realSize= " + realSize );
+		while (currentLength < realSize) {
+			int resto = realSize - currentLength;
 			int numThisTime = resto < packageSize ? resto : bfile.length;
 			System.out.println("[ServerNetworkManager] numthistime= " + numThisTime );
 			lido = in.read(bfile, 0, numThisTime);

@@ -6,15 +6,18 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import network.messages.NetworkMessage;
 import util.SecurityUtils;
@@ -43,32 +46,52 @@ public class ClientNetworkManager extends NetworkManager {
 		return isValid;
 	}
 	
-	public File receiveFile(int fileSize, String name, SecretKey key) throws IOException {
+	public File receiveFile(int fileSize, String name, SecretKey key) throws IOException, IOException, GeneralSecurityException {
 
 		File file = new File(name);
 		FileOutputStream fileOut = new FileOutputStream(file);
+		
+		//cifra em modo decifra
+		Cipher cipher = Cipher.getInstance("AES");
+		byte[] keyEncoded = key.getEncoded();
+		SecretKeySpec keySpec = new SecretKeySpec(keyEncoded, "AES");
+		cipher.init(Cipher.DECRYPT_MODE, keySpec);
+		
+		CipherOutputStream cos = new CipherOutputStream(fileOut, cipher);
 
 		int packageSize = getPackageSize();
 		int currentLength = 0;
 		byte[] bfile = new byte[packageSize];
 		int lido;
+		byte [] decipher;
+		
+		System.out.println("[ClientNetworkMAnager] receiveFile fileSize = " + fileSize);
 
 		while (currentLength < fileSize) {
 			int resto = fileSize - currentLength;
 			int numThisTime = resto < packageSize ? resto : bfile.length;
 			lido = in.read(bfile, 0, numThisTime);
-
+			System.out.println("[ClientNetworkMAnager] receiveFile lido = " + lido);
+			
 			if (lido == -1) {
 				break;
 			}
 			
+			//decipher = cipher.update(bfile);
+			/*
+			if(numThisTime == packageSize)
+				decipher = cipher.update(bfile);
+			else
+				decipher = cipher.doFinal(bfile);
+			*/
 			
-
-			fileOut.write(bfile, 0, numThisTime);
+			cos.write(bfile, 0, lido);
 			currentLength += lido;
 		}
-
-		fileOut.close();
+		cos.flush();
+		cos.close();
+		System.out.println("[ClientNetworkMAnager] receiveFile total = " + currentLength);
+		//fileOut.close();
 
 		return file;
 	}
@@ -137,6 +160,7 @@ public class ClientNetworkManager extends NetworkManager {
 			out.write(bfile, 0, bfile.length);
 		}
 	*/
+
 		byte [] ciphered = null;
 		while (currentLength < fileSize) {
 			if ((fileSize - currentLength) < packageSize)
@@ -147,6 +171,7 @@ public class ClientNetworkManager extends NetworkManager {
 			int lido = fileInputStream.read(bfile, 0, bfile.length);
 			currentLength += lido;
 			System.out.println("[ClientNetworkMAnager] sendByteFile lido  = " + lido);
+			
 			
 			if(bfile.length == packageSize)
 				ciphered = cipher.update(bfile);
@@ -165,11 +190,10 @@ public class ClientNetworkManager extends NetworkManager {
 			
 			out.write(ciphered, 0, ciphered.length);
 		}
-
+		fileInputStream.close();
 		out.flush();
 		
 		
-		fileInputStream.close();
 	}
 
 	
