@@ -107,6 +107,7 @@ public class ConversationDAO {
 
 		// persistir mensagem
 		String messageFileName = Long.toString(chatMessage.getCreatedAt().getTime());
+		
 		String pathToTxt = "conversations/" + conversation.getId() + "/messages/" + messageFileName;
 
 		StringBuilder sb = new StringBuilder();
@@ -124,7 +125,19 @@ public class ConversationDAO {
 
 		PersistenceUtil.writeStringToFile(sb.toString(), pathToTxt);
 
-		String signaturePath = "conversations/" + conversation.getId() + "/signatures/" + messageFileName + ".sig";
+		saveSignAndKeys(messageFileName, chatMessage, conversation.getId());
+		
+		if(chatMessage.getMessageType().equals(MessageType.FILE)) {
+			saveSignAndKeys(chatMessage.getContent(), chatMessage, conversation.getId());
+		}
+
+		return conversation.getId();
+	}
+	
+	private void saveSignAndKeys(String messageFileName, ChatMessage chatMessage, Long id ) {
+		
+		//guarda assinatura
+		String signaturePath = "conversations/" + id + "/signatures/" + messageFileName + ".sig";
 		String signature = MiscUtil.bytesToHex(chatMessage.getSignature());
 		PersistenceUtil.writeStringToFile(signature, signaturePath);
 
@@ -132,12 +145,12 @@ public class ConversationDAO {
 		System.out.println("[ConversationDAO.addChatMessage] users length: " + chatMessage.getUsers().size());
 		
 		for (String username : chatMessage.getUsers()) {
-			String keyPath = "conversations/" + conversation.getId() + "/keys/" + messageFileName + ".key." + username;
+			String keyPath = "conversations/" + id + "/keys/" + messageFileName + ".key." + username;
 			String userKey = MiscUtil.bytesToHex(chatMessage.getUserKey(username));
 			PersistenceUtil.writeStringToFile(userKey, keyPath);
 		}
 
-		return conversation.getId();
+		
 	}
 
 	/**
@@ -214,7 +227,7 @@ public class ConversationDAO {
 		return lastMessage;
 	}
 
-	private byte[] getUserChatMessageKey(String username, long conversationId, String chatMessageName) {
+	public byte[] getUserChatMessageKey(String username, long conversationId, String chatMessageName) {
 		String filePath = "conversations/" + conversationId + "/keys/" + chatMessageName + ".key." + username;
 
 		File file = new File(filePath);
@@ -241,7 +254,7 @@ public class ConversationDAO {
 	 * @return Devolve a assinatura da mensagem, caso esta exista, ou null caso
 	 *         contrário
 	 */
-	private byte[] getChatMessageSignature(Long conversationId, String chatMessageName) {
+	public byte[] getChatMessageSignature(Long conversationId, String chatMessageName) {
 		String filePath = "conversations/" + conversationId + "/signatures/" + chatMessageName + ".sig";
 		String signature = null;
 

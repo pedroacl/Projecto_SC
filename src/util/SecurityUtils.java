@@ -135,7 +135,7 @@ public class SecurityUtils {
 		return signedMessage;
 	}
 
-	public static byte[] signFile(String message, PrivateKey privateKey) {
+	public static byte[] signFile(String message, String username) {
 		// TODO
 
 		return null;

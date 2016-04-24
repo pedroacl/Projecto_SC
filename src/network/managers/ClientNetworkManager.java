@@ -9,8 +9,10 @@ import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
@@ -100,19 +102,26 @@ public class ClientNetworkManager extends NetworkManager {
 		
 		//Stream para ler do ficheiro
 		FileInputStream fileInputStream = new FileInputStream(name);
-		
-		//Stream para cifrar e enviar para o socket;
-		CipherOutputStream cos = new CipherOutputStream(out, cipher);
-		
 		int currentLength = 0;
 		int i = 0;
 		byte[] bfile = new byte [packageSize] ;
 		
+		
+		/*
+		//Stream para cifrar e enviar para o socket;
+		CipherOutputStream cos = new CipherOutputStream(out, cipher);
+		
+		
+		
 		while ((i = fileInputStream.read(bfile)) != -1) {
 			System.out.println("li= " + i  );
+			currentLength  += i; 
 			cos.write(bfile, 0, i);	
 		}
+		System.out.println("[ClientNetworkMAnager] sendByteFile total = " + currentLength);
 		cos.flush();
+		*/
+		
 		/*
 		while (currentLength < fileSize) {
 			if ((fileSize - currentLength) < packageSize)
@@ -123,13 +132,42 @@ public class ClientNetworkManager extends NetworkManager {
 			int lido = fileInputStream.read(bfile, 0, bfile.length);
 			currentLength += lido;
 			
-			bfile = SecurityUtils.cipherWithSessionKey(bfile, key);
+			//bfile = SecurityUtils.cipherWithSessionKey(bfile, key);
 			
 			out.write(bfile, 0, bfile.length);
 		}
+	*/
+		byte [] ciphered = null;
+		while (currentLength < fileSize) {
+			if ((fileSize - currentLength) < packageSize)
+				bfile = new byte[(fileSize - currentLength)];
+			else
+				bfile = new byte[packageSize];
+
+			int lido = fileInputStream.read(bfile, 0, bfile.length);
+			currentLength += lido;
+			System.out.println("[ClientNetworkMAnager] sendByteFile lido  = " + lido);
+			
+			if(bfile.length == packageSize)
+				ciphered = cipher.update(bfile);
+			else
+				try {
+					ciphered = cipher.doFinal(bfile);
+				} catch (IllegalBlockSizeException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (BadPaddingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
+			System.out.println("[ClientNetworkMAnager] sendByteFile = " + ciphered.length);
+			
+			out.write(ciphered, 0, ciphered.length);
+		}
 
 		out.flush();
-		*/
+		
 		
 		fileInputStream.close();
 	}

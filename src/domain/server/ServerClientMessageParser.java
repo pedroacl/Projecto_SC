@@ -187,6 +187,16 @@ public class ServerClientMessageParser {
 				}
 				break;
 			default:
+				
+				/*
+				 * S ----------RECEIVER-----------> C
+				 *  --AD,Ks(F),K(ks)/NOK--FILE-->
+				 *  -----------F---------------->
+				 * <----------OK/NOK-------------
+				 * -----------OK/NOK-------------> 
+				 * */
+				
+				
 				// destinatario eh utilizador ou grupo
 				if (authentication.existsUser(clientMessage.getDestination())
 						|| groupService.existsGroup(clientMessage.getDestination())) {
@@ -196,13 +206,37 @@ public class ServerClientMessageParser {
 
 					// se exitir o path
 					if (path != null) {
-
+						ChatMessage messageTosend = new ChatMessage(MessageType.FILE);
+						
 						File file = new File(path);
-						serverMessage = new ServerMessage(MessageType.FILE);
-						serverMessage.setFileSize((int) file.length());
-						serverMessage.setContent(path);
+						int fileSize = (int) file.length();
+						messageTosend.setFileSize(fileSize);
+						String fileName = MiscUtil.extractName(path);
+						messageTosend.setContent(fileName);
+						
 						// get assinatura digital
+						Long id = Long.parseLong(path.split("/")[1]) ;
+						byte [] sign = conversationService.getChatMessageSignature
+								(id,fileName);
+						messageTosend.setSignature(sign);
+						
 						// get SecretKey cifrada com publicKey
+						byte[] key = conversationService.getUserChatMessageKey
+								(clientMessage.getUsername(), id,fileName);
+						messageTosend.setCypheredMessageKey(key);
+						
+						//envia mensagem de aviso para file
+						serverNetworkManager.sendMessage(messageTosend);
+						
+						//envia File
+						serverNetworkManager.sendFile(path, fileSize);
+						
+						//espera resposta do cliente
+						ChatMessage clientPGPMessage = (ChatMessage) serverNetworkManager.receiveMessage();
+						
+						//envia confimaçao ao cliente
+						serverMessage = new ServerMessage(clientPGPMessage.getMessageType());
+								
 
 					} else {
 						serverMessage = new ServerMessage(MessageType.NOK);

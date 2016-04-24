@@ -6,6 +6,7 @@ import java.util.List;
 
 import dao.ConversationDAO;
 import network.messages.ChatMessage;
+import util.MiscUtil;
 import util.PersistenceUtil;
 import util.SecurityUtils;
 
@@ -124,6 +125,15 @@ public class ConversationService {
 				tempFile.delete();
 		}
 
+	}
+
+	public byte [] getChatMessageSignature(Long id, String name) {
+		 return conversationDAO.getChatMessageSignature(id, name);
+		
+	}
+
+	public byte[] getUserChatMessageKey(String username, Long id, String name) {
+		return conversationDAO.getUserChatMessageKey(username, id, name);
 	}
 
 }

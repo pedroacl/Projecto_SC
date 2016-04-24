@@ -18,30 +18,14 @@ public class ServerNetworkManager extends NetworkManager {
 		super(socket);
 	}
 	
-	/**
-	 * Função auxiliar
-	 * 
-	 * @param absolutePath
-	 * @return
-	 */
-	private String extractName(String absolutePath) {
-		String[] splitName = absolutePath.split("/");
-		return splitName[splitName.length - 1];
-	}
 
-
-	public boolean sendFile(NetworkMessage message) {
+	public boolean sendFile(String filePath, int fileSize) {
 		boolean isValid = false;
 	
-		String filePath = (message.getContent());
-		message.setContent(extractName(filePath));
-		
-		send(message);
-		
 		isValid = true;
 		
 		try {
-			sendByteFile(filePath, message.getFileSize());
+			sendByteFile(filePath, fileSize);
 		} catch (IOException e) {
 			isValid = false;
 			e.printStackTrace();
@@ -94,7 +78,16 @@ public class ServerNetworkManager extends NetworkManager {
 		int currentLength = 0;
 		byte[] bfile = new byte[packageSize];
 		int lido;
-
+		int i= 0;
+		
+		/*
+		while ((i = in.read(bfile)) != -1) {
+			System.out.println("li= " + i  );
+			currentLength  += i; 
+			fileOut.write(bfile, 0, i);	
+		}
+		*/
+		
 		while (currentLength < fileSize) {
 			int resto = fileSize - currentLength;
 			int numThisTime = resto < packageSize ? resto : bfile.length;
@@ -104,11 +97,12 @@ public class ServerNetworkManager extends NetworkManager {
 			if (lido == -1) {
 				break;
 			}
-
+	
 			fileOut.write(bfile, 0, numThisTime);
 			currentLength += lido;
 			System.out.println("[ServerNetworkManager] currentLength= " + currentLength );
 		}
+		
 		
 		System.out.println("[ServerNetworkManager] close ");
 

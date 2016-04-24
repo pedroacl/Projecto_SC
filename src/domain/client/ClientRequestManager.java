@@ -1,8 +1,10 @@
 package domain.client;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -153,7 +155,7 @@ public class ClientRequestManager {
 
 					// gerar assinatura
 					byte[] clientSignature = SecurityUtils.signFile(parsedRequest.getSpecificField(),
-							keyPair.getPrivate());
+							username);
 					chatMessage.setSignature(new byte[5]); // TODO
 
 					// obter chave secreta
@@ -282,13 +284,33 @@ public class ClientRequestManager {
 
 				// recebe Resposta
 				ChatMessage chatmessage2 = (ChatMessage) clientNetworkManager.receiveMessage();
-
-				// recebe file
-				// TODO
-				// clientNetworkManeger.receiveFile(chatmessage,
-				// chatmessage.getSecretKey)
-				// Sign File e compara com AD
-
+				
+				//obtem chave de sessão para decifrar ficheiro
+				SecretKey sessionKey = SecurityUtils.unwrapSessionKey
+						(username, userPassword, chatmessage2.getCypheredMessageKey());
+				
+				//recebe ficheiro
+				File newfile = clientNetworkManager.receiveFile(chatmessage2.getFileSize(), 
+						chatmessage2.getContent(), sessionKey);
+				
+				//verifica se está tudo ok
+				byte [] assinatura = SecurityUtils.signFile(newfile.getAbsolutePath(), username);
+				
+				boolean equalSign = Arrays.equals(assinatura, chatmessage2.getSignature());
+				
+				if(true) 	
+					chatmessage2 = new ChatMessage (MessageType.OK);
+				else
+					chatmessage2 = new ChatMessage (MessageType.NOK);
+				
+				// enviar mensagem
+				clientNetworkManager.sendMessage(chatMessage);
+				
+				//recebe resposta 
+				networkMessage = (ServerMessage) clientNetworkManager.receiveMessage();
+				if(networkMessage.getMessageType().equals(MessageType.NOK))
+					networkMessage.setContent("Ficheiro corrompido");
+				
 				break;
 
 			case "-a":
