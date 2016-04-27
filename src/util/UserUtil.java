@@ -89,7 +89,7 @@ public class UserUtil {
 			sb.append(chatMessage.getFromUser() + ": ");
 		}
 
-		sb.append(MiscUtil.bytesToHex(chatMessage.getCypheredMessage()) + "\n");
+		sb.append((chatMessage.getContent()) + "\n");
 
 		// formatar data para apresentacao
 		SimpleDateFormat dt = new SimpleDateFormat("dd-MM-yyyy HH:mm");

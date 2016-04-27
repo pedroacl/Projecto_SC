@@ -252,7 +252,6 @@ public class ClientRequestManager {
 							currChatMessage.getCypheredMessageKey(),
 							currChatMessage.getCypheredMessage());
 					
-					System.out.println("MENSAGEM DECIFRADA ->>>>> " + decipheredMessage);
 
 					// validar assinatura
 					byte[] signature = currChatMessage.getSignature();
@@ -264,6 +263,8 @@ public class ClientRequestManager {
 						System.out.println("Assinatura invalida!");
 						e.printStackTrace();
 					}
+					
+					currChatMessage.setContent(decipheredMessage);
 				}
 				
 				networkMessage = serverMessage;
@@ -359,12 +360,16 @@ public class ClientRequestManager {
 						parsedRequest.getPassword(), MessageType.ADDUSER);
 
 				clientNetworkMessage.setContent(parsedRequest.getSpecificField());
+				clientNetworkMessage.setDestination(parsedRequest.getContact());
 
 				// enviar mensagem
 				clientNetworkManager.sendMessage(clientNetworkMessage);
 
 				// recebe Resposta
-				ChatMessage chatmessage = (ChatMessage) clientNetworkManager.receiveMessage();
+				ServerMessage chatmessage = (ServerMessage) clientNetworkManager.receiveMessage();
+				System.out.println("[ClientRequestManager] -a: " + chatmessage.getMessageType());
+				
+				
 				networkMessage = chatmessage;
 
 				break;
@@ -379,6 +384,7 @@ public class ClientRequestManager {
 						parsedRequest.getPassword(), MessageType.REMOVEUSER);
 
 				clientNetworkMessage.setContent(parsedRequest.getSpecificField());
+				clientNetworkMessage.setDestination(parsedRequest.getContact());
 
 				// enviar mensagem
 				clientNetworkManager.sendMessage(clientNetworkMessage);

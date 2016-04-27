@@ -257,6 +257,8 @@ public class ServerClientMessageParser {
 			} catch (InvalidMacException e) {
 				e.printStackTrace();
 			}
+			
+			System.out.println("[ServerClientMesageParser] addUser: "+ serverMessage.getMessageType());
 			break;
 
 		// remover utilizador

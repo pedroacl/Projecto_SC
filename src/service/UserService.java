@@ -44,6 +44,7 @@ public class UserService {
 	}
 
 	public String[] getUserPasswordAndSalt(String username) {
+		System.out.println("Username = " + username);
 		String passwordAndSalt = users.get(username);
 
 		if (passwordAndSalt == null)

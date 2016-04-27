@@ -255,11 +255,11 @@ public class ConversationDAO {
 	 *         contrário
 	 */
 	public byte[] getChatMessageSignature(Long conversationId, String chatMessageName) {
-		String filePath = "conversations/" + conversationId + "/signatures/" + chatMessageName + ".sig";
+		File fileWithSig = PersistenceUtil.getMessageSignature(conversationId, chatMessageName);
+		
 		String signature = null;
-
 		try {
-			signature = PersistenceUtil.readStringFromFile(new File(filePath));
+			signature = PersistenceUtil.readStringFromFile(fileWithSig);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
