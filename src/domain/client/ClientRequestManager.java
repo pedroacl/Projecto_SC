@@ -289,6 +289,33 @@ public class ClientRequestManager {
 
 				// espera resposta
 				ServerMessage serverMessage2 = (ServerMessage) clientNetworkManager.receiveMessage();
+				List<ChatMessage> chatMessages2 = serverMessage2.getMessageList();
+				
+				// iterar mensagens
+				for (ChatMessage currChatMessage: chatMessages2) {
+					System.out.println("[ClientRequestManager] cipheredKey: "
+							+ MiscUtil.bytesToHex(currChatMessage.getCypheredMessageKey()));
+					
+					// decifrar mensagem
+					String decipheredMessage = SecurityUtils.decipherChatMessage(username, userPassword,
+							currChatMessage.getCypheredMessageKey(),
+							currChatMessage.getCypheredMessage());
+					
+
+					// validar assinatura
+					byte[] signature = currChatMessage.getSignature();
+					Certificate certificate = SecurityUtils.getCertificate(username, currChatMessage.getFromUser(), userPassword);
+
+					try {
+						SecurityUtils.verifySignature(decipheredMessage, certificate.getPublicKey(), signature);
+					} catch (SignatureException e) {
+						System.out.println("Assinatura invalida!");
+						e.printStackTrace();
+					}
+					
+					currChatMessage.setContent(decipheredMessage);
+				}
+				
 
 				networkMessage = serverMessage2;
 				break;
