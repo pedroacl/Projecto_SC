@@ -148,9 +148,9 @@ public class SecurityUtils {
 	 * @param certificate
 	 * @param signature
 	 * @return Devolve true caso a assinatura seja válida e false caso contrário
+	 * @throws SignatureException 
 	 */
-	public static boolean verifySignature(String message, Certificate certificate, byte[] signature) {
-		PublicKey publicKey = certificate.getPublicKey();
+	public static boolean verifySignature(String message, PublicKey publicKey, byte[] signature) throws SignatureException {
 
 		try {
 			Signature sign = Signature.getInstance("MD5withRSA");
@@ -162,8 +162,6 @@ public class SecurityUtils {
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		} catch (InvalidKeyException e) {
-			e.printStackTrace();
-		} catch (SignatureException e) {
 			e.printStackTrace();
 		}
 

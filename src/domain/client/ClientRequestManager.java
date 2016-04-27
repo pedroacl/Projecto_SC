@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
+import java.security.SignatureException;
+import java.security.cert.Certificate;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
@@ -57,6 +59,9 @@ public class ClientRequestManager {
 			 * (ChatMessage) <-------OK/NOK----------
 			 */
 
+			/**
+			 * Enviar mensagem a um utilizador
+			 */
 			case "-m":
 				// enviar mensagem a perguntar o tipo do destinatario (contacto?
 				// grupo?)
@@ -135,6 +140,9 @@ public class ClientRequestManager {
 			 * <--------OK/NOK-----------
 			 */
 
+			/**
+			 * Enviar um ficheiro a um utilizador
+			 */
 			case "-f":
 				// enviar mensagem a perguntar o tipo do destinatario (user?
 				// grupo?)
@@ -215,6 +223,9 @@ public class ClientRequestManager {
 			 * M/NOK--LAST--
 			 */
 
+			/**
+			 * Receber as ultimas mensagens trocadas com cada utilizador
+			 */
 			case "-rLast":
 
 				System.out.println("-rLast");
@@ -227,17 +238,33 @@ public class ClientRequestManager {
 				// enviar mensagem
 				clientNetworkManager.sendMessage(clientNetworkMessage);
 
-				// espera resposta
+				// obter resposta
 				ServerMessage serverMessage = (ServerMessage) clientNetworkManager.receiveMessage();
+				List<ChatMessage> chatMessages = serverMessage.getMessageList();
+				
+				// iterar mensagens
+				for (ChatMessage currChatMessage: chatMessages) {
+					System.out.println("[ClientRequestManager] cipheredKey: "
+							+ MiscUtil.bytesToHex(currChatMessage.getCypheredMessageKey()));
+					
+					// decifrar mensagem
+					String decipheredMessage = SecurityUtils.decipherChatMessage(username, userPassword,
+							currChatMessage.getCypheredMessageKey(),
+							currChatMessage.getCypheredMessage());
+					
+					System.out.println("MENSAGEM DECIFRADA ->>>>> " + decipheredMessage);
 
-				System.out.println("[ClientRequestManager] cipheredKey: "
-						+ MiscUtil.bytesToHex(serverMessage.getMessageList().get(0).getCypheredMessageKey()));
-				
-				String decipheredMessage = SecurityUtils.decipherChatMessage(username, userPassword,
-						serverMessage.getMessageList().get(0).getCypheredMessageKey(),
-						serverMessage.getMessageList().get(0).getCypheredMessage());
-				
-				System.out.println("MENSAGEM DECIFRADA ->>>>> " + decipheredMessage);
+					// validar assinatura
+					byte[] signature = currChatMessage.getSignature();
+					Certificate certificate = SecurityUtils.getCertificate(username, currChatMessage.getFromUser(), userPassword);
+
+					try {
+						SecurityUtils.verifySignature(decipheredMessage, certificate.getPublicKey(), signature);
+					} catch (SignatureException e) {
+						System.out.println("Assinatura invalida!");
+						e.printStackTrace();
+					}
+				}
 				
 				networkMessage = serverMessage;
 				
