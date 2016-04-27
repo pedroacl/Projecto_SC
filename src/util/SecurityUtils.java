@@ -151,7 +151,7 @@ public class SecurityUtils {
 	 * @throws SignatureException 
 	 */
 	public static boolean verifySignature(String message, PublicKey publicKey, byte[] signature) throws SignatureException {
-
+		
 		try {
 			Signature sign = Signature.getInstance("MD5withRSA");
 			sign.initVerify(publicKey);

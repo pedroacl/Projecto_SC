@@ -252,4 +252,22 @@ public class PersistenceUtil {
 		
 		return line;
 	}
+	
+	
+	/**
+	 * Obter o ficheiro da assinatura relativa a uma determinada mensagem
+	 * @param conversationId
+	 * @param messageName
+	 * @return
+	 */
+	public static File getMessageSignature(Long conversationId, String messageName) {
+		File folder = new File("conversations/" + conversationId + "/signatures");
+
+		// iterar ficheiros presentes na directoria
+		for (File file : folder.listFiles())
+			if (file.isFile() && file.getName().matches(messageName + ".sig.*")) 
+				return file;
+		
+		return null;
+	}
 }
