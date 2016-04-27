@@ -137,7 +137,7 @@ public class ConversationDAO {
 	private void saveSignAndKeys(String messageFileName, ChatMessage chatMessage, Long id ) {
 		
 		//guarda assinatura
-		String signaturePath = "conversations/" + id + "/signatures/" + messageFileName + ".sig";
+		String signaturePath = "conversations/" + id + "/signatures/" + messageFileName + ".sig." + chatMessage.getFromUser();
 		String signature = MiscUtil.bytesToHex(chatMessage.getSignature());
 		PersistenceUtil.writeStringToFile(signature, signaturePath);
 
