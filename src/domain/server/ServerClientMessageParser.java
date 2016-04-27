@@ -255,7 +255,6 @@ public class ServerClientMessageParser {
 			try {
 				serverMessage = addUserToGroup();
 			} catch (InvalidMacException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			break;

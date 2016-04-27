@@ -18,6 +18,7 @@ import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
@@ -37,7 +38,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
 
 import exceptions.InvalidMacException;
 
@@ -142,6 +142,35 @@ public class SecurityUtils {
 	}
 
 	/**
+	 * Verifica a assinatura digital de uma mensagem
+	 * 
+	 * @param message
+	 * @param certificate
+	 * @param signature
+	 * @return Devolve true caso a assinatura seja válida e false caso contrário
+	 */
+	public static boolean verifySignature(String message, Certificate certificate, byte[] signature) {
+		PublicKey publicKey = certificate.getPublicKey();
+
+		try {
+			Signature sign = Signature.getInstance("MD5withRSA");
+			sign.initVerify(publicKey);
+			sign.update(message.getBytes());
+
+			return sign.verify(signature);
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+		} catch (SignatureException e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+	/**
 	 * 
 	 * @param username
 	 * @param userPassword
@@ -161,7 +190,7 @@ public class SecurityUtils {
 
 			byte[] decipheredChatMessageBytes = decipherWithSessionKey(cipheredMessage, sessionKey);
 			decipheredChatMessage = new String(decipheredChatMessageBytes, StandardCharsets.UTF_8);
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -169,7 +198,6 @@ public class SecurityUtils {
 		return decipheredChatMessage;
 	}
 
-	
 	/**
 	 * 
 	 * @param message
@@ -178,7 +206,7 @@ public class SecurityUtils {
 	 */
 	public static byte[] cipherWithSessionKey(byte[] message, SecretKey secretKey) {
 		byte[] encryptedMessage = null;
-		
+
 		printSecretKey(secretKey);
 
 		try {
@@ -203,14 +231,14 @@ public class SecurityUtils {
 
 	private static byte[] decipherWithSessionKey(byte[] cipheredMessage, SecretKey secretKey) {
 		byte[] decipheredMessage = null;
-		
+
 		try {
 			Cipher cipher = Cipher.getInstance("AES");
 
 			byte[] keyEncoded = secretKey.getEncoded();
 			SecretKeySpec keySpec = new SecretKeySpec(keyEncoded, "AES");
 			cipher.init(Cipher.DECRYPT_MODE, keySpec);
-			
+
 			decipheredMessage = cipher.doFinal(cipheredMessage);
 
 		} catch (NoSuchAlgorithmException e) {
@@ -535,17 +563,17 @@ public class SecurityUtils {
 
 		return keyStore;
 	}
-	
-	public static void printSecretKey(SecretKey key)  {
-		byte [] chave = key.getEncoded();
-		
+
+	public static void printSecretKey(SecretKey key) {
+		byte[] chave = key.getEncoded();
+
 		StringBuilder sb = new StringBuilder("------------------> ");
-		
-		for(int i = 0; i < chave.length; i++) {
-		
+
+		for (int i = 0; i < chave.length; i++) {
+
 			sb.append(chave[i]);
 		}
-		
+
 		System.out.println(sb.toString());
 
 	}
