@@ -417,7 +417,7 @@ public class ClientRequestManager {
 				clientNetworkManager.sendMessage(clientNetworkMessage);
 
 				// recebe Resposta
-				ChatMessage chatmessage3 = (ChatMessage) clientNetworkManager.receiveMessage();
+				ServerMessage chatmessage3 = (ServerMessage) clientNetworkManager.receiveMessage();
 				networkMessage = chatmessage3;
 
 				break;

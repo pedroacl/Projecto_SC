@@ -2,6 +2,7 @@ package service;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import dao.ConversationDAO;
@@ -115,14 +116,18 @@ public class ConversationService {
 	 */
 	public void removeKeyUserFromFolder(String userToRemove, Long conversationId) {
 		
-		File f = new File("/Conversations/" + conversationId.toString() + "/keys/");
+		File f = new File("conversations/" + conversationId.toString() + "/keys");
 
 		File[] listConversationKeyUser = f.listFiles();
 
 		for (File tempFile : listConversationKeyUser) {
-			String[] temp = tempFile.getName().split(".");
-			if (userToRemove.equals(temp[temp.length - 1]))
+			System.out.println("[ConversationService] removeKeyUserFromFolder: " + tempFile.getName());
+			String[] temp = tempFile.getName().split("\\.");
+			System.out.println("[ConversationService] removeKeyUserFromFolder: " + Arrays.toString(temp));
+			if (userToRemove.equals(temp[temp.length - 1])) {
+				System.out.println("[ConversationService] removeKeyUserFromFolder: " + temp[temp.length - 1]);
 				tempFile.delete();
+			}
 		}
 
 	}
