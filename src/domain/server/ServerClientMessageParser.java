@@ -359,17 +359,12 @@ public class ServerClientMessageParser {
 			// obter membros do grupo
 			List<String> members = groupService.getGroupMembers(clientMessage.getDestination());
 
-			// iterar sobre a lista de membros
-			// colocando-os com o respectivo Certificados na hashMap da Message
-			// TODO
-
-			/*
-			 * serverContactTypeMessage.addGroupMember("jose", null);
-			 * serverContactTypeMessage.addGroupMember("pedro", null);
-			 * serverContactTypeMessage.addGroupMember("antonio", null);
-			 */
+			for(String membro: members) {
+				if(!membro.equals(clientMessage.getUsername()))
+					serverContactTypeMessage.addGroupMember(membro);
+			}
+			
 			serverMessage = serverContactTypeMessage;
-			// serverMessage.setGroupMembers(groupMembers);
 
 			// destinatario nao existe
 		} else {

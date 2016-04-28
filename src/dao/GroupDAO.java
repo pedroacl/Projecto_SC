@@ -54,6 +54,8 @@ public class GroupDAO {
 		SecurityUtils.validateFileMac("groups.txt", serverPassword);
 		
 		Group group = (Group) PersistenceUtil.readObject(filePath);
+		
+		System.out.println("[GroupDAO] addUserToGroup: " + group.getUsers());
 
 		if (group.addUser(username)) {
 			PersistenceUtil.writeObject(group, filePath);

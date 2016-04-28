@@ -49,6 +49,7 @@ public class GroupService {
 			// ler ficheiro
 			Group group = groupDAO.getGroup(groupName);
 
+			System.out.println("[GROUPOSERVICE] addUserToGroup:"+  userToAdd);
 			// utilizador nao adicionado ao grupo
 			if (!group.getUsers().contains(userToAdd)) {
 				groupDAO.addUserToGroup(userToAdd, groupName);
