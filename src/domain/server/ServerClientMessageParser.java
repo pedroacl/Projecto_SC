@@ -52,7 +52,7 @@ public class ServerClientMessageParser {
 		this.serverNetworkManager = serverNetworkManager;
 
 		conversationService = new ConversationService();
-		groupService = GroupService.getInstance();
+		groupService = new GroupService(authentication.getServerPassword());
 
 	}
 
@@ -250,7 +250,10 @@ public class ServerClientMessageParser {
 			}
 
 			break;
-		// adicionar utilizador
+
+		/**
+		 * Adicionar um utilizador a um grupo
+		 */
 		case ADDUSER:
 			try {
 				serverMessage = addUserToGroup();
@@ -258,10 +261,12 @@ public class ServerClientMessageParser {
 				e.printStackTrace();
 			}
 			
-			System.out.println("[ServerClientMesageParser] addUser: "+ serverMessage.getMessageType());
+			System.out.println("[ServerClientMesageParser] addUser: " + serverMessage.getMessageType());
 			break;
 
-		// remover utilizador
+		/**
+		 * Remover um utilizador de um grupo
+		 */
 		case REMOVEUSER:
 			try {
 				serverMessage = removeUserFromGroup();

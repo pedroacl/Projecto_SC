@@ -370,11 +370,11 @@ public class SecurityUtils {
 			// nao existe ficheiro MAC
 			if (!usersFileMacPath.exists()) {
 				System.out.println("Ficheiro MAC não existe");
+				
+				// criar ficheiro MAC
 				SecurityUtils.updateFileMac(filePath, serverPassword);
 
 			} else {
-				System.out.println("[Authentication.validateUsersFileMac] ficheiro MAC existe");
-
 				// obter MAC original
 				BufferedReader inF = new BufferedReader(new FileReader(usersFileMacPath));
 				String originalMAC = inF.readLine();
@@ -382,7 +382,6 @@ public class SecurityUtils {
 
 				// gerar MAC atual
 				System.out.println(filePath);
-				System.out.println(serverPassword);
 				String currentMacString = MiscUtil.bytesToHex(SecurityUtils.generateFileMac(filePath, serverPassword));
 
 				System.out.println("MAC original: " + originalMAC);

@@ -17,17 +17,17 @@ import util.SecurityUtils;
  */
 public class Authentication {
 
-	private static final String	USERS_FILE_PATH	= "users.txt";
+	private static final String USERS_FILE_PATH = "users.txt";
 
-	private static UserService	userService;
+	private static UserService userService;
 
-	private String				serverPassword;
+	private String serverPassword;
 
 	public Authentication(String serverPassword) {
 		this.serverPassword = serverPassword;
 		userService = new UserService();
 	}
-	
+
 	public String getServerPassword() {
 		return this.serverPassword;
 	}

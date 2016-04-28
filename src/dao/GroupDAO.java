@@ -14,8 +14,10 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import entities.Group;
+import exceptions.InvalidMacException;
 import factories.ConversationFactory;
 import util.PersistenceUtil;
+import util.SecurityUtils;
 
 /**
  * Classe que gere os grupos, persistindo-os em disco
@@ -25,8 +27,11 @@ import util.PersistenceUtil;
 public class GroupDAO {
 
 	private static ConversationFactory conversationFactory;
+	
+	private String serverPassword;
 
-	public GroupDAO() {
+	public GroupDAO(String serverPassword) {
+		this.serverPassword = serverPassword;
 		conversationFactory = ConversationFactory.getInstance();
 	}
 
@@ -39,11 +44,15 @@ public class GroupDAO {
 	 *            Nome do utilizador a ser adicionado
 	 * @return Devolve true caso o username tenha sido adicionado a groupName e
 	 *         false caso contrario
+	 * @throws InvalidMacException 
 	 * @requires username != null && groupName != null
 	 */
-	public boolean addUserToGroup(String username, String groupName) {
+	public boolean addUserToGroup(String username, String groupName) throws InvalidMacException {
 		String filePath = "groups/" + groupName + "/group";
 
+		// validar ficheiro MAC
+		SecurityUtils.validateFileMac("groups.txt", serverPassword);
+		
 		Group group = (Group) PersistenceUtil.readObject(filePath);
 
 		if (group.addUser(username)) {
@@ -60,16 +69,21 @@ public class GroupDAO {
 	 * 
 	 * @return HasMap com todos os grupos registados associados com os seus
 	 *         donos
+	 * @throws InvalidMacException 
 	 */
-	public ConcurrentHashMap<String, String> getGroups() {
+	public ConcurrentHashMap<String, String> getGroups() throws InvalidMacException {
 		ConcurrentHashMap<String, String> groups = new ConcurrentHashMap<String, String>();
 
 		String line;
+		String filePath = "groups.txt";
 		BufferedReader br;
 
 		// criar ficheiro caso este nao exista
-		PersistenceUtil.createFile("groups.txt");
-		File file = new File("groups.txt");
+		PersistenceUtil.createFile(filePath);
+		File file = new File(filePath);
+		
+		// validar ficheiro MAC
+		SecurityUtils.validateFileMac(filePath, serverPassword);
 
 		// existe ficheiro e nao estah vazio
 		if (file.exists() && file.length() > 0) {
@@ -107,18 +121,27 @@ public class GroupDAO {
 	 * @param admin
 	 *            Dono do grupo, isto é quem cria o grupo
 	 * @return Devolve o id da conversação associada ao grupo
+	 * @throws InvalidMacException 
 	 * @requires groupName != null && admin != null
 	 */
-	public Long createGroup(String groupName, String admin) {
+	public Long createGroup(String groupName, String admin) throws InvalidMacException {
+		
+		String filePath = "groups.txt";
+
+		// validar ficheiro MAC
+		SecurityUtils.validateFileMac(filePath, serverPassword);
 
 		// adiciona uma entrada no ficheiro groups.txt
 		try {
-			FileWriter fw = new FileWriter("groups.txt", true);
+			FileWriter fw = new FileWriter(filePath, true);
 			fw.write(groupName + ":" + admin + "\n");
 			fw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		// atualizar ficheiro MAC
+		SecurityUtils.updateFileMac(filePath, serverPassword);
 
 		// cria directoria groups caso nao exista previamente
 		PersistenceUtil.createDir("groups");
@@ -145,11 +168,17 @@ public class GroupDAO {
 	 * 
 	 * @param groupName
 	 *            Nome do grupo a ser eliminado do ficheiro
+	 * @throws InvalidMacException 
 	 * @requires groupName != null
 	 */
-	public void deleteGroup(String groupName) {
+	public void deleteGroup(String groupName) throws InvalidMacException {
+		String filePath = "groups.txt";
+
+		// validar ficheiro MAC
+		SecurityUtils.validateFileMac(filePath, serverPassword);
+		
 		// elimina entrada no ficheiro groups.txt
-		File file = new File("groups.txt");
+		File file = new File(filePath);
 		File tempFile = new File("tempGroups.txt");
 
 		try {
@@ -180,15 +209,18 @@ public class GroupDAO {
 
 		// elimina ficheiro antigo
 		if (!file.delete()) {
-			System.out.println("Could not delete file");
+			System.out.println("Erro ao eliminar ficheiro");
 			return;
 		}
 		if (!tempFile.renameTo(file))
-			System.out.println("Could not rename file");
+			System.out.println("Erro ao renomerar ficheiro");
 
 		// eliminar pasta do grupo
 		file = new File("groups/" + groupName);
 		PersistenceUtil.delete(file);
+		
+		// atualizar ficheiro MAC
+		SecurityUtils.updateFileMac(filePath, serverPassword);
 	}
 
 	/**

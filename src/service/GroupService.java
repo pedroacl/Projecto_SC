@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import dao.GroupDAO;
 import entities.Group;
-import util.SecurityUtils;
+import exceptions.InvalidMacException;
 
 /**
  * 
@@ -15,26 +15,25 @@ import util.SecurityUtils;
  */
 public class GroupService {
 
-	private GroupDAO							groupDAO;
+	private GroupDAO groupDAO;
 
-	private static ConversationService			conversationService;
+	private static ConversationService conversationService;
 
-	private static GroupService					groupService	= new GroupService();
-
-	private ConcurrentHashMap<String, String>	groups;									// groupName:owner
+	private ConcurrentHashMap<String, String> groups; // groupName:owner
 	
-	private GroupService() {
-		groupDAO = new GroupDAO();
-		groups = groupDAO.getGroups();
-		conversationService = new ConversationService();
-	}
+	private String serverPassword;
 
-	/**
-	 * 
-	 * @return
-	 */
-	public static GroupService getInstance() {
-		return groupService;
+	public GroupService(String serverPassword) {
+		this.serverPassword = serverPassword;
+		groupDAO = new GroupDAO(serverPassword);
+
+		try {
+			groups = groupDAO.getGroups();
+		} catch (InvalidMacException e) {
+			e.printStackTrace();
+		}
+
+		conversationService = new ConversationService();
 	}
 
 	/**
@@ -42,9 +41,10 @@ public class GroupService {
 	 * @param username
 	 * @param userToAdd
 	 * @param groupName
+	 * @throws InvalidMacException 
 	 */
-	public boolean addUserToGroup(String username, String userToAdd, String groupName) {
-		
+	public boolean addUserToGroup(String username, String userToAdd, String groupName) throws InvalidMacException {
+
 		if (existsGroup(groupName) && getGroupOwner(groupName).equals(username)) {
 			// ler ficheiro
 			Group group = groupDAO.getGroup(groupName);
@@ -110,7 +110,12 @@ public class GroupService {
 				conversationService.removeConversation(group.getConversationId());
 
 				// Apaga o group do "disco"
-				groupDAO.deleteGroup(groupName);
+				try {
+					groupDAO.deleteGroup(groupName);
+				} catch (InvalidMacException e) {
+					e.printStackTrace();
+				}
+				
 				groups.remove(groupName);
 
 				return true;
@@ -130,6 +135,7 @@ public class GroupService {
 				}
 			}
 		}
+		
 		return false;
 	}
 
@@ -148,12 +154,28 @@ public class GroupService {
 
 	/**
 	 * 
+	 * @param groupName
+	 * @param admin
+	 * @return
 	 */
 	public Long createGroup(String groupName, String admin) {
 		groups.put(groupName, admin);
-		return groupDAO.createGroup(groupName, admin);
+		Long groupId = null;
+
+		try {
+			groupId = groupDAO.createGroup(groupName, admin);
+		} catch (InvalidMacException e) {
+			e.printStackTrace();
+		}
+		
+		return groupId;
 	}
 
+	/**
+	 * 
+	 * @param groupName
+	 * @return
+	 */
 	public List<String> getGroupMembers(String groupName) {
 		Group grupo = groupDAO.getGroup(groupName);
 		return grupo.getUsers();
