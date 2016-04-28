@@ -79,7 +79,7 @@ public class ServerNetworkManager extends NetworkManager {
 		int currentLength = 0;
 		byte[] bfile = new byte[packageSize];
 		int lido;
-		int padding = fileSize % 16 == 0 ? 0: 16-(fileSize % 16);
+		int padding = fileSize % 16 == 0 ? 16: 16-(fileSize % 16);
 		int realSize = fileSize + padding; 
 		int i= 0;
 		
