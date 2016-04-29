@@ -135,10 +135,40 @@ public class SecurityUtils {
 		return signedMessage;
 	}
 
-	public static byte[] signFile(String message, String username) {
-		// TODO
+	public static byte[] signFile(String path , PrivateKey privateKey) throws IOException, Exception {
+		
+		//abre o ficheiro e o stream correspondente
+		File file = new File(path);
+		FileInputStream fis = new FileInputStream(file);
+		
+		//prepara instacia de Signature
+		Signature signature = Signature.getInstance("MD5withRSA");
+		signature.initSign(privateKey);
+		
 
-		return null;
+		
+		int fileSize = (int) file.length();
+		int currentLength = 0;
+		int packageSize = 1024;
+		byte[] bfile = new byte[packageSize];
+		int resto;
+		int lido = 0;
+		
+		while(currentLength < fileSize) {
+			
+			resto = fileSize - currentLength;
+			int numThisTime = resto < packageSize ? resto : bfile.length;
+			
+			lido = fis.read(bfile, 0, numThisTime);
+		
+			signature.update(bfile);
+			
+			currentLength += lido;
+		
+		}
+		fis.close();
+
+		return signature.sign();
 	}
 
 	/**
@@ -573,5 +603,14 @@ public class SecurityUtils {
 
 		System.out.println(sb.toString());
 
+	}
+
+	public static PrivateKey getPrivateKey(String username,
+			String userPassword) throws Exception {
+		
+		KeyStore ks = getKeyStore(username, userPassword);
+		PrivateKey privateKey = (PrivateKey) ks.getKey(username, userPassword.toCharArray());
+		
+		return privateKey;
 	}
 }

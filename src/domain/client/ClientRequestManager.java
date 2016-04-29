@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
+import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.util.Arrays;
@@ -28,14 +29,12 @@ public class ClientRequestManager {
 
 	private Parsed parsedRequest;
 	private ClientNetworkManager clientNetworkManager;
-	private KeyPair keyPair;
+	
 
 	public ClientRequestManager(Parsed parsedRequest, ClientNetworkManager clientNetworkManager) {
 		this.parsedRequest = parsedRequest;
 		this.clientNetworkManager = clientNetworkManager;
 
-		// obter chave assimétrica do utilizador
-		keyPair = SecurityUtils.getKeyPair();
 	}
 
 	public NetworkMessage processRequest() throws AliasNotFoundException, KeyStoreException, IOException {
@@ -84,8 +83,14 @@ public class ClientRequestManager {
 					System.out.println("Client - CONTACT");
 
 					// gerar assinatura
-					byte[] clientSignature = SecurityUtils.signMessage(parsedRequest.getSpecificField(),
-							keyPair.getPrivate());
+					byte[] clientSignature = null;
+					try {
+						clientSignature = SecurityUtils.signMessage(parsedRequest.getSpecificField(),
+								SecurityUtils.getPrivateKey(username, userPassword));
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 
 					clientPGPMessage.setSignature(clientSignature);
 
@@ -161,11 +166,22 @@ public class ClientRequestManager {
 					
 					// contacto
 					System.out.println("[ClientRequestManager] -f " + serverNetworkContactTypeMessage.numGroupMembers());
-
-					// gerar assinatura
-					byte[] clientSignature = SecurityUtils.signFile(parsedRequest.getSpecificField(),
-							username);
-					chatMessage.setSignature(new byte[5]); // TODO
+					
+					//obtem chave privada do utilizador
+					PrivateKey privateKey;
+					byte[] clientSignature = null;
+					try {
+						privateKey = SecurityUtils.getPrivateKey(username, userPassword);
+						// gerar assinatura
+						clientSignature = SecurityUtils.signFile(parsedRequest.getSpecificField(),
+								privateKey);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+							
+					
+					chatMessage.setSignature(clientSignature);
 
 					// obter chave secreta
 					SecretKey secretKey = SecurityUtils.generateSecretKey();
@@ -357,9 +373,13 @@ public class ClientRequestManager {
 			}
 				
 				//verifica se está tudo ok
-				byte [] assinatura = SecurityUtils.signFile(newfile.getAbsolutePath(), username);
-				
-				boolean equalSign = Arrays.equals(assinatura, chatmessage2.getSignature());
+				//TODO
+			try {
+				boolean equalSign = SecurityUtils.verifySignature(newfile.getAbsolutePath(), null, null);
+			} catch (SignatureException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 				
 				if(false) 	//TODO
 					chatmessage2 = new ChatMessage (MessageType.OK);
