@@ -72,10 +72,10 @@ public class ClientRequestManager {
 
 				// existe contacto
 				if (serverNetworkContactTypeMessage.getMessageType() == MessageType.CONTACT) {
-					ChatMessage clientPGPMessage = new ChatMessage(MessageType.MESSAGE);
+					ChatMessage clientChatMessage = new ChatMessage(MessageType.MESSAGE);
 
-					clientPGPMessage.setFromUser(parsedRequest.getUsername());
-					clientPGPMessage.setDestination(parsedRequest.getContact());
+					clientChatMessage.setFromUser(parsedRequest.getUsername());
+					clientChatMessage.setDestination(parsedRequest.getContact());
 
 					System.out.println(serverNetworkContactTypeMessage.numGroupMembers());
 
@@ -88,11 +88,10 @@ public class ClientRequestManager {
 						clientSignature = SecurityUtils.signMessage(parsedRequest.getSpecificField(),
 								SecurityUtils.getPrivateKey(username, userPassword));
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 
-					clientPGPMessage.setSignature(clientSignature);
+					clientChatMessage.setSignature(clientSignature);
 
 					// obter chave secreta
 					SecretKey sessionKey = SecurityUtils.generateSecretKey();
@@ -102,10 +101,10 @@ public class ClientRequestManager {
 					byte[] encryptedMessage = SecurityUtils
 							.cipherWithSessionKey(parsedRequest.getSpecificField().getBytes(), sessionKey);
 
-					clientPGPMessage.setCypheredMessage(encryptedMessage);
+					clientChatMessage.setCypheredMessage(encryptedMessage);
 
 					System.out.println("[ClientRequestManager] cypheredMessage: "
-							+ MiscUtil.bytesToHex(clientPGPMessage.getCypheredMessage()));
+							+ MiscUtil.bytesToHex(clientChatMessage.getCypheredMessage()));
 
 					List<String> groupMembers = serverNetworkContactTypeMessage.getGroupMembers();
 
@@ -116,15 +115,15 @@ public class ClientRequestManager {
 						byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(username, groupMember, userPassword,
 								sessionKey);
 
-						clientPGPMessage.putUserKey(groupMember, wrappedSecretKey);
+						clientChatMessage.putUserKey(groupMember, wrappedSecretKey);
 					}
 
 					// adicionar chave cifrada do proprio utilizador
 					byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(username, username, userPassword, sessionKey);
-					clientPGPMessage.putUserKey(parsedRequest.getUsername(), wrappedSecretKey);
+					clientChatMessage.putUserKey(parsedRequest.getUsername(), wrappedSecretKey);
 
 					// enviar mensagem
-					clientNetworkManager.sendMessage(clientPGPMessage);
+					clientNetworkManager.sendMessage(clientChatMessage);
 
 					// espera resposta
 					networkMessage = (NetworkMessage) clientNetworkManager.receiveMessage();
@@ -268,15 +267,16 @@ public class ClientRequestManager {
 							currChatMessage.getCypheredMessageKey(),
 							currChatMessage.getCypheredMessage());
 					
-
 					// validar assinatura
 					byte[] signature = currChatMessage.getSignature();
 					Certificate certificate = SecurityUtils.getCertificate(username, currChatMessage.getFromUser(), userPassword);
 
 					try {
-						SecurityUtils.verifySignature(decipheredMessage, certificate.getPublicKey(), signature);
+						if (!SecurityUtils.verifySignature(decipheredMessage, certificate.getPublicKey(), signature)) {
+							System.err.println("[ClientRequestManager] Assinatura invalida!");
+						}
+						
 					} catch (SignatureException e) {
-						System.out.println("Assinatura invalida!");
 						e.printStackTrace();
 					}
 					

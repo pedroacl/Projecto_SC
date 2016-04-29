@@ -6,6 +6,7 @@ import java.net.Socket;
 import exceptions.InvalidMacException;
 import network.managers.ServerNetworkManager;
 import network.messages.ClientNetworkMessage;
+import network.messages.MessageType;
 import network.messages.NetworkMessage;
 
 /**
@@ -50,7 +51,8 @@ public class ServerThread extends Thread {
 			System.out.println("Terminar servidor!");
 			
 			//enviar mensagem de erro ao cliente
-			//serverNetworkManager.sendMessage(message);
+			NetworkMessage errorMessage = new NetworkMessage(MessageType.NOK);
+			serverNetworkManager.sendMessage(errorMessage);
 
 			try {
 				socket.close();

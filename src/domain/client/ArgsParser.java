@@ -39,6 +39,14 @@ public class ArgsParser {
 	public String getServerIP() {
 		return serverIP;
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getPassword() {
+		return this.password;
+	}
 
 	/**
 	 * Devolve o porto do servidor selecionado pelo utilizador

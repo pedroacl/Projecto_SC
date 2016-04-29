@@ -72,7 +72,6 @@ public class ServerClientMessageParser {
 			authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword());
 
 		} catch (InvalidMacException e) {
-			System.out.println("Mac inválido");
 			// preenche sermessage com indicaçao do erro
 			serverMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
 			serverMessage.setContent("MAC inválido");
@@ -93,8 +92,12 @@ public class ServerClientMessageParser {
 
 		System.out.println("Server - " + clientMessage);
 
+		// avaliar tipo de pedido do cliente
 		switch (clientMessage.getMessageType()) {
-		// mensagem de texto
+
+		/**
+		 * Mensagem de texto
+		 */
 		case MESSAGE:
 
 			System.out.println("[ServerClientMessageParser] MESSAGE");
@@ -124,11 +127,16 @@ public class ServerClientMessageParser {
 
 			break;
 
-		// mensagem contendo um ficheiro
+		/**
+		 * Mensagem contendo um ficheiro
+		 */
 		case FILE:
 			serverMessage = receiveFile();
 			break;
-		// mensagem contendo diversas mensagens
+			
+		/**
+		 * Mensagem contendo diversas mensagens
+		 */
 		case RECEIVER:
 
 			switch (clientMessage.getContent()) {
@@ -377,7 +385,7 @@ public class ServerClientMessageParser {
 
 	/**
 	 * Função que recebe e guarda um ficheiro vindo do utilizador 
-	 * Servidor	<---------FILE--------------Cliente
+	 * Servidor	<---------FILE-------------- Cliente
 	 * 			---------CONTACT/NOK-------> 
 	 *         	<--FILE: AD, Ks, SizeFile---
 	 *          -----------OK/NOK---------->
