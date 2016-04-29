@@ -146,16 +146,15 @@ public class SecurityUtils {
 		// prepara instacia de Signature
 		Signature signature = Signature.getInstance("SHA256withRSA");
 		signature.initSign(privateKey);
-
-
-		
 		
 		BufferedInputStream bufin = new BufferedInputStream(fis);
 		byte[] buffer = new byte[1024];
 		int len;
+		
 		while ((len = bufin.read(buffer)) >= 0) {
 		    signature.update(buffer, 0, len);
 		};
+		
 		bufin.close();
 		
 
@@ -195,7 +194,7 @@ public class SecurityUtils {
 	 * @return Devolve true caso a assinatura seja válida e false caso contrário
 	 * @throws SignatureException
 	 */
-	public static boolean verifySignature(String message, PublicKey publicKey, byte[] signature)
+	public static boolean verifyMessageSignature(String message, PublicKey publicKey, byte[] signature)
 			throws SignatureException {
 
 		try {
@@ -211,6 +210,57 @@ public class SecurityUtils {
 			e.printStackTrace();
 		}
 
+		return false;
+	}
+
+	/**
+	 * Verifica a assinatura digital de um ficheiro
+	 * @param message
+	 * @param publicKey
+	 * @param signature
+	 * @return
+	 */
+	public static boolean verifyFileSignature(String filePath, PublicKey publicKey, byte[] signature) {
+		// abre o ficheiro e o stream correspondente
+		File file = new File(filePath);
+		BufferedInputStream bufin = null;
+
+		FileInputStream fis;
+		try {
+			fis = new FileInputStream(file);
+			bufin = new BufferedInputStream(fis);
+
+			Signature sig;
+			sig = Signature.getInstance("SHA256withRSA");
+			sig.initVerify(publicKey);
+			
+			byte[] buffer = new byte[1024];
+			int len;
+
+			while ((len = bufin.read(buffer)) >= 0) {
+			    sig.update(buffer, 0, len);
+			};
+
+			return sig.verify(signature);
+
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+		} catch (SignatureException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				bufin.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		return false;
 	}
 
