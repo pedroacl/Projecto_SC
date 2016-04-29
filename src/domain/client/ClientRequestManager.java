@@ -270,16 +270,18 @@ public class ClientRequestManager {
 					
 
 					// validar assinatura
-					byte[] signature = currChatMessage.getSignature();
-					Certificate certificate = SecurityUtils.getCertificate(username, currChatMessage.getFromUser(), userPassword);
-
-					try {
-						SecurityUtils.verifySignature(decipheredMessage, certificate.getPublicKey(), signature);
-					} catch (SignatureException e) {
-						System.out.println("Assinatura invalida!");
-						e.printStackTrace();
+					if(currChatMessage.getMessageType().equals(MessageType.MESSAGE)) {
+						byte[] signature = currChatMessage.getSignature();
+						Certificate certificate = SecurityUtils.getCertificate(username, currChatMessage.getFromUser(), userPassword);
+	
+						try {
+							SecurityUtils.verifySignature(decipheredMessage, certificate.getPublicKey(), signature);
+						} catch (SignatureException e) {
+							System.out.println("Assinatura invalida!");
+							e.printStackTrace();
+						}
 					}
-					
+						
 					currChatMessage.setContent(decipheredMessage);
 				}
 				
@@ -319,14 +321,16 @@ public class ClientRequestManager {
 					
 
 					// validar assinatura
-					byte[] signature = currChatMessage.getSignature();
-					Certificate certificate = SecurityUtils.getCertificate(username, currChatMessage.getFromUser(), userPassword);
-
-					try {
-						SecurityUtils.verifySignature(decipheredMessage, certificate.getPublicKey(), signature);
-					} catch (SignatureException e) {
-						System.out.println("Assinatura invalida!");
-						e.printStackTrace();
+					if(currChatMessage.getMessageType().equals(MessageType.MESSAGE)) {
+						byte[] signature = currChatMessage.getSignature();
+						Certificate certificate = SecurityUtils.getCertificate(username, currChatMessage.getFromUser(), userPassword);
+	
+						try {
+							SecurityUtils.verifySignature(decipheredMessage, certificate.getPublicKey(), signature);
+						} catch (SignatureException e) {
+							System.out.println("Assinatura invalida!");
+							e.printStackTrace();
+						}
 					}
 					
 					currChatMessage.setContent(decipheredMessage);
@@ -373,14 +377,15 @@ public class ClientRequestManager {
 			}
 				
 				//verifica se está tudo ok
-				//TODO
+			/*
+			//TODO
 			try {
-				boolean equalSign = SecurityUtils.verifySignature(newfile.getAbsolutePath(), null, null);
+				boolean equalSign = SecurityUtils.verifyFileSignature(newfile.getAbsolutePath(), username, userPassword, chatMessage2.getFileOwner(), chatmessage2.getSignature());
 			} catch (SignatureException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-				
+				*/
 				if(false) 	//TODO
 					chatmessage2 = new ChatMessage (MessageType.OK);
 				else 
