@@ -1,5 +1,6 @@
 package domain.server;
 
+import java.io.IOException;
 import java.net.Socket;
 
 import exceptions.InvalidMacException;
@@ -15,7 +16,7 @@ import network.messages.NetworkMessage;
  */
 public class ServerThread extends Thread {
 
-	private Socket	socket;
+	private Socket socket;
 
 	private Authentication authentication;
 
@@ -30,18 +31,32 @@ public class ServerThread extends Thread {
 	public void run() {
 		// incializa comunicação com o cliente e recebe ClientMessage
 		ServerNetworkManager serverNetworkManager = new ServerNetworkManager(socket);
-		
-		ClientNetworkMessage clientMessage = (ClientNetworkMessage) serverNetworkManager.receiveMessage();
-		
-		System.out.println("[SerThread] Recebi primeira mensagem. Type: "
-		+ clientMessage.getMessageType() + " From: " + clientMessage.getUsername() );
-		
-		// processa a mensagem do cliente e cria mensagem de resposta
-		ServerClientMessageParser clientMessageParser = new ServerClientMessageParser(clientMessage,
-				serverNetworkManager, authentication);
 
-		NetworkMessage  netMsg= clientMessageParser.processRequest();
-		
-		serverNetworkManager.sendMessage(netMsg);
+		ClientNetworkMessage clientMessage = (ClientNetworkMessage) serverNetworkManager.receiveMessage();
+
+		System.out.println("[SerThread] Recebi primeira mensagem. Type: " + clientMessage.getMessageType() + " From: "
+				+ clientMessage.getUsername());
+
+		// processa a mensagem do cliente e cria mensagem de resposta
+		ServerClientMessageParser clientMessageParser;
+
+		try {
+			clientMessageParser = new ServerClientMessageParser(clientMessage, serverNetworkManager, authentication);
+			NetworkMessage netMsg = clientMessageParser.processRequest();
+
+			serverNetworkManager.sendMessage(netMsg);
+
+		} catch (InvalidMacException e) {
+			System.out.println("Terminar servidor!");
+			
+			//enviar mensagem de erro ao cliente
+			//serverNetworkManager.sendMessage(message);
+
+			try {
+				socket.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
 	}
 }

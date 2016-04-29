@@ -1,5 +1,6 @@
 package util;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -135,38 +137,51 @@ public class SecurityUtils {
 		return signedMessage;
 	}
 
-	public static byte[] signFile(String path , PrivateKey privateKey) throws IOException, Exception {
-		
-		//abre o ficheiro e o stream correspondente
-		File file = new File(path);
-		FileInputStream fis = new FileInputStream(file);
-		
-		//prepara instacia de Signature
+	public static byte[] signFile(String path, PrivateKey privateKey) throws IOException, Exception {
+
+		// abre o ficheiro e o stream correspondente
+		File filePath = new File(path);
+		FileInputStream fis = new FileInputStream(filePath);
+
+		// prepara instacia de Signature
 		Signature signature = Signature.getInstance("MD5withRSA");
 		signature.initSign(privateKey);
-		
+
 
 		
-		int fileSize = (int) file.length();
+		
+		BufferedInputStream bufin = new BufferedInputStream(fis);
+		byte[] buffer = new byte[1024];
+		int len;
+		while ((len = bufin.read(buffer)) >= 0) {
+		    signature.update(buffer, 0, len);
+		};
+		bufin.close();
+		
+
+		/*
+		  
+		int fileSize = (int) filePath.length();
 		int currentLength = 0;
 		int packageSize = 1024;
 		byte[] bfile = new byte[packageSize];
 		int resto;
-		int lido = 0;
-		
-		while(currentLength < fileSize) {
-			
+		int lido = 0;  
+		 
+		while (currentLength < fileSize) {
+
 			resto = fileSize - currentLength;
 			int numThisTime = resto < packageSize ? resto : bfile.length;
-			
+
 			lido = fis.read(bfile, 0, numThisTime);
-		
+
 			signature.update(bfile);
-			
+
 			currentLength += lido;
-		
+
 		}
 		fis.close();
+		*/
 
 		return signature.sign();
 	}
@@ -178,10 +193,11 @@ public class SecurityUtils {
 	 * @param certificate
 	 * @param signature
 	 * @return Devolve true caso a assinatura seja válida e false caso contrário
-	 * @throws SignatureException 
+	 * @throws SignatureException
 	 */
-	public static boolean verifySignature(String message, PublicKey publicKey, byte[] signature) throws SignatureException {
-		
+	public static boolean verifySignature(String message, PublicKey publicKey, byte[] signature)
+			throws SignatureException {
+
 		try {
 			Signature sign = Signature.getInstance("MD5withRSA");
 			sign.initVerify(publicKey);
@@ -399,12 +415,31 @@ public class SecurityUtils {
 
 			// nao existe ficheiro MAC
 			if (!usersFileMacPath.exists()) {
-				System.out.println("Ficheiro MAC não existe");
-				
-				// criar ficheiro MAC
-				SecurityUtils.updateFileMac(filePath, serverPassword);
+				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+				boolean validInput = false;
 
+				do {
+					System.out.println("\nNão existe ficheiro MAC para o ficheiro " + filePath + "!");
+					System.out.println("1 - Criar ficheiro MAC");
+					System.out.println("2 - Terminar servidor");
+					char userInput = bufferedReader.readLine().charAt(0);
+
+					if (userInput == '1') {
+						// criar ficheiro MAC
+						SecurityUtils.updateFileMac(filePath, serverPassword);
+						validInput = true;
+						
+						System.out.println("\nCriado ficheiro MAC para o ficheiro " + filePath);
+
+					} else if (userInput == '2') {
+						throw new InvalidMacException("Ficheiro MAC não existe");
+
+					} else {
+						System.out.println("\nInsira uma opção válida! (1 ou 2)");
+					}
+				} while (!validInput);
 			} else {
+
 				// obter MAC original
 				BufferedReader inF = new BufferedReader(new FileReader(usersFileMacPath));
 				String originalMAC = inF.readLine();
@@ -605,12 +640,11 @@ public class SecurityUtils {
 
 	}
 
-	public static PrivateKey getPrivateKey(String username,
-			String userPassword) throws Exception {
-		
+	public static PrivateKey getPrivateKey(String username, String userPassword) throws Exception {
+
 		KeyStore ks = getKeyStore(username, userPassword);
 		PrivateKey privateKey = (PrivateKey) ks.getKey(username, userPassword.toCharArray());
-		
+
 		return privateKey;
 	}
 }

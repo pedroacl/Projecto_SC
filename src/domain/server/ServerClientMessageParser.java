@@ -45,7 +45,7 @@ public class ServerClientMessageParser {
 	private final String GROUPS_FILE = "groups.txt";
 
 	public ServerClientMessageParser(ClientNetworkMessage clientMessage, ServerNetworkManager serverNetworkManager,
-			Authentication authentication) {
+			Authentication authentication) throws InvalidMacException {
 
 		this.clientMessage = clientMessage;
 		this.authentication = authentication;
