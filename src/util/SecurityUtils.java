@@ -121,7 +121,7 @@ public class SecurityUtils {
 		byte[] signedMessage = null;
 
 		try {
-			Signature signature = Signature.getInstance("MD5withRSA");
+			Signature signature = Signature.getInstance("SHA256withRSA");
 			signature.initSign(privateKey);
 			signature.update(message.getBytes());
 			signedMessage = signature.sign();
@@ -144,7 +144,7 @@ public class SecurityUtils {
 		FileInputStream fis = new FileInputStream(filePath);
 
 		// prepara instacia de Signature
-		Signature signature = Signature.getInstance("MD5withRSA");
+		Signature signature = Signature.getInstance("SHA256withRSA");
 		signature.initSign(privateKey);
 
 
@@ -199,7 +199,7 @@ public class SecurityUtils {
 			throws SignatureException {
 
 		try {
-			Signature sign = Signature.getInstance("MD5withRSA");
+			Signature sign = Signature.getInstance("SHA256withRSA");
 			sign.initVerify(publicKey);
 			sign.update(message.getBytes());
 
@@ -487,11 +487,11 @@ public class SecurityUtils {
 			PBEKeySpec keySpec = new PBEKeySpec(serverPassword.toCharArray());
 
 			// obter chave secreta atraves da password
-			SecretKeyFactory kf = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
+			SecretKeyFactory kf = SecretKeyFactory.getInstance("PBEWithSHA256AndDES");
 			SecretKey secretKey = kf.generateSecret(keySpec);
 
 			// inicializar MAC
-			Mac mac = Mac.getInstance("HmacSHA1");
+			Mac mac = Mac.getInstance("HmacSHA256");
 			mac.init(secretKey);
 
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath));
