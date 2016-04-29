@@ -487,7 +487,7 @@ public class SecurityUtils {
 			PBEKeySpec keySpec = new PBEKeySpec(serverPassword.toCharArray());
 
 			// obter chave secreta atraves da password
-			SecretKeyFactory kf = SecretKeyFactory.getInstance("PBEWithSHA256AndDES");
+			SecretKeyFactory kf = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
 			SecretKey secretKey = kf.generateSecret(keySpec);
 
 			// inicializar MAC
