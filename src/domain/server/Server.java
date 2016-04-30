@@ -90,16 +90,16 @@ public class Server {
 			} catch (InvalidMacException e) {
 				e.printStackTrace();
 				break;
-			} finally {
-				try {
-					serverSocket.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
 			}
 
 			ServerThread serverThread = new ServerThread(socket, authentication);
 			executorService.execute(serverThread);
+		}
+
+		try {
+			serverSocket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
 		executorService.shutdown();
