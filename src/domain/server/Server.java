@@ -33,8 +33,8 @@ public class Server {
 	 */
 	public static void main(String[] args) {
 		// nao existem parametros
-		if (args.length == 0) {
-			System.err.println("Por favor introduza o numero do porto.");
+		if (args.length != 2) {
+			System.err.println("Por favor introduza o numero do porto e a password.");
 			System.exit(-1);
 		}
 
@@ -55,8 +55,8 @@ public class Server {
 		}
 
 		
-		String password = "1234";
-		//UserUtil.askForPassword();
+		String password = args[1];
+		
 
 		// Thread Pool
 		ExecutorService executorService = Executors.newFixedThreadPool(MAX_THREADS);
