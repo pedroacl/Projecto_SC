@@ -196,13 +196,16 @@ public class SecurityUtils {
 	 */
 	public static boolean verifyMessageSignature(String message, PublicKey publicKey, byte[] signature)
 			throws SignatureException {
+		
 
 		try {
 			Signature sign = Signature.getInstance("SHA256withRSA");
 			sign.initVerify(publicKey);
 			sign.update(message.getBytes());
+			
+			boolean isValid = sign.verify(signature);
 
-			return sign.verify(signature);
+			return isValid;
 
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();

@@ -262,27 +262,29 @@ public class ClientRequestManager {
 					String decipheredMessage = SecurityUtils.decipherChatMessage(username, userPassword,
 							currChatMessage.getCypheredMessageKey(), currChatMessage.getCypheredMessage());
 
-					//so para as mensagens de texto, validar assinatura
+					//só para as mesnagens de texto.
+					boolean isValid = true;
 					if(currChatMessage.getMessageType().equals(MessageType.MESSAGE)) {
-						
+					
 						// validar assinatura
 						byte[] signature = currChatMessage.getSignature();
 						Certificate certificate = SecurityUtils.getCertificate(username, currChatMessage.getFromUser(),
 								userPassword);
-	
+						
+						
 						try {
-							if (!SecurityUtils.verifyMessageSignature(decipheredMessage, certificate.getPublicKey(),
-									signature)) {
-								System.err.println("[ClientRequestManager] Assinatura invalida!");
-							}
-	
+							isValid = SecurityUtils.verifyMessageSignature(decipheredMessage, certificate.getPublicKey(), signature);
 						} catch (SignatureException e) {
 							e.printStackTrace();
 						}
+						
 					}
-					currChatMessage.setContent(decipheredMessage);
+					if(!isValid)
+						currChatMessage.setContent("ALERTA: Mensagem Corrompida");
+					else
+						currChatMessage.setContent(decipheredMessage);
+						
 				}
-
 				networkMessage = serverMessage;
 
 				break;
@@ -316,23 +318,30 @@ public class ClientRequestManager {
 					String decipheredMessage = SecurityUtils.decipherChatMessage(username, userPassword,
 							currChatMessage.getCypheredMessageKey(), currChatMessage.getCypheredMessage());
 					
+			
 					//só para as mesnagens de texto.
+					boolean isValid = true;
 					if(currChatMessage.getMessageType().equals(MessageType.MESSAGE)) {
 					
 						// validar assinatura
 						byte[] signature = currChatMessage.getSignature();
 						Certificate certificate = SecurityUtils.getCertificate(username, currChatMessage.getFromUser(),
 								userPassword);
-	
+						
+						
 						try {
-							SecurityUtils.verifyMessageSignature(decipheredMessage, certificate.getPublicKey(), signature);
+							isValid = SecurityUtils.verifyMessageSignature(decipheredMessage, certificate.getPublicKey(), signature);
 						} catch (SignatureException e) {
-							System.out.println("Assinatura invalida!");
 							e.printStackTrace();
 						}
+						
+					
 					}
-
-					currChatMessage.setContent(decipheredMessage);
+					if(!isValid)
+						currChatMessage.setContent("ALERTA: Mensagem Corrompida");
+					else
+						currChatMessage.setContent(decipheredMessage);
+						
 				}
 
 				networkMessage = serverMessage2;

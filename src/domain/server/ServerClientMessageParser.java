@@ -71,7 +71,12 @@ public class ServerClientMessageParser {
 
 		} catch (InvalidMacException e) {
 			// preenche sermessage com indicaçao do erro
-			serverMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
+			if(clientMessage.getMessageType().equals(MessageType.MESSAGE) || clientMessage.getMessageType().equals(MessageType.FILE)) {
+				serverMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
+			}
+			else
+				serverMessage = new ServerMessage(MessageType.NOK);
+			
 			serverMessage.setContent("MAC inválido");
 
 			e.printStackTrace();
@@ -79,10 +84,15 @@ public class ServerClientMessageParser {
 			return serverMessage;
 
 		} catch (InvalidPasswordException e) {
-			serverMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
-			System.out.println("[ServerClientMessageParser] - Password errada!");
+			if(clientMessage.getMessageType().equals(MessageType.MESSAGE) || clientMessage.getMessageType().equals(MessageType.FILE)) {
+				serverMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
+				System.out.println("[ServerClientMessageParser] - Password errada!");
+				
+			}
+			else 
+				serverMessage = new ServerMessage(MessageType.NOK);
+				
 			serverMessage.setContent("Password errada");
-
 			e.printStackTrace();
 
 			return serverMessage;
