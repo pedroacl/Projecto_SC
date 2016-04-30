@@ -9,6 +9,9 @@ import java.util.concurrent.Executors;
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocketFactory;
 
+import exceptions.InvalidMacException;
+import util.SecurityUtils;
+
 /**
  * Classe que representa o servidor. Tem a lógica do negocio. Responde perante
  * os pedidos do cliente
@@ -34,8 +37,8 @@ public class Server {
 		}
 
 		ServerSocketFactory ssf = null;
-		ServerSocket serverSocket= null;
-		
+		ServerSocket serverSocket = null;
+
 		System.setProperty("javax.net.ssl.keyStore", "keystore.servidor");
 		System.setProperty("javax.net.ssl.keyStorePassword", "seguranca");
 
@@ -48,32 +51,60 @@ public class Server {
 		} catch (IOException | NumberFormatException e) {
 			e.printStackTrace();
 		}
-		
-		//TODO obter password da linha de comandos
+
+		// TODO obter password da linha de comandos
 		String password = "1234";
-		
+
 		// Thread Pool
 		ExecutorService executorService = Executors.newFixedThreadPool(MAX_THREADS);
+		Authentication authentication = new Authentication(password);
 
-		System.out.println("Servidor inicializado e ah espera de pedidos.");
+		System.out.println("Validar ficheiros MAC");
+
+		try {
+			SecurityUtils.validateMacFiles(authentication.getServerPassword());
+		} catch (InvalidMacException e) {
+			executorService.shutdown();
+			System.out.println("\nServidor terminado!");
+			System.exit(0);
+		}
+		
+		System.out.println("\nFicheiros MAC válidos.");
+		System.out.println("\nServidor inicializado e à espera de pedidos.");
 
 		while (true) {
 			Socket socket = null;
 
 			try {
 				socket = serverSocket.accept();
+
+				System.out.println("Cliente ligado!");
+				System.out.println("Validar ficheiros MAC");
+				
+				// validar ficheiros MAC para cada pedido
+				SecurityUtils.validateMacFiles(authentication.getServerPassword());
+
 			} catch (IOException e) {
 				e.printStackTrace();
+				break;
+			} catch (InvalidMacException e) {
+				e.printStackTrace();
+				break;
+			} finally {
+				try {
+					serverSocket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 
-			System.out.println("Cliente ligado!");
-
-			Authentication authentication = new Authentication(password);
 			ServerThread serverThread = new ServerThread(socket, authentication);
 			executorService.execute(serverThread);
 		}
 
-		// executorService.shutdown();
-		// serverSocket.close();
+		executorService.shutdown();
+
+		System.out.println("\nServidor terminado!");
+		System.exit(0);
 	}
 }

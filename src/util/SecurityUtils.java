@@ -449,6 +449,11 @@ public class SecurityUtils {
 		final SecureRandom randomNumber = new SecureRandom();
 		return (randomNumber.nextInt(900000) + 100000);
 	}
+	
+	public static void validateMacFiles(String serverPassword) throws InvalidMacException {
+		validateFileMac("users.txt", serverPassword);
+		validateFileMac("groups.txt", serverPassword);
+	}
 
 	/**
 	 * 
@@ -496,7 +501,7 @@ public class SecurityUtils {
 				inF.close();
 
 				// gerar MAC atual
-				System.out.println(filePath);
+				System.out.println("\n" + filePath);
 				String currentMacString = MiscUtil.bytesToHex(SecurityUtils.generateFileMac(filePath, serverPassword));
 
 				System.out.println("MAC original: " + originalMAC);
@@ -580,7 +585,7 @@ public class SecurityUtils {
 	 *            Password do servidor utilizada para gerar o MAC
 	 */
 	public static void updateFileMac(String filePath, String serverPassword) {
-		System.out.println("[SecurityUtils.updateFileMac] filePath: " + filePath);
+		System.out.println("\n[SecurityUtils.updateFileMac] filePath: " + filePath);
 
 		File macFilePath = new File(filePath + ".mac");
 
