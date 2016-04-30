@@ -1,5 +1,6 @@
 package util;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -119,7 +121,7 @@ public class SecurityUtils {
 		byte[] signedMessage = null;
 
 		try {
-			Signature signature = Signature.getInstance("MD5withRSA");
+			Signature signature = Signature.getInstance("SHA256withRSA");
 			signature.initSign(privateKey);
 			signature.update(message.getBytes());
 			signedMessage = signature.sign();
@@ -135,38 +137,50 @@ public class SecurityUtils {
 		return signedMessage;
 	}
 
-	public static byte[] signFile(String path , PrivateKey privateKey) throws IOException, Exception {
-		
-		//abre o ficheiro e o stream correspondente
-		File file = new File(path);
-		FileInputStream fis = new FileInputStream(file);
-		
-		//prepara instacia de Signature
-		Signature signature = Signature.getInstance("MD5withRSA");
+	public static byte[] signFile(String path, PrivateKey privateKey) throws IOException, Exception {
+
+		// abre o ficheiro e o stream correspondente
+		File filePath = new File(path);
+		FileInputStream fis = new FileInputStream(filePath);
+
+		// prepara instacia de Signature
+		Signature signature = Signature.getInstance("SHA256withRSA");
 		signature.initSign(privateKey);
 		
-
+		BufferedInputStream bufin = new BufferedInputStream(fis);
+		byte[] buffer = new byte[1024];
+		int len;
 		
-		int fileSize = (int) file.length();
+		while ((len = bufin.read(buffer)) >= 0) {
+		    signature.update(buffer, 0, len);
+		};
+		
+		bufin.close();
+		
+
+		/*
+		  
+		int fileSize = (int) filePath.length();
 		int currentLength = 0;
 		int packageSize = 1024;
 		byte[] bfile = new byte[packageSize];
 		int resto;
-		int lido = 0;
-		
-		while(currentLength < fileSize) {
-			
+		int lido = 0;  
+		 
+		while (currentLength < fileSize) {
+
 			resto = fileSize - currentLength;
 			int numThisTime = resto < packageSize ? resto : bfile.length;
-			
+
 			lido = fis.read(bfile, 0, numThisTime);
-		
+
 			signature.update(bfile);
-			
+
 			currentLength += lido;
-		
+
 		}
 		fis.close();
+		*/
 
 		return signature.sign();
 	}
@@ -178,12 +192,13 @@ public class SecurityUtils {
 	 * @param certificate
 	 * @param signature
 	 * @return Devolve true caso a assinatura seja válida e false caso contrário
-	 * @throws SignatureException 
+	 * @throws SignatureException
 	 */
-	public static boolean verifySignature(String message, PublicKey publicKey, byte[] signature) throws SignatureException {
-		
+	public static boolean verifyMessageSignature(String message, PublicKey publicKey, byte[] signature)
+			throws SignatureException {
+
 		try {
-			Signature sign = Signature.getInstance("MD5withRSA");
+			Signature sign = Signature.getInstance("SHA256withRSA");
 			sign.initVerify(publicKey);
 			sign.update(message.getBytes());
 
@@ -195,6 +210,57 @@ public class SecurityUtils {
 			e.printStackTrace();
 		}
 
+		return false;
+	}
+
+	/**
+	 * Verifica a assinatura digital de um ficheiro
+	 * @param message
+	 * @param publicKey
+	 * @param signature
+	 * @return
+	 */
+	public static boolean verifyFileSignature(String filePath, PublicKey publicKey, byte[] signature) {
+		// abre o ficheiro e o stream correspondente
+		File file = new File(filePath);
+		BufferedInputStream bufin = null;
+
+		FileInputStream fis;
+		try {
+			fis = new FileInputStream(file);
+			bufin = new BufferedInputStream(fis);
+
+			Signature sig;
+			sig = Signature.getInstance("SHA256withRSA");
+			sig.initVerify(publicKey);
+			
+			byte[] buffer = new byte[1024];
+			int len;
+
+			while ((len = bufin.read(buffer)) >= 0) {
+			    sig.update(buffer, 0, len);
+			};
+
+			return sig.verify(signature);
+
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+		} catch (SignatureException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				bufin.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		return false;
 	}
 
@@ -399,12 +465,31 @@ public class SecurityUtils {
 
 			// nao existe ficheiro MAC
 			if (!usersFileMacPath.exists()) {
-				System.out.println("Ficheiro MAC não existe");
-				
-				// criar ficheiro MAC
-				SecurityUtils.updateFileMac(filePath, serverPassword);
+				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+				boolean validInput = false;
 
+				do {
+					System.out.println("\nNão existe ficheiro MAC para o ficheiro " + filePath + "!");
+					System.out.println("1 - Criar ficheiro MAC");
+					System.out.println("2 - Terminar servidor");
+					char userInput = bufferedReader.readLine().charAt(0);
+
+					if (userInput == '1') {
+						// criar ficheiro MAC
+						SecurityUtils.updateFileMac(filePath, serverPassword);
+						validInput = true;
+						
+						System.out.println("\nCriado ficheiro MAC para o ficheiro " + filePath);
+
+					} else if (userInput == '2') {
+						throw new InvalidMacException("Ficheiro MAC não existe");
+
+					} else {
+						System.out.println("\nInsira uma opção válida! (1 ou 2)");
+					}
+				} while (!validInput);
 			} else {
+
 				// obter MAC original
 				BufferedReader inF = new BufferedReader(new FileReader(usersFileMacPath));
 				String originalMAC = inF.readLine();
@@ -456,7 +541,7 @@ public class SecurityUtils {
 			SecretKey secretKey = kf.generateSecret(keySpec);
 
 			// inicializar MAC
-			Mac mac = Mac.getInstance("HmacSHA1");
+			Mac mac = Mac.getInstance("HmacSHA256");
 			mac.init(secretKey);
 
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath));
@@ -548,8 +633,6 @@ public class SecurityUtils {
 			// obter mac do ficheiro de utilizadores
 			byte[] fileMac = generateFileMac(filePath, serverPassword);
 
-			System.out.println("!!!!" + fileMac == null);
-
 			// guardar mac
 			fileWriter.write(MiscUtil.bytesToHex(fileMac));
 			fileWriter.close();
@@ -605,12 +688,11 @@ public class SecurityUtils {
 
 	}
 
-	public static PrivateKey getPrivateKey(String username,
-			String userPassword) throws Exception {
-		
+	public static PrivateKey getPrivateKey(String username, String userPassword) throws Exception {
+
 		KeyStore ks = getKeyStore(username, userPassword);
 		PrivateKey privateKey = (PrivateKey) ks.getKey(username, userPassword.toCharArray());
-		
+
 		return privateKey;
 	}
 }

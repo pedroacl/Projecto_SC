@@ -3,12 +3,11 @@ package domain.client;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.KeyPair;
 import java.security.KeyStoreException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -29,7 +28,6 @@ public class ClientRequestManager {
 
 	private Parsed parsedRequest;
 	private ClientNetworkManager clientNetworkManager;
-	
 
 	public ClientRequestManager(Parsed parsedRequest, ClientNetworkManager clientNetworkManager) {
 		this.parsedRequest = parsedRequest;
@@ -72,10 +70,10 @@ public class ClientRequestManager {
 
 				// existe contacto
 				if (serverNetworkContactTypeMessage.getMessageType() == MessageType.CONTACT) {
-					ChatMessage clientPGPMessage = new ChatMessage(MessageType.MESSAGE);
+					ChatMessage clientChatMessage = new ChatMessage(MessageType.MESSAGE);
 
-					clientPGPMessage.setFromUser(parsedRequest.getUsername());
-					clientPGPMessage.setDestination(parsedRequest.getContact());
+					clientChatMessage.setFromUser(parsedRequest.getUsername());
+					clientChatMessage.setDestination(parsedRequest.getContact());
 
 					System.out.println(serverNetworkContactTypeMessage.numGroupMembers());
 
@@ -88,24 +86,24 @@ public class ClientRequestManager {
 						clientSignature = SecurityUtils.signMessage(parsedRequest.getSpecificField(),
 								SecurityUtils.getPrivateKey(username, userPassword));
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 
-					clientPGPMessage.setSignature(clientSignature);
+					clientChatMessage.setSignature(clientSignature);
 
 					// obter chave secreta
 					SecretKey sessionKey = SecurityUtils.generateSecretKey();
-					System.out.println("[ClientRequestManager -m] SecretKey" + Base64.getEncoder().encodeToString(sessionKey.getEncoded()));
+					System.out.println("[ClientRequestManager -m] SecretKey"
+							+ Base64.getEncoder().encodeToString(sessionKey.getEncoded()));
 
 					// cifrar mensagem com chave de sessão
 					byte[] encryptedMessage = SecurityUtils
 							.cipherWithSessionKey(parsedRequest.getSpecificField().getBytes(), sessionKey);
 
-					clientPGPMessage.setCypheredMessage(encryptedMessage);
+					clientChatMessage.setCypheredMessage(encryptedMessage);
 
 					System.out.println("[ClientRequestManager] cypheredMessage: "
-							+ MiscUtil.bytesToHex(clientPGPMessage.getCypheredMessage()));
+							+ MiscUtil.bytesToHex(clientChatMessage.getCypheredMessage()));
 
 					List<String> groupMembers = serverNetworkContactTypeMessage.getGroupMembers();
 
@@ -116,15 +114,15 @@ public class ClientRequestManager {
 						byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(username, groupMember, userPassword,
 								sessionKey);
 
-						clientPGPMessage.putUserKey(groupMember, wrappedSecretKey);
+						clientChatMessage.putUserKey(groupMember, wrappedSecretKey);
 					}
 
 					// adicionar chave cifrada do proprio utilizador
 					byte[] wrappedSecretKey = SecurityUtils.wrapSecretKey(username, username, userPassword, sessionKey);
-					clientPGPMessage.putUserKey(parsedRequest.getUsername(), wrappedSecretKey);
+					clientChatMessage.putUserKey(parsedRequest.getUsername(), wrappedSecretKey);
 
 					// enviar mensagem
-					clientNetworkManager.sendMessage(clientPGPMessage);
+					clientNetworkManager.sendMessage(clientChatMessage);
 
 					// espera resposta
 					networkMessage = (NetworkMessage) clientNetworkManager.receiveMessage();
@@ -137,12 +135,9 @@ public class ClientRequestManager {
 				break;
 
 			/*
-			 * C --------AUTH------------> S 
-			 * <------Contact/NOK-------
-			 * ----AD,Ks(M),Kp(Ks)-----> 
-			 * <---------OK/NOK------------
-			 * -------Ks(file)-------------> 
-			 * <--------OK/NOK-----------
+			 * C --------AUTH------------> S <------Contact/NOK-------
+			 * ----AD,Ks(M),Kp(Ks)-----> <---------OK/NOK------------
+			 * -------Ks(file)-------------> <--------OK/NOK-----------
 			 */
 
 			/**
@@ -163,24 +158,23 @@ public class ClientRequestManager {
 					chatMessage = new ChatMessage(MessageType.FILE);
 					chatMessage.setDestination(parsedRequest.getContact());
 					chatMessage.setFromUser(username);
-					
+
 					// contacto
-					System.out.println("[ClientRequestManager] -f " + serverNetworkContactTypeMessage.numGroupMembers());
-					
-					//obtem chave privada do utilizador
+					System.out
+							.println("[ClientRequestManager] -f " + serverNetworkContactTypeMessage.numGroupMembers());
+
+					// obtem chave privada do utilizador
 					PrivateKey privateKey;
 					byte[] clientSignature = null;
 					try {
 						privateKey = SecurityUtils.getPrivateKey(username, userPassword);
 						// gerar assinatura
-						clientSignature = SecurityUtils.signFile(parsedRequest.getSpecificField(),
-								privateKey);
+						clientSignature = SecurityUtils.signFile(parsedRequest.getSpecificField(), privateKey);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-							
-					
+
 					chatMessage.setSignature(clientSignature);
 
 					// obter chave secreta
@@ -188,12 +182,12 @@ public class ClientRequestManager {
 
 					// envia tamanho do ficheiro
 					chatMessage.setFileSize(parsedRequest.getFileSize());
-					
-					//envia nome do ficheiro
+
+					// envia nome do ficheiro
 					// cifrar mensagem com chave de sessão
-					byte[] encryptedMessage = SecurityUtils
-							.cipherWithSessionKey(MiscUtil.extractName(parsedRequest.getSpecificField()).getBytes(), secretKey);
-					
+					byte[] encryptedMessage = SecurityUtils.cipherWithSessionKey(
+							MiscUtil.extractName(parsedRequest.getSpecificField()).getBytes(), secretKey);
+
 					chatMessage.setCypheredMessage(encryptedMessage);
 					chatMessage.setContent(MiscUtil.extractName(parsedRequest.getSpecificField()));
 
@@ -221,7 +215,8 @@ public class ClientRequestManager {
 
 					if (networkMessage.getMessageType().equals(MessageType.OK)) {
 						// enviar ficheiro
-						clientNetworkManager.sendFile(parsedRequest.getSpecificField(), parsedRequest.getFileSize(), secretKey);
+						clientNetworkManager.sendFile(parsedRequest.getSpecificField(), parsedRequest.getFileSize(),
+								secretKey);
 
 						// esperar resposta confimação
 						networkMessage = (NetworkMessage) clientNetworkManager.receiveMessage();
@@ -257,36 +252,36 @@ public class ClientRequestManager {
 				// obter resposta
 				ServerMessage serverMessage = (ServerMessage) clientNetworkManager.receiveMessage();
 				List<ChatMessage> chatMessages = serverMessage.getMessageList();
-				
+
 				// iterar mensagens
-				for (ChatMessage currChatMessage: chatMessages) {
+				for (ChatMessage currChatMessage : chatMessages) {
 					System.out.println("[ClientRequestManager] cipheredKey: "
 							+ MiscUtil.bytesToHex(currChatMessage.getCypheredMessageKey()));
-					
+
 					// decifrar mensagem
 					String decipheredMessage = SecurityUtils.decipherChatMessage(username, userPassword,
-							currChatMessage.getCypheredMessageKey(),
-							currChatMessage.getCypheredMessage());
-					
+							currChatMessage.getCypheredMessageKey(), currChatMessage.getCypheredMessage());
 
 					// validar assinatura
-					if(currChatMessage.getMessageType().equals(MessageType.MESSAGE)) {
-						byte[] signature = currChatMessage.getSignature();
-						Certificate certificate = SecurityUtils.getCertificate(username, currChatMessage.getFromUser(), userPassword);
-	
-						try {
-							SecurityUtils.verifySignature(decipheredMessage, certificate.getPublicKey(), signature);
-						} catch (SignatureException e) {
-							System.out.println("Assinatura invalida!");
-							e.printStackTrace();
+
+					byte[] signature = currChatMessage.getSignature();
+					Certificate certificate = SecurityUtils.getCertificate(username, currChatMessage.getFromUser(),
+							userPassword);
+
+					try {
+						if (!SecurityUtils.verifyMessageSignature(decipheredMessage, certificate.getPublicKey(),
+								signature)) {
+							System.err.println("[ClientRequestManager] Assinatura invalida!");
 						}
+
+					} catch (SignatureException e) {
+						e.printStackTrace();
 					}
-						
 					currChatMessage.setContent(decipheredMessage);
 				}
-				
+
 				networkMessage = serverMessage;
-				
+
 				break;
 
 			case "-rContact":
@@ -298,7 +293,7 @@ public class ClientRequestManager {
 
 				clientNetworkMessage = new ClientNetworkMessage(parsedRequest.getUsername(),
 						parsedRequest.getPassword(), MessageType.RECEIVER);
-				
+
 				clientNetworkMessage.setDestination(parsedRequest.getContact());
 				clientNetworkMessage.setContent("all");
 
@@ -308,97 +303,102 @@ public class ClientRequestManager {
 				// espera resposta
 				ServerMessage serverMessage2 = (ServerMessage) clientNetworkManager.receiveMessage();
 				List<ChatMessage> chatMessages2 = serverMessage2.getMessageList();
-				
+
 				// iterar mensagens
-				for (ChatMessage currChatMessage: chatMessages2) {
+				for (ChatMessage currChatMessage : chatMessages2) {
 					System.out.println("[ClientRequestManager] cipheredKey: "
 							+ MiscUtil.bytesToHex(currChatMessage.getCypheredMessageKey()));
-					
+
 					// decifrar mensagem
 					String decipheredMessage = SecurityUtils.decipherChatMessage(username, userPassword,
-							currChatMessage.getCypheredMessageKey(),
-							currChatMessage.getCypheredMessage());
-					
+							currChatMessage.getCypheredMessageKey(), currChatMessage.getCypheredMessage());
 
 					// validar assinatura
-					if(currChatMessage.getMessageType().equals(MessageType.MESSAGE)) {
-						byte[] signature = currChatMessage.getSignature();
-						Certificate certificate = SecurityUtils.getCertificate(username, currChatMessage.getFromUser(), userPassword);
-	
-						try {
-							SecurityUtils.verifySignature(decipheredMessage, certificate.getPublicKey(), signature);
-						} catch (SignatureException e) {
-							System.out.println("Assinatura invalida!");
-							e.printStackTrace();
-						}
+
+					byte[] signature = currChatMessage.getSignature();
+					Certificate certificate = SecurityUtils.getCertificate(username, currChatMessage.getFromUser(),
+							userPassword);
+
+					try {
+						SecurityUtils.verifyMessageSignature(decipheredMessage, certificate.getPublicKey(), signature);
+					} catch (SignatureException e) {
+						System.out.println("Assinatura invalida!");
+						e.printStackTrace();
 					}
-					
+
 					currChatMessage.setContent(decipheredMessage);
 				}
-				
 
 				networkMessage = serverMessage2;
 				break;
 
+			/**
+			 * Receber ficheiro enviado por outro utilizador
+			 */
 			case "-rFile":
-
 				/*
 				 * C ----------RECEIVER-----------> S
-				 * <--AD,Ks(F),K(ks)/NOK--FILE--
-				 *  <-----------F----------------
+				 * <--AD,Ks(F),K(ks)/NOK--FILE-- <-----------F----------------
 				 * ----------OK/NOK------------->
 				 * <-----------OK/NOK-------------
 				 */
 
+				System.out.println("-rFile");
+
 				clientNetworkMessage = new ClientNetworkMessage(parsedRequest.getUsername(),
 						parsedRequest.getPassword(), MessageType.RECEIVER);
 				clientNetworkMessage.setDestination(parsedRequest.getContact());
-				
+
 				clientNetworkMessage.setContent(parsedRequest.getSpecificField());
 
 				// enviar mensagem
 				clientNetworkManager.sendMessage(clientNetworkMessage);
 
 				// recebe Resposta
-				ChatMessage chatmessage2 = (ChatMessage) clientNetworkManager.receiveMessage();
-				
-				//obtem chave de sessão para decifrar ficheiro
-				SecretKey sessionKey = SecurityUtils.unwrapSessionKey
-						(username, userPassword, chatmessage2.getCypheredMessageKey());
-				
-				//recebe ficheiro
-			File newfile = null;
-			try {
-				newfile = clientNetworkManager.receiveFile(chatmessage2.getFileSize(), 
-						chatmessage2.getContent(), sessionKey);
-			} catch (GeneralSecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-				
-				//verifica se está tudo ok
-			/*
-			//TODO
-			try {
-				boolean equalSign = SecurityUtils.verifyFileSignature(newfile.getAbsolutePath(), username, userPassword, chatMessage2.getFileOwner(), chatmessage2.getSignature());
-			} catch (SignatureException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-				*/
-				if(false) 	//TODO
-					chatmessage2 = new ChatMessage (MessageType.OK);
-				else 
-					chatmessage2 = new ChatMessage (MessageType.NOK);
-				
+				chatMessage = (ChatMessage) clientNetworkManager.receiveMessage();
+
+				// obtem chave de sessão para decifrar ficheiro
+				SecretKey sessionKey = SecurityUtils.unwrapSessionKey(username, userPassword,
+						chatMessage.getCypheredMessageKey());
+
+				// recebe ficheiro
+				File newfile = null;
+				try {
+					newfile = clientNetworkManager.receiveFile(chatMessage.getFileSize(), chatMessage.getContent(),
+							sessionKey);
+				} catch (GeneralSecurityException e) {
+					e.printStackTrace();
+				}
+
+				// TODO verifica se está tudo ok
+				try {
+					// chatMessage.getFromUser() está a null!
+					Certificate cert = SecurityUtils.getCertificate(username, chatMessage.getFromUser(), userPassword);
+					System.out.println(chatMessage.getFromUser());
+					PublicKey publicKey = cert.getPublicKey();
+
+					if (!SecurityUtils.verifyMessageSignature(newfile.getAbsolutePath(), publicKey,
+							chatMessage.getSignature())) {
+						System.out.println("Assinatura do ficheiro invalida!");
+					}
+
+				} catch (SignatureException e) {
+					e.printStackTrace();
+				}
+
+				if (false) // TODO
+					chatMessage = new ChatMessage(MessageType.OK);
+				else
+					chatMessage = new ChatMessage(MessageType.NOK);
+
 				// enviar mensagem
-				clientNetworkManager.sendMessage(chatmessage2);
-				
-				//recebe resposta 
+				clientNetworkManager.sendMessage(chatMessage);
+
+				// recebe resposta
 				networkMessage = (ServerMessage) clientNetworkManager.receiveMessage();
-				if(networkMessage.getMessageType().equals(MessageType.NOK))
+				if (networkMessage.getMessageType().equals(MessageType.NOK))
 					networkMessage.setContent("Ficheiro corrompido");
-				
+
 				break;
 
 			case "-a":
@@ -420,8 +420,7 @@ public class ClientRequestManager {
 				// recebe Resposta
 				ServerMessage chatmessage = (ServerMessage) clientNetworkManager.receiveMessage();
 				System.out.println("[ClientRequestManager] -a: " + chatmessage.getMessageType());
-				
-				
+
 				networkMessage = chatmessage;
 
 				break;

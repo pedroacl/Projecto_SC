@@ -81,7 +81,7 @@ public class Client {
 			
 			System.out.println("[Client] " + netWorkMessage.getMessageType() );
 			
-			ClientServerResponseParser srp = new ClientServerResponseParser(argsParser.getUsername());
+			ClientServerResponseParser srp = new ClientServerResponseParser(argsParser);
 			srp.processMessage(netWorkMessage);
 
 		} catch (AliasNotFoundException e) {

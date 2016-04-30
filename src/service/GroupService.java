@@ -23,15 +23,10 @@ public class GroupService {
 	
 	private String serverPassword;
 
-	public GroupService(String serverPassword) {
+	public GroupService(String serverPassword) throws InvalidMacException {
 		this.serverPassword = serverPassword;
 		groupDAO = new GroupDAO(serverPassword);
-
-		try {
-			groups = groupDAO.getGroups();
-		} catch (InvalidMacException e) {
-			e.printStackTrace();
-		}
+		groups = groupDAO.getGroups();
 
 		conversationService = new ConversationService();
 	}

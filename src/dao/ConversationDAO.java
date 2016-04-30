@@ -14,7 +14,6 @@ import network.messages.ChatMessage;
 import network.messages.MessageType;
 import util.MiscUtil;
 import util.PersistenceUtil;
-import util.SecurityUtils;
 
 /**
  * Classe que persiste conversações, isto é, gere as pastas das conversações e
@@ -107,9 +106,10 @@ public class ConversationDAO {
 
 		// persistir mensagem
 		String messageFileName = Long.toString(chatMessage.getCreatedAt().getTime());
-		
+
 		String pathToTxt = "conversations/" + conversation.getId() + "/messages/" + messageFileName;
 
+		// preparar conteudo a ser persistido
 		StringBuilder sb = new StringBuilder();
 		sb.append(chatMessage.getFromUser());
 		sb.append("\n");
@@ -117,40 +117,47 @@ public class ConversationDAO {
 		sb.append("\n");
 		sb.append(chatMessage.getMessageType());
 		sb.append("\n");
-		
+
 		String content = MiscUtil.bytesToHex(chatMessage.getCypheredMessage());
-		
+
 		sb.append(content);
 		sb.append("\n");
 
 		PersistenceUtil.writeStringToFile(sb.toString(), pathToTxt);
 
-		saveSignAndKeys(messageFileName, chatMessage, conversation.getId());
-		
-		if(chatMessage.getMessageType().equals(MessageType.FILE)) {
-			saveSignAndKeys(chatMessage.getContent(), chatMessage, conversation.getId());
+		saveSignatureAndKeys(messageFileName, chatMessage, conversation.getId());
+
+		if (chatMessage.getMessageType().equals(MessageType.FILE)) {
+			saveSignatureAndKeys(chatMessage.getContent(), chatMessage, conversation.getId());
 		}
 
 		return conversation.getId();
 	}
-	
-	private void saveSignAndKeys(String messageFileName, ChatMessage chatMessage, Long id ) {
+
+	/**
+	 * Guarda a assinatura de uma chat message e respectivas chaves em disco 
+	 * @param messageFileName Nome do ficheiro em formato timestamp 
+	 * @param chatMessage Mensagem enviada pelo cliente
+	 * @param id Id da conversa à qual pertence a mensagem
+	 */
+	private void saveSignatureAndKeys(String messageFileName, ChatMessage chatMessage, Long id) {
+
+		// guarda assinatura
+		String signaturePath = "conversations/" + id + "/signatures/" + messageFileName + ".sig."
+				+ chatMessage.getFromUser();
 		
-		//guarda assinatura
-		String signaturePath = "conversations/" + id + "/signatures/" + messageFileName + ".sig." + chatMessage.getFromUser();
 		String signature = MiscUtil.bytesToHex(chatMessage.getSignature());
 		PersistenceUtil.writeStringToFile(signature, signaturePath);
 
-		// persistir chave para cada utilizador 
+		// persistir chave para cada utilizador
 		System.out.println("[ConversationDAO.addChatMessage] users length: " + chatMessage.getUsers().size());
-		
+
 		for (String username : chatMessage.getUsers()) {
 			String keyPath = "conversations/" + id + "/keys/" + messageFileName + ".key." + username;
 			String userKey = MiscUtil.bytesToHex(chatMessage.getUserKey(username));
 			PersistenceUtil.writeStringToFile(userKey, keyPath);
 		}
 
-		
 	}
 
 	/**
@@ -227,6 +234,13 @@ public class ConversationDAO {
 		return lastMessage;
 	}
 
+	/**
+	 * 
+	 * @param username
+	 * @param conversationId
+	 * @param chatMessageName
+	 * @return
+	 */
 	public byte[] getUserChatMessageKey(String username, long conversationId, String chatMessageName) {
 		String filePath = "conversations/" + conversationId + "/keys/" + chatMessageName + ".key." + username;
 
@@ -256,7 +270,7 @@ public class ConversationDAO {
 	 */
 	public byte[] getChatMessageSignature(Long conversationId, String chatMessageName) {
 		File fileWithSig = PersistenceUtil.getMessageSignature(conversationId, chatMessageName);
-		
+
 		String signature = null;
 		try {
 			signature = PersistenceUtil.readStringFromFile(fileWithSig);
@@ -311,7 +325,8 @@ public class ConversationDAO {
 
 	/**
 	 * Obtem todas as mensagens associadas a uma conversação
-	 * @param username 
+	 * 
+	 * @param username
 	 * 
 	 * @param consersationId
 	 *            Identificador da conversa de onde se quer as mensagens
@@ -330,26 +345,25 @@ public class ConversationDAO {
 
 		// percorrer todos os ficheiros das mensagens
 		for (int i = 0; i < filesIn.length; i++) {
-			
-			//vai buscar a key
-			byte [] key = getUserChatMessageKey(username, conversationId, filesIn[i]);
-			
-			if(key != null) {
-				
-				//vai buscar a assinatura digital
-				byte [] signature = getChatMessageSignature(conversationId,filesIn[i]);
-				
-			
+
+			// vai buscar a key
+			byte[] key = getUserChatMessageKey(username, conversationId, filesIn[i]);
+
+			if (key != null) {
+
+				// vai buscar a assinatura digital
+				byte[] signature = getChatMessageSignature(conversationId, filesIn[i]);
+
 				// ler conteudo da mensagem
 				ArrayList<String> texto = (ArrayList<String>) PersistenceUtil.readFromFile(path + "/" + filesIn[i]);
 				ChatMessage k = makeChatMessage(texto);
-	
+
 				// definir data de inicio da conversa atraves do seu nome de
 				// ficheiro
 				k.setCreatedAt(new Date(Long.parseLong(filesIn[i])));
 				k.setCypheredMessageKey(key);
 				k.setSignature(signature);
-				
+
 				allMessages.add(k);
 			}
 		}

@@ -45,7 +45,7 @@ public class ServerClientMessageParser {
 	private final String GROUPS_FILE = "groups.txt";
 
 	public ServerClientMessageParser(ClientNetworkMessage clientMessage, ServerNetworkManager serverNetworkManager,
-			Authentication authentication) {
+			Authentication authentication) throws InvalidMacException {
 
 		this.clientMessage = clientMessage;
 		this.authentication = authentication;
@@ -65,14 +65,11 @@ public class ServerClientMessageParser {
 	public NetworkMessage processRequest() {
 		NetworkMessage serverMessage = null;
 
-		System.out.println("Server - Recebi msg");
-
 		// preenche sermessage com indicaçao do erro
 		try {
 			authentication.authenticateUser(clientMessage.getUsername(), clientMessage.getPassword());
 
 		} catch (InvalidMacException e) {
-			System.out.println("Mac inválido");
 			// preenche sermessage com indicaçao do erro
 			serverMessage = new ServerNetworkContactTypeMessage(MessageType.NOK);
 			serverMessage.setContent("MAC inválido");
@@ -93,8 +90,12 @@ public class ServerClientMessageParser {
 
 		System.out.println("Server - " + clientMessage);
 
+		// avaliar tipo de pedido do cliente
 		switch (clientMessage.getMessageType()) {
-		// mensagem de texto
+
+		/**
+		 * Mensagem de texto
+		 */
 		case MESSAGE:
 
 			System.out.println("[ServerClientMessageParser] MESSAGE");
@@ -124,11 +125,16 @@ public class ServerClientMessageParser {
 
 			break;
 
-		// mensagem contendo um ficheiro
+		/**
+		 * Mensagem contendo um ficheiro
+		 */
 		case FILE:
 			serverMessage = receiveFile();
 			break;
-		// mensagem contendo diversas mensagens
+			
+		/**
+		 * Mensagem contendo diversas mensagens
+		 */
 		case RECEIVER:
 
 			switch (clientMessage.getContent()) {
@@ -377,7 +383,7 @@ public class ServerClientMessageParser {
 
 	/**
 	 * Função que recebe e guarda um ficheiro vindo do utilizador 
-	 * Servidor	<---------FILE--------------Cliente
+	 * Servidor	<---------FILE-------------- Cliente
 	 * 			---------CONTACT/NOK-------> 
 	 *         	<--FILE: AD, Ks, SizeFile---
 	 *          -----------OK/NOK---------->
@@ -391,6 +397,7 @@ public class ServerClientMessageParser {
 
 		// destinatario eh um utilizador ou grupo
 		serverMessage = verifyContactType();
+		
 
 		if (!serverMessage.getMessageType().equals(MessageType.NOK)) {
 			// envia mensagem com indicaçao grupo ou utilizador
@@ -428,7 +435,7 @@ public class ServerClientMessageParser {
 
 			// verifica se o ficheiro foi bem recebido
 			if (file.length() >= clientMessage.getFileSize()) {
-				System.out.println("[ServerClientMessageParser] FILE: sadsad");
+				System.out.println("[ServerClientMessageParser] FILE: " + serverMessage.getContent());
 				serverMessage = new ServerMessage(MessageType.OK);
 			}
 
