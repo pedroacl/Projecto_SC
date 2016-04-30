@@ -262,20 +262,23 @@ public class ClientRequestManager {
 					String decipheredMessage = SecurityUtils.decipherChatMessage(username, userPassword,
 							currChatMessage.getCypheredMessageKey(), currChatMessage.getCypheredMessage());
 
-					// validar assinatura
-
-					byte[] signature = currChatMessage.getSignature();
-					Certificate certificate = SecurityUtils.getCertificate(username, currChatMessage.getFromUser(),
-							userPassword);
-
-					try {
-						if (!SecurityUtils.verifyMessageSignature(decipheredMessage, certificate.getPublicKey(),
-								signature)) {
-							System.err.println("[ClientRequestManager] Assinatura invalida!");
+					//so para as mensagens de texto, validar assinatura
+					if(currChatMessage.getMessageType().equals(MessageType.MESSAGE)) {
+						
+						// validar assinatura
+						byte[] signature = currChatMessage.getSignature();
+						Certificate certificate = SecurityUtils.getCertificate(username, currChatMessage.getFromUser(),
+								userPassword);
+	
+						try {
+							if (!SecurityUtils.verifyMessageSignature(decipheredMessage, certificate.getPublicKey(),
+									signature)) {
+								System.err.println("[ClientRequestManager] Assinatura invalida!");
+							}
+	
+						} catch (SignatureException e) {
+							e.printStackTrace();
 						}
-
-					} catch (SignatureException e) {
-						e.printStackTrace();
 					}
 					currChatMessage.setContent(decipheredMessage);
 				}
@@ -312,18 +315,21 @@ public class ClientRequestManager {
 					// decifrar mensagem
 					String decipheredMessage = SecurityUtils.decipherChatMessage(username, userPassword,
 							currChatMessage.getCypheredMessageKey(), currChatMessage.getCypheredMessage());
-
-					// validar assinatura
-
-					byte[] signature = currChatMessage.getSignature();
-					Certificate certificate = SecurityUtils.getCertificate(username, currChatMessage.getFromUser(),
-							userPassword);
-
-					try {
-						SecurityUtils.verifyMessageSignature(decipheredMessage, certificate.getPublicKey(), signature);
-					} catch (SignatureException e) {
-						System.out.println("Assinatura invalida!");
-						e.printStackTrace();
+					
+					//só para as mesnagens de texto.
+					if(currChatMessage.getMessageType().equals(MessageType.MESSAGE)) {
+					
+						// validar assinatura
+						byte[] signature = currChatMessage.getSignature();
+						Certificate certificate = SecurityUtils.getCertificate(username, currChatMessage.getFromUser(),
+								userPassword);
+	
+						try {
+							SecurityUtils.verifyMessageSignature(decipheredMessage, certificate.getPublicKey(), signature);
+						} catch (SignatureException e) {
+							System.out.println("Assinatura invalida!");
+							e.printStackTrace();
+						}
 					}
 
 					currChatMessage.setContent(decipheredMessage);
@@ -370,26 +376,18 @@ public class ClientRequestManager {
 					e.printStackTrace();
 				}
 
-				// TODO verifica se está tudo ok
-				try {
-					// chatMessage.getFromUser() está a null!
-					Certificate cert = SecurityUtils.getCertificate(username, chatMessage.getFromUser(), userPassword);
-					System.out.println(chatMessage.getFromUser());
-					PublicKey publicKey = cert.getPublicKey();
+			// chatMessage.getFromUser() está a null!
+			Certificate cert = SecurityUtils.getCertificate(username, chatMessage.getFromUser(), userPassword);
+			System.out.println(chatMessage.getFromUser());
+			PublicKey publicKey = cert.getPublicKey();
 
-					if (!SecurityUtils.verifyMessageSignature(newfile.getAbsolutePath(), publicKey,
-							chatMessage.getSignature())) {
-						System.out.println("Assinatura do ficheiro invalida!");
-					}
-
-				} catch (SignatureException e) {
-					e.printStackTrace();
-				}
-
-				if (false) // TODO
-					chatMessage = new ChatMessage(MessageType.OK);
-				else
-					chatMessage = new ChatMessage(MessageType.NOK);
+			if (!SecurityUtils.verifyFileSignature(newfile.getAbsolutePath(), publicKey,
+					chatMessage.getSignature())) {
+				chatMessage = new ChatMessage(MessageType.NOK);
+				System.out.println("Assinatura do ficheiro invalida!");
+			}
+			else
+				chatMessage = new ChatMessage(MessageType.OK);
 
 				// enviar mensagem
 				clientNetworkManager.sendMessage(chatMessage);
