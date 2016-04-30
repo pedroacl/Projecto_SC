@@ -226,6 +226,10 @@ public class ServerClientMessageParser {
 								(id,fileName);
 						messageTosend.setSignature(sign);
 						
+						//obtem criador da assinatura digital;
+						String owner = ConversationService.getSignatureProducer(id,fileName);
+						messageTosend.setFromUser(owner);
+						
 						// get SecretKey cifrada com publicKey
 						byte[] key = conversationService.getUserChatMessageKey
 								(clientMessage.getUsername(), id,fileName);

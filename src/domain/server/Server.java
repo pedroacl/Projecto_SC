@@ -1,5 +1,6 @@
 package domain.server;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -11,6 +12,7 @@ import javax.net.ssl.SSLServerSocketFactory;
 
 import exceptions.InvalidMacException;
 import util.SecurityUtils;
+import util.UserUtil;
 
 /**
  * Classe que representa o servidor. Tem a lógica do negocio. Responde perante
@@ -52,24 +54,29 @@ public class Server {
 			e.printStackTrace();
 		}
 
-		// TODO obter password da linha de comandos
+		
 		String password = "1234";
+		//UserUtil.askForPassword();
 
 		// Thread Pool
 		ExecutorService executorService = Executors.newFixedThreadPool(MAX_THREADS);
 		Authentication authentication = new Authentication(password);
 
 		System.out.println("Validar ficheiros MAC");
-
-		try {
-			SecurityUtils.validateMacFiles(authentication.getServerPassword());
-		} catch (InvalidMacException e) {
-			executorService.shutdown();
-			System.out.println("\nServidor terminado!");
-			System.exit(0);
+		File users = new File("users.txt");
+		
+		if(users.exists()) {
+			try {
+				SecurityUtils.validateMacFiles(authentication.getServerPassword());
+			} catch (InvalidMacException e) {
+				executorService.shutdown();
+				System.out.println("\nServidor terminado!");
+				System.exit(0);
+			}
+			
+			System.out.println("\nFicheiros MAC válidos.");
 		}
 		
-		System.out.println("\nFicheiros MAC válidos.");
 		System.out.println("\nServidor inicializado e à espera de pedidos.");
 
 		while (true) {
@@ -79,11 +86,13 @@ public class Server {
 				socket = serverSocket.accept();
 
 				System.out.println("Cliente ligado!");
-				System.out.println("Validar ficheiros MAC");
 				
-				// validar ficheiros MAC para cada pedido
-				SecurityUtils.validateMacFiles(authentication.getServerPassword());
-
+				if(users.exists()){
+					System.out.println("Validar ficheiros MAC");
+					
+					// validar ficheiros MAC para cada pedido
+					SecurityUtils.validateMacFiles(authentication.getServerPassword());
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 				break;

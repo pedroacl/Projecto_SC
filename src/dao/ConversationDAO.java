@@ -3,6 +3,7 @@ package dao;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -502,5 +503,12 @@ public class ConversationDAO {
 			return null;
 
 		return file.listFiles();
+	}
+
+	public String getSignatureProducer(Long conversationId, String chatMessageName) {
+		File fileWithSig = PersistenceUtil.getMessageSignature(conversationId, chatMessageName);
+		String [] fileNames = fileWithSig.getName().split("\\.");
+		
+		return fileNames[fileNames.length - 1];
 	}
 }

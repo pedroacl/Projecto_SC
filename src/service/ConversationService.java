@@ -141,4 +141,8 @@ public class ConversationService {
 		return conversationDAO.getUserChatMessageKey(username, id, name);
 	}
 
+	public static String getSignatureProducer(Long id, String fileName) {
+		return conversationDAO.getSignatureProducer(id,fileName);
+	}
+
 }

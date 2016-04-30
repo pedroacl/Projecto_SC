@@ -478,7 +478,8 @@ public class SecurityUtils {
 					System.out.println("1 - Criar ficheiro MAC");
 					System.out.println("2 - Terminar servidor");
 					char userInput = bufferedReader.readLine().charAt(0);
-
+					
+					System.out.println("\nOpção escolhida: " + userInput);
 					if (userInput == '1') {
 						// criar ficheiro MAC
 						SecurityUtils.createMacFile(filePath, serverPassword);
