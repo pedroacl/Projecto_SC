@@ -1,6 +1,7 @@
 
-grant codeBase "file:server.jar" {
+grant {
 	permission java.util.PropertyPermission "user.dir", "read";
+	permission java.security.AllPermission; 
 
 	// aceitar ligacoes em portos superiores ao porto 1024
 	permission java.net.SocketPermission "*:1024-", "accept";
@@ -30,4 +31,12 @@ grant codeBase "file:server.jar" {
 	// ler todos os ficheiros	
 	permission java.io.FilePermission "/-", "read";
 	permission java.io.FilePermission "*", "read";
+	
+	permission java.io.FilePermission "groups.txt", "read, write, delete";
 };
+
+grant codeBase "file:${java.home}/lib/ext/*" { 
+	permission java.security.AllPermission; 
+}; 
+
+

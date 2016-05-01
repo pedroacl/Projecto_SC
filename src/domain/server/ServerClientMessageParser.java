@@ -254,8 +254,9 @@ public class ServerClientMessageParser {
 								
 
 					} else {
-						serverMessage = new ServerMessage(MessageType.NOK);
-						serverMessage.setContent("Não há registos desta conversa");
+						ChatMessage chm = new ChatMessage(MessageType.NOK);
+						chm.setContent("Não há registos desta conversa");
+						serverMessage = chm;
 					}
 					// destinatario nao existe
 				} else {
