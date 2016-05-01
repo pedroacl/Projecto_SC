@@ -28,7 +28,6 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Base64;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -58,6 +57,7 @@ public class SecurityUtils {
 			byte[] auxMessage = message.getBytes("UTF-8");
 			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
 			hashedMessage = messageDigest.digest(auxMessage);
+
 		} catch (UnsupportedEncodingException e1) {
 			e1.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
@@ -81,6 +81,7 @@ public class SecurityUtils {
 			keyPairGenerator = KeyPairGenerator.getInstance("RSA");
 			keyPairGenerator.initialize(2048);
 			keyPair = keyPairGenerator.generateKeyPair();
+
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
@@ -100,6 +101,7 @@ public class SecurityUtils {
 			KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
 			keyGenerator.init(128);
 			secretKey = keyGenerator.generateKey();
+
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
@@ -137,6 +139,17 @@ public class SecurityUtils {
 		return signedMessage;
 	}
 
+	/**
+	 * Cria a assinatura digital de um determinado ficheiro
+	 * 
+	 * @param path
+	 *            Localização do ficheiro em disco
+	 * @param privateKey
+	 *            Chave privada utilizada para criar a assinatura
+	 * @return Devolve a assinatura do ficheiro
+	 * @throws IOException
+	 * @throws Exception
+	 */
 	public static byte[] signFile(String path, PrivateKey privateKey) throws IOException, Exception {
 
 		// abre o ficheiro e o stream correspondente
@@ -146,19 +159,17 @@ public class SecurityUtils {
 		// prepara instacia de Signature
 		Signature signature = Signature.getInstance("SHA256withRSA");
 		signature.initSign(privateKey);
-		
+
 		BufferedInputStream bufin = new BufferedInputStream(fis);
 		byte[] buffer = new byte[1024];
 		int len;
-		
-		while ((len = bufin.read(buffer)) >= 0) {
-		    signature.update(buffer, 0, len);
-		};
-		
-		bufin.close();
-		
 
-		
+		while ((len = bufin.read(buffer)) >= 0) {
+			signature.update(buffer, 0, len);
+		}
+		;
+
+		bufin.close();
 
 		return signature.sign();
 	}
@@ -174,13 +185,12 @@ public class SecurityUtils {
 	 */
 	public static boolean verifyMessageSignature(String message, PublicKey publicKey, byte[] signature)
 			throws SignatureException {
-		
 
 		try {
 			Signature sign = Signature.getInstance("SHA256withRSA");
 			sign.initVerify(publicKey);
 			sign.update(message.getBytes());
-			
+
 			boolean isValid = sign.verify(signature);
 
 			return isValid;
@@ -196,6 +206,7 @@ public class SecurityUtils {
 
 	/**
 	 * Verifica a assinatura digital de um ficheiro
+	 * 
 	 * @param message
 	 * @param publicKey
 	 * @param signature
@@ -214,13 +225,14 @@ public class SecurityUtils {
 			Signature sig;
 			sig = Signature.getInstance("SHA256withRSA");
 			sig.initVerify(publicKey);
-			
+
 			byte[] buffer = new byte[1024];
 			int len;
 
 			while ((len = bufin.read(buffer)) >= 0) {
-			    sig.update(buffer, 0, len);
-			};
+				sig.update(buffer, 0, len);
+			}
+			;
 
 			return sig.verify(signature);
 
@@ -241,7 +253,7 @@ public class SecurityUtils {
 				e.printStackTrace();
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -280,7 +292,6 @@ public class SecurityUtils {
 	public static byte[] cipherWithSessionKey(byte[] message, SecretKey secretKey) {
 		byte[] encryptedMessage = null;
 
-
 		try {
 			Cipher cipher = Cipher.getInstance("AES");
 			cipher.init(Cipher.ENCRYPT_MODE, secretKey);
@@ -301,6 +312,15 @@ public class SecurityUtils {
 		return encryptedMessage;
 	}
 
+	/**
+	 * Decifra uma determinada mensagem através de uma chave secreta
+	 * 
+	 * @param cipheredMessage
+	 *            Mensagem cifrada
+	 * @param secretKey
+	 *            Chave secreta
+	 * @return Devolve a mensagem decifrada
+	 */
 	private static byte[] decipherWithSessionKey(byte[] cipheredMessage, SecretKey secretKey) {
 		byte[] decipheredMessage = null;
 
@@ -372,6 +392,19 @@ public class SecurityUtils {
 		return wrappedKey;
 	}
 
+	/**
+	 * Faz o unwrap de uma chave de sessão
+	 * 
+	 * @param username
+	 *            Nome do utilizador cuja chave irá ser usada para o unwrap da
+	 *            chave de sessão
+	 * @param userPassword
+	 *            Password do utilizador
+	 * @param wrappedKey
+	 *            Chave cifrada
+	 * @return Devolve a chave de sessão decifrada
+	 * @throws IOException
+	 */
 	public static SecretKey unwrapSessionKey(String username, String userPassword, byte[] wrappedKey)
 			throws IOException {
 		Key unwrappedSecretKey = null;
@@ -427,7 +460,7 @@ public class SecurityUtils {
 		final SecureRandom randomNumber = new SecureRandom();
 		return (randomNumber.nextInt(900000) + 100000);
 	}
-	
+
 	public static void validateMacFiles(String serverPassword) throws InvalidMacException {
 		validateFileMac("users.txt", serverPassword);
 		validateFileMac("groups.txt", serverPassword);
@@ -456,13 +489,13 @@ public class SecurityUtils {
 					System.out.println("1 - Criar ficheiro MAC");
 					System.out.println("2 - Terminar servidor");
 					char userInput = bufferedReader.readLine().charAt(0);
-					
+
 					System.out.println("\nOpção escolhida: " + userInput);
 					if (userInput == '1') {
 						// criar ficheiro MAC
 						SecurityUtils.createMacFile(filePath, serverPassword);
 						validInput = true;
-						
+
 						System.out.println("\nCriado ficheiro MAC para o ficheiro " + filePath);
 
 					} else if (userInput == '2') {
@@ -473,7 +506,6 @@ public class SecurityUtils {
 					}
 				} while (!validInput);
 			} else {
-
 				// obter MAC original
 				BufferedReader inF = new BufferedReader(new FileReader(usersFileMacPath));
 				String originalMAC = inF.readLine();
@@ -498,8 +530,13 @@ public class SecurityUtils {
 	}
 
 	/**
+	 * Obtém o código MAC de um determinado ficheiro
 	 * 
-	 * @param secretKey
+	 * @param filePath
+	 *            Localização do ficheiro para o qual será gerado o MAC
+	 * @param serverPassword
+	 *            Password do servidor
+	 * @return Devolve o código MAC gerado
 	 */
 	public static byte[] generateFileMac(String filePath, String serverPassword) {
 		byte[] digest = null;
@@ -512,11 +549,15 @@ public class SecurityUtils {
 		}
 
 		try {
-			PBEKeySpec keySpec = new PBEKeySpec(serverPassword.toCharArray());
-
 			// obter chave secreta atraves da password
-			SecretKeyFactory kf = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
-			SecretKey secretKey = kf.generateSecret(keySpec);
+			/*
+			 * PBEKeySpec keySpec = new
+			 * PBEKeySpec(serverPassword.toCharArray()); SecretKeyFactory kf =
+			 * SecretKeyFactory.getInstance("PBEWithMD5AndDES"); SecretKey
+			 * secretKey = kf.generateSecret(keySpec);
+			 */
+			// obter chave secreta
+			SecretKey secretKey = getPBESecretKey(serverPassword);
 
 			// inicializar MAC
 			Mac mac = Mac.getInstance("HmacSHA256");
@@ -542,11 +583,33 @@ public class SecurityUtils {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+
+		return digest;
+	}
+
+	/**
+	 * Obtém uma chave secreta baseada numa determinada password
+	 * 
+	 * @param password
+	 *            Password utilizada para gerar a chave secreta
+	 * @return Devolve a chave secreta criada
+	 */
+	public static SecretKey getPBESecretKey(String password) {
+		SecretKey secretKey = null;
+
+		try {
+			SecretKeyFactory kf = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
+			PBEKeySpec keySpec = new PBEKeySpec(password.toCharArray());
+			secretKey = kf.generateSecret(keySpec);
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
 		} catch (InvalidKeySpecException e) {
 			e.printStackTrace();
 		}
 
-		return digest;
+		return secretKey;
 	}
 
 	/**
@@ -623,8 +686,10 @@ public class SecurityUtils {
 	}
 
 	/**
-	 * Obter keystore guardada num ficheiro
+	 * Permite obter o acesso à keystore de um utilizador
 	 * 
+	 * @param username
+	 *            Nome do utilizador
 	 * @param userPassword
 	 *            Password de acesso à keystore
 	 * @throws IOException
@@ -649,7 +714,6 @@ public class SecurityUtils {
 		return keyStore;
 	}
 
-	
 	public static void printSecretKey(SecretKey key) {
 		byte[] chave = key.getEncoded();
 
@@ -663,7 +727,15 @@ public class SecurityUtils {
 		System.out.println(sb.toString());
 
 	}
-	
+
+	/**
+	 * Obtém uma chave privada da keystore
+	 * 
+	 * @param username
+	 * @param userPassword
+	 * @return
+	 * @throws Exception
+	 */
 	public static PrivateKey getPrivateKey(String username, String userPassword) throws Exception {
 
 		KeyStore ks = getKeyStore(username, userPassword);
