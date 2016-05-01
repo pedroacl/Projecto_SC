@@ -38,7 +38,6 @@ public class ClientServerResponseParser {
 	 */
 	public void processMessage(NetworkMessage serverMessage) {
 		
-		System.out.println("[ClientServerResponseParser] serverMessage: " + serverMessage);
 		
 		switch (serverMessage.getMessageType()) {
 		// operacao bem sucedida
@@ -56,31 +55,18 @@ public class ClientServerResponseParser {
 		// todas as mensagens de uma conversa
 		case CONVERSATION:
 			ServerMessage trueMessage = (ServerMessage) serverMessage;
-			System.out.println("[ClientServerResponseParser] Lista: " + trueMessage.getMessageList());
 			UserUtil.printChatMessages(trueMessage.getMessageList(), username);
 			
 			break;
 
 		// ultima mensagem de cada conversa em que o utilizador participou
 		case LAST_MESSAGES:
-			System.out.println("[ClientServerResponseParser] LAST_MESSAGES");
 			ArrayList<ChatMessage> chatMessages = ((ServerMessage) serverMessage).getMessageList();
 			
 			UserUtil.printContactChatMessages(((ServerMessage) serverMessage).getMessageList(), username);
 			
 			break;
 
-		// receber um ficheiro
-			/*
-		case FILE:
-			try {
-				clientNetwork.receiveFile(serverMessage.getFileSize(), serverMessage.getContent());
-			} catch (IOException e) {
-				userUtil.print("ERRO a receber o ficheiro");
-				e.printStackTrace();
-			}
-			break;
-			*/
 
 		// mensagem do servidor mal formatada
 		default:

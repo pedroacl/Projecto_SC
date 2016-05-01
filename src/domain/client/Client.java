@@ -63,7 +63,7 @@ public class Client {
 		}
 
 		clientNetwork = new ClientNetworkManager(socket);
-		System.out.println("Cliente ligado ao servidor " + argsParser.getServerIP() + ":" + argsParser.getServerPort());
+		
 
 		// Cria mensagem de comunicaçao com o pedido do cliente
 		Parsed parsedRequest = argsParser.getParsed();
@@ -79,7 +79,6 @@ public class Client {
 			// recebe resultado da comunicaçao
 			netWorkMessage = clientRequestManager.processRequest();
 			
-			System.out.println("[Client] " + netWorkMessage.getMessageType() );
 			
 			ClientServerResponseParser srp = new ClientServerResponseParser(argsParser);
 			srp.processMessage(netWorkMessage);

@@ -38,10 +38,6 @@ public class ServerClientMessageParser {
 
 	private ServerNetworkManager serverNetworkManager;
 
-	private final int MAX_FILE_SIZE = Integer.MAX_VALUE;
-
-	private final String USERS_FILE = "users.txt";
-
 	private final String GROUPS_FILE = "groups.txt";
 
 	public ServerClientMessageParser(ClientNetworkMessage clientMessage, ServerNetworkManager serverNetworkManager,
@@ -98,7 +94,6 @@ public class ServerClientMessageParser {
 			return serverMessage;
 		}
 
-		System.out.println("Server - " + clientMessage);
 
 		// avaliar tipo de pedido do cliente
 		switch (clientMessage.getMessageType()) {

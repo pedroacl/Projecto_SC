@@ -158,29 +158,7 @@ public class SecurityUtils {
 		bufin.close();
 		
 
-		/*
-		  
-		int fileSize = (int) filePath.length();
-		int currentLength = 0;
-		int packageSize = 1024;
-		byte[] bfile = new byte[packageSize];
-		int resto;
-		int lido = 0;  
-		 
-		while (currentLength < fileSize) {
-
-			resto = fileSize - currentLength;
-			int numThisTime = resto < packageSize ? resto : bfile.length;
-
-			lido = fis.read(bfile, 0, numThisTime);
-
-			signature.update(bfile);
-
-			currentLength += lido;
-
-		}
-		fis.close();
-		*/
+		
 
 		return signature.sign();
 	}
@@ -282,8 +260,6 @@ public class SecurityUtils {
 
 		try {
 			SecretKey sessionKey = unwrapSessionKey(username, userPassword, wrappedSessionKey);
-			System.out.println("[SecurityUtils.decipherChatMessage] SecretKey"
-					+ Base64.getEncoder().encodeToString(sessionKey.getEncoded()));
 
 			byte[] decipheredChatMessageBytes = decipherWithSessionKey(cipheredMessage, sessionKey);
 			decipheredChatMessage = new String(decipheredChatMessageBytes, StandardCharsets.UTF_8);
@@ -304,7 +280,6 @@ public class SecurityUtils {
 	public static byte[] cipherWithSessionKey(byte[] message, SecretKey secretKey) {
 		byte[] encryptedMessage = null;
 
-		printSecretKey(secretKey);
 
 		try {
 			Cipher cipher = Cipher.getInstance("AES");
@@ -657,9 +632,6 @@ public class SecurityUtils {
 	private static KeyStore getKeyStore(String username, String userPassword) throws IOException {
 		KeyStore keyStore = null;
 
-		System.out.println("[SecurityUtils.getKeystore] username: " + username);
-		System.out.println("[SecurityUtils.getKeystore] userPassword: " + userPassword);
-
 		try {
 			FileInputStream fileInputStream = new FileInputStream("keystore." + username);
 			keyStore = KeyStore.getInstance("JKS");
@@ -677,10 +649,11 @@ public class SecurityUtils {
 		return keyStore;
 	}
 
+	
 	public static void printSecretKey(SecretKey key) {
 		byte[] chave = key.getEncoded();
 
-		StringBuilder sb = new StringBuilder("------------------> ");
+		StringBuilder sb = new StringBuilder("PrintKEY:");
 
 		for (int i = 0; i < chave.length; i++) {
 
@@ -690,7 +663,7 @@ public class SecurityUtils {
 		System.out.println(sb.toString());
 
 	}
-
+	
 	public static PrivateKey getPrivateKey(String username, String userPassword) throws Exception {
 
 		KeyStore ks = getKeyStore(username, userPassword);

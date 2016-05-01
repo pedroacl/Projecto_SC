@@ -74,7 +74,6 @@ public class ClientNetworkManager extends NetworkManager {
 			
 			
 			lido = in.read(bfile, 0, numThisTime);
-			System.out.println("[ClientNetworkMAnager] receiveFile lido = " + lido);
 			
 			if (lido == -1) {
 				break;
@@ -136,7 +135,7 @@ public class ClientNetworkManager extends NetworkManager {
 
 			int lido = fileInputStream.read(bfile, 0, bfile.length);
 			
-			System.out.println("[ClientNetworkMAnager] sendByteFile lido  = " + lido);
+		
 			
 			
 			if((fileSize - currentLength) > packageSize)
@@ -145,7 +144,7 @@ public class ClientNetworkManager extends NetworkManager {
 				try {
 					
 					ciphered = cipher.doFinal(bfile);
-					System.out.println("[ClientNetworkMAnager] sendByteFile doFinal: " + Arrays.toString(ciphered));
+					
 				} catch (IllegalBlockSizeException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -156,8 +155,6 @@ public class ClientNetworkManager extends NetworkManager {
 			currentLength += lido;
 			totalLength += ciphered.length;
 			
-			System.out.println("[ClientNetworkMAnager] sendByteFile ciphered = " + ciphered.length);
-			System.out.println("[ClientNetworkMAnager] sendByteFile falta: = " + (fileSize - currentLength));
 			
 			out.write(ciphered, 0, ciphered.length);
 		}

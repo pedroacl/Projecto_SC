@@ -62,7 +62,6 @@ public class Server {
 		ExecutorService executorService = Executors.newFixedThreadPool(MAX_THREADS);
 		Authentication authentication = new Authentication(password);
 
-		System.out.println("Validar ficheiros MAC");
 		File users = new File("users.txt");
 		
 		if(users.exists()) {

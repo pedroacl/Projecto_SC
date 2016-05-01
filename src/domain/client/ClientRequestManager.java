@@ -42,8 +42,6 @@ public class ClientRequestManager {
 		ChatMessage chatMessage = null;
 		ClientNetworkMessage clientNetworkMessage;
 
-		System.out.println("[ClientRequestManager.processRequest] " + parsedRequest.getOrder());
-
 		String username = parsedRequest.getUsername();
 		String userPassword = parsedRequest.getPassword();
 
@@ -75,7 +73,6 @@ public class ClientRequestManager {
 					clientChatMessage.setFromUser(parsedRequest.getUsername());
 					clientChatMessage.setDestination(parsedRequest.getContact());
 
-					System.out.println(serverNetworkContactTypeMessage.numGroupMembers());
 
 					// contacto
 					System.out.println("Client - CONTACT");
@@ -93,17 +90,13 @@ public class ClientRequestManager {
 
 					// obter chave secreta
 					SecretKey sessionKey = SecurityUtils.generateSecretKey();
-					System.out.println("[ClientRequestManager -m] SecretKey"
-							+ Base64.getEncoder().encodeToString(sessionKey.getEncoded()));
+					
 
 					// cifrar mensagem com chave de sessão
 					byte[] encryptedMessage = SecurityUtils
 							.cipherWithSessionKey(parsedRequest.getSpecificField().getBytes(), sessionKey);
 
 					clientChatMessage.setCypheredMessage(encryptedMessage);
-
-					System.out.println("[ClientRequestManager] cypheredMessage: "
-							+ MiscUtil.bytesToHex(clientChatMessage.getCypheredMessage()));
 
 					List<String> groupMembers = serverNetworkContactTypeMessage.getGroupMembers();
 
@@ -158,10 +151,6 @@ public class ClientRequestManager {
 					chatMessage = new ChatMessage(MessageType.FILE);
 					chatMessage.setDestination(parsedRequest.getContact());
 					chatMessage.setFromUser(username);
-
-					// contacto
-					System.out
-							.println("[ClientRequestManager] -f " + serverNetworkContactTypeMessage.numGroupMembers());
 
 					// obtem chave privada do utilizador
 					PrivateKey privateKey;
@@ -239,7 +228,6 @@ public class ClientRequestManager {
 			 */
 			case "-rLast":
 
-				System.out.println("-rLast");
 
 				clientNetworkMessage = new ClientNetworkMessage(parsedRequest.getUsername(),
 						parsedRequest.getPassword(), MessageType.RECEIVER);
@@ -255,8 +243,6 @@ public class ClientRequestManager {
 
 				// iterar mensagens
 				for (ChatMessage currChatMessage : chatMessages) {
-					System.out.println("[ClientRequestManager] cipheredKey: "
-							+ MiscUtil.bytesToHex(currChatMessage.getCypheredMessageKey()));
 
 					// decifrar mensagem
 					String decipheredMessage = SecurityUtils.decipherChatMessage(username, userPassword,
@@ -311,8 +297,6 @@ public class ClientRequestManager {
 
 				// iterar mensagens
 				for (ChatMessage currChatMessage : chatMessages2) {
-					System.out.println("[ClientRequestManager] cipheredKey: "
-							+ MiscUtil.bytesToHex(currChatMessage.getCypheredMessageKey()));
 
 					// decifrar mensagem
 					String decipheredMessage = SecurityUtils.decipherChatMessage(username, userPassword,
@@ -385,9 +369,8 @@ public class ClientRequestManager {
 					e.printStackTrace();
 				}
 
-			// chatMessage.getFromUser() está a null!
+			//obtem chave publica
 			Certificate cert = SecurityUtils.getCertificate(username, chatMessage.getFromUser(), userPassword);
-			System.out.println(chatMessage.getFromUser());
 			PublicKey publicKey = cert.getPublicKey();
 
 			if (!SecurityUtils.verifyFileSignature(newfile.getAbsolutePath(), publicKey,
@@ -426,7 +409,6 @@ public class ClientRequestManager {
 
 				// recebe Resposta
 				ServerMessage chatmessage = (ServerMessage) clientNetworkManager.receiveMessage();
-				System.out.println("[ClientRequestManager] -a: " + chatmessage.getMessageType());
 
 				networkMessage = chatmessage;
 
@@ -473,7 +455,7 @@ public class ClientRequestManager {
 
 		aux_message.setDestination(parsedRequest.getContact());
 
-		System.out.println(" [clientRequestManager] ENVIANDO MENSAGEM DE AUTH para " + parsedRequest.getContact());
+		
 		clientNetworkManager.sendMessage(aux_message);
 
 	}

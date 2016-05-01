@@ -119,14 +119,16 @@ public class ConversationService {
 		File f = new File("conversations/" + conversationId.toString() + "/keys");
 
 		File[] listConversationKeyUser = f.listFiles();
-
-		for (File tempFile : listConversationKeyUser) {
-			System.out.println("[ConversationService] removeKeyUserFromFolder: " + tempFile.getName());
-			String[] temp = tempFile.getName().split("\\.");
-			System.out.println("[ConversationService] removeKeyUserFromFolder: " + Arrays.toString(temp));
-			if (userToRemove.equals(temp[temp.length - 1])) {
-				System.out.println("[ConversationService] removeKeyUserFromFolder: " + temp[temp.length - 1]);
-				tempFile.delete();
+		
+		if(listConversationKeyUser != null) {
+			for (File tempFile : listConversationKeyUser) {
+				System.out.println("[ConversationService] removeKeyUserFromFolder: " + tempFile.getName());
+				String[] temp = tempFile.getName().split("\\.");
+				System.out.println("[ConversationService] removeKeyUserFromFolder: " + Arrays.toString(temp));
+				if (userToRemove.equals(temp[temp.length - 1])) {
+					System.out.println("[ConversationService] removeKeyUserFromFolder: " + temp[temp.length - 1]);
+					tempFile.delete();
+				}
 			}
 		}
 
