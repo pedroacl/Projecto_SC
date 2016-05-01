@@ -337,7 +337,8 @@ public class ClientRequestManager {
 			case "-rFile":
 				/*
 				 * C ----------RECEIVER-----------> S
-				 * <--AD,Ks(F),K(ks)/NOK--FILE-- <-----------F----------------
+				 * <--AD,Ks(F),K(ks)/NOK--FILE-- 
+				 * <-----------F----------------
 				 * ----------OK/NOK------------->
 				 * <-----------OK/NOK-------------
 				 */
@@ -355,40 +356,47 @@ public class ClientRequestManager {
 
 				// recebe Resposta
 				chatMessage = (ChatMessage) clientNetworkManager.receiveMessage();
+				
+				if(!chatMessage.getMessageType().equals(MessageType.NOK)) {
 
-				// obtem chave de sessão para decifrar ficheiro
-				SecretKey sessionKey = SecurityUtils.unwrapSessionKey(username, userPassword,
-						chatMessage.getCypheredMessageKey());
-
-				// recebe ficheiro
-				File newfile = null;
-				try {
-					newfile = clientNetworkManager.receiveFile(chatMessage.getFileSize(), chatMessage.getContent(),
-							sessionKey);
-				} catch (GeneralSecurityException e) {
-					e.printStackTrace();
+					// obtem chave de sessão para decifrar ficheiro
+					SecretKey sessionKey = SecurityUtils.unwrapSessionKey(username, userPassword,
+							chatMessage.getCypheredMessageKey());
+	
+					// recebe ficheiro
+					File newfile = null;
+					try {
+						newfile = clientNetworkManager.receiveFile(chatMessage.getFileSize(), chatMessage.getContent(),
+								sessionKey);
+					} catch (GeneralSecurityException e) {
+						e.printStackTrace();
+					}
+	
+					//obtem chave publica
+					Certificate cert = SecurityUtils.getCertificate(username, chatMessage.getFromUser(), userPassword);
+					PublicKey publicKey = cert.getPublicKey();
+		
+					if (!SecurityUtils.verifyFileSignature(newfile.getAbsolutePath(), publicKey,
+							chatMessage.getSignature())) {
+						chatMessage = new ChatMessage(MessageType.NOK);
+						System.out.println("Assinatura do ficheiro invalida!");
+					}
+					else
+						chatMessage = new ChatMessage(MessageType.OK);
+		
+						// enviar mensagem
+						clientNetworkManager.sendMessage(chatMessage);
+		
+						// recebe resposta
+						networkMessage = (ServerMessage) clientNetworkManager.receiveMessage();
+						if (networkMessage.getMessageType().equals(MessageType.NOK))
+							networkMessage.setContent("Ficheiro corrompido");
 				}
-
-			//obtem chave publica
-			Certificate cert = SecurityUtils.getCertificate(username, chatMessage.getFromUser(), userPassword);
-			PublicKey publicKey = cert.getPublicKey();
-
-			if (!SecurityUtils.verifyFileSignature(newfile.getAbsolutePath(), publicKey,
-					chatMessage.getSignature())) {
-				chatMessage = new ChatMessage(MessageType.NOK);
-				System.out.println("Assinatura do ficheiro invalida!");
-			}
-			else
-				chatMessage = new ChatMessage(MessageType.OK);
-
-				// enviar mensagem
-				clientNetworkManager.sendMessage(chatMessage);
-
-				// recebe resposta
-				networkMessage = (ServerMessage) clientNetworkManager.receiveMessage();
-				if (networkMessage.getMessageType().equals(MessageType.NOK))
-					networkMessage.setContent("Ficheiro corrompido");
-
+				
+				else {
+					networkMessage = new NetworkMessage(chatMessage.getMessageType());
+					networkMessage.setContent(chatMessage.getContent());
+				}
 				break;
 
 			case "-a":

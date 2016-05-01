@@ -1,6 +1,9 @@
 
-grant codeBase "file:client.jar" {
+grant {
 	permission java.util.PropertyPermission "user.dir", "read";
+	permission java.util.PropertyPermission "javax.net.ssl.trustStore", "read, write";
+	permission java.util.PropertyPermission "javax.net.ssl.trustStorePassword", "read, write";
+	
 	
 	// aceitar ligacoes em portos superiores ao porto 1024
 	permission java.net.SocketPermission "*:1024-", "connect";
@@ -8,3 +11,4 @@ grant codeBase "file:client.jar" {
 	// permissao para ler e escrever qualquer ficheiro
 	permission java.io.FilePermission "<<ALL FILES>>", "read, write";
 };
+
