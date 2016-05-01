@@ -17,8 +17,8 @@ public class ConversationFactory {
 	private static ConversationFactory conversationFactory = new ConversationFactory();
 	
 	private ConversationFactory() {
-		ConversationService conversationService = new ConversationService();
-		conversationId = conversationService.getLastConversationId()+ 1;
+		ConversationService conversationService = new ConversationService("tempPassword");
+		conversationId = conversationService.getLastConversationId() + 1;
 	}
 
 	/**

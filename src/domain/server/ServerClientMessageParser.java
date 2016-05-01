@@ -47,7 +47,7 @@ public class ServerClientMessageParser {
 		this.authentication = authentication;
 		this.serverNetworkManager = serverNetworkManager;
 
-		conversationService = new ConversationService();
+		conversationService = new ConversationService(authentication.getServerPassword());
 		groupService = new GroupService(authentication.getServerPassword());
 
 	}

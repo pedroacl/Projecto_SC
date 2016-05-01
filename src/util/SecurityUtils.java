@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyPair;
@@ -38,11 +39,17 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.PBEParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import domain.server.ServerClientMessageParser;
 import exceptions.InvalidMacException;
 
 public class SecurityUtils {
+
+	private static final byte[] SALT = { (byte) 0xc9, (byte) 0x36, (byte) 0x78, (byte) 0x99, (byte) 0x52, (byte) 0x3e,
+			(byte) 0xea, (byte) 0xf2 };
+
 	/**
 	 * Gera uma sintese SHA 256 baseada numa string message
 	 * 
@@ -321,7 +328,7 @@ public class SecurityUtils {
 	 *            Chave secreta
 	 * @return Devolve a mensagem decifrada
 	 */
-	private static byte[] decipherWithSessionKey(byte[] cipheredMessage, SecretKey secretKey) {
+	public static byte[] decipherWithSessionKey(byte[] cipheredMessage, SecretKey secretKey) {
 		byte[] decipheredMessage = null;
 
 		try {
@@ -610,6 +617,73 @@ public class SecurityUtils {
 		}
 
 		return secretKey;
+	}
+
+	/**
+	 * 
+	 * @param message
+	 * @param password
+	 * @return
+	 */
+	public static byte[] cipherWithPBE(byte[] message, String password) {
+		PBEParameterSpec paramSpec = new PBEParameterSpec(SALT, 20);
+
+		byte[] cipheredMessage = null;
+
+		try {
+			SecretKey key = getPBESecretKey(password);
+			Cipher c = Cipher.getInstance("PBEWithMD5AndDES");
+			c.init(Cipher.ENCRYPT_MODE, key, paramSpec);
+			cipheredMessage = c.doFinal(message);
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+		} catch (InvalidAlgorithmParameterException e) {
+			e.printStackTrace();
+		} catch (IllegalBlockSizeException e) {
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			e.printStackTrace();
+		}
+
+		return cipheredMessage;
+	}
+
+	/**
+	 * 
+	 * @param serverPassword
+	 * @return
+	 */
+	public static byte[] decipherWithPBE(byte[] message, String password) {
+		PBEParameterSpec paramSpec = new PBEParameterSpec(SALT, 20);
+
+		byte[] decipheredMessage = null;
+
+		try {
+			SecretKey key = getPBESecretKey(password);
+			Cipher c = Cipher.getInstance("PBEWithMD5AndDES");
+			c.init(Cipher.DECRYPT_MODE, key, paramSpec);
+			decipheredMessage = c.doFinal(message);
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+		} catch (InvalidAlgorithmParameterException e) {
+			e.printStackTrace();
+		} catch (IllegalBlockSizeException e) {
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			e.printStackTrace();
+		}
+
+		return decipheredMessage;
 	}
 
 	/**

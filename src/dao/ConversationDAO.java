@@ -2,12 +2,14 @@ package dao;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.crypto.SecretKey;
 
 import entities.Conversation;
 import factories.ConversationFactory;
@@ -15,6 +17,7 @@ import network.messages.ChatMessage;
 import network.messages.MessageType;
 import util.MiscUtil;
 import util.PersistenceUtil;
+import util.SecurityUtils;
 
 /**
  * Classe que persiste conversações, isto é, gere as pastas das conversações e
@@ -26,8 +29,11 @@ public class ConversationDAO {
 
 	private ConversationFactory conversationFactory;
 
-	public ConversationDAO() {
+	private String serverPassword;
+
+	public ConversationDAO(String serverPassword) {
 		conversationFactory = ConversationFactory.getInstance();
+		this.serverPassword = serverPassword;
 	}
 
 	/**
@@ -112,15 +118,22 @@ public class ConversationDAO {
 
 		// preparar conteudo a ser persistido
 		StringBuilder sb = new StringBuilder();
-		sb.append(chatMessage.getFromUser());
+		String fromUser = MiscUtil
+				.bytesToHex(SecurityUtils.cipherWithPBE(chatMessage.getFromUser().getBytes(), serverPassword));
+		sb.append(fromUser);
 		sb.append("\n");
-		sb.append(chatMessage.getDestination());
+
+		String destination = MiscUtil
+				.bytesToHex(SecurityUtils.cipherWithPBE(chatMessage.getDestination().getBytes(), serverPassword));
+		sb.append(destination);
 		sb.append("\n");
-		sb.append(chatMessage.getMessageType());
+
+		String messageType = MiscUtil.bytesToHex(
+				SecurityUtils.cipherWithPBE(chatMessage.getMessageType().name().getBytes(), serverPassword));
+		sb.append(messageType);
 		sb.append("\n");
 
 		String content = MiscUtil.bytesToHex(chatMessage.getCypheredMessage());
-
 		sb.append(content);
 		sb.append("\n");
 
@@ -136,17 +149,21 @@ public class ConversationDAO {
 	}
 
 	/**
-	 * Guarda a assinatura de uma chat message e respectivas chaves em disco 
-	 * @param messageFileName Nome do ficheiro em formato timestamp 
-	 * @param chatMessage Mensagem enviada pelo cliente
-	 * @param id Id da conversa à qual pertence a mensagem
+	 * Guarda a assinatura de uma chat message e respectivas chaves em disco
+	 * 
+	 * @param messageFileName
+	 *            Nome do ficheiro em formato timestamp
+	 * @param chatMessage
+	 *            Mensagem enviada pelo cliente
+	 * @param id
+	 *            Id da conversa à qual pertence a mensagem
 	 */
 	private void saveSignatureAndKeys(String messageFileName, ChatMessage chatMessage, Long id) {
 
 		// guarda assinatura
 		String signaturePath = "conversations/" + id + "/signatures/" + messageFileName + ".sig."
 				+ chatMessage.getFromUser();
-		
+
 		String signature = MiscUtil.bytesToHex(chatMessage.getSignature());
 		PersistenceUtil.writeStringToFile(signature, signaturePath);
 
@@ -393,14 +410,35 @@ public class ConversationDAO {
 				sb.append(messageFields.get(i));
 		}
 
-		// criar mensagem
-		ChatMessage chatMessage = new ChatMessage(MessageType.valueOf(messageFields.get(2)));
-
 		System.out.println("[ConversationDAO.makeChatMessage]" + sb.toString());
 
+		// criar mensagem
+		// message type
+		String messageType = new String(
+				SecurityUtils.decipherWithPBE(MiscUtil.hexToBytes(messageFields.get(2)), serverPassword),
+				StandardCharsets.UTF_8);
+		
+		ChatMessage chatMessage = new ChatMessage(MessageType.valueOf(messageType));
+		// ChatMessage(MessageType.valueOf(messageFields.get(2)));
+
+		// mensagem cifrada
 		chatMessage.setCypheredMessage(MiscUtil.hexToBytes(sb.toString()));
-		chatMessage.setFromUser(messageFields.get(0));
-		chatMessage.setDestination(messageFields.get(1));
+
+		// from user
+		String fromUser = new String(
+				SecurityUtils.decipherWithPBE(MiscUtil.hexToBytes(messageFields.get(0)), serverPassword),
+				StandardCharsets.UTF_8);
+
+		chatMessage.setFromUser(fromUser);
+		// chatMessage.setFromUser(messageFields.get(0));
+
+		// destination
+		String destination = new String(
+				SecurityUtils.decipherWithPBE(MiscUtil.hexToBytes(messageFields.get(1)), serverPassword),
+				StandardCharsets.UTF_8);
+		
+		chatMessage.setDestination(destination);
+		// chatMessage.setDestination(messageFields.get(1));
 
 		return chatMessage;
 	}
@@ -507,8 +545,8 @@ public class ConversationDAO {
 
 	public String getSignatureProducer(Long conversationId, String chatMessageName) {
 		File fileWithSig = PersistenceUtil.getMessageSignature(conversationId, chatMessageName);
-		String [] fileNames = fileWithSig.getName().split("\\.");
-		
+		String[] fileNames = fileWithSig.getName().split("\\.");
+
 		return fileNames[fileNames.length - 1];
 	}
 }

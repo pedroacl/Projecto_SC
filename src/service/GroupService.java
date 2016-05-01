@@ -10,7 +10,7 @@ import exceptions.InvalidMacException;
 
 /**
  * 
- * @author pedro
+ * @author 
  *
  */
 public class GroupService {
@@ -21,14 +21,10 @@ public class GroupService {
 
 	private ConcurrentHashMap<String, String> groups; // groupName:owner
 	
-	private String serverPassword;
-
 	public GroupService(String serverPassword) throws InvalidMacException {
-		this.serverPassword = serverPassword;
 		groupDAO = new GroupDAO(serverPassword);
 		groups = groupDAO.getGroups();
-
-		conversationService = new ConversationService();
+		conversationService = new ConversationService(serverPassword);
 	}
 
 	/**

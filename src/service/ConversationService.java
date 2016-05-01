@@ -7,9 +7,7 @@ import java.util.List;
 
 import dao.ConversationDAO;
 import network.messages.ChatMessage;
-import util.MiscUtil;
 import util.PersistenceUtil;
-import util.SecurityUtils;
 
 /**
  * 
@@ -20,8 +18,8 @@ public class ConversationService {
 
 	private static ConversationDAO conversationDAO;
 	
-	public ConversationService() {
-		conversationDAO = new ConversationDAO();
+	public ConversationService(String serverPassword) {
+		conversationDAO = new ConversationDAO(serverPassword);
 	}
 
 	public void removeConversationFromUser(String username, String fromUser) {
