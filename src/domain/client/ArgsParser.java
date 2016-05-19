@@ -84,8 +84,8 @@ public class ArgsParser {
 		username = args[1];
 
 		// verifica 3º parametro (serverAddress)
-		if (!args[2].matches("(\\d+\\.){3}(\\d:\\d+)"))
-			return false;
+		//if (!args[2].matches("(\\d+\\.){3}(\\d:\\d+)"))
+		//	return false;
 
 		// obter IP e porto do servidor
 		String[] address = args[2].split(":");
