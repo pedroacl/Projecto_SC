@@ -1,0 +1,77 @@
+# flush
+/sbin/iptables -F INPUT &&
+/sbin/iptables -F OUTPUT &&
+
+# Máquinas DC
+/sbin/iptables -A INPUT -d 10.101.253.11 -j ACCEPT &&
+/sbin/iptables -A INPUT -d 10.101.253.12 -j ACCEPT &&
+/sbin/iptables -A INPUT -d 10.101.253.13 -j ACCEPT &&
+/sbin/iptables -A INPUT -d 10.121.53.14 -j ACCEPT &&
+/sbin/iptables -A INPUT -d 10.121.53.15 -j ACCEPT &&
+/sbin/iptables -A INPUT -d 10.101.53.16 -j ACCEPT &&
+
+# Máquina Storage
+/sbin/iptables -A INPUT -d 10.101.249.63 -j ACCEPT &&
+
+# Máquina Iate/Falua
+/sbin/iptables -A INPUT -d 10.101.85.6 -j ACCEPT &&
+/sbin/iptables -A INPUT -d 10.101.85.138 -j ACCEPT &&
+
+# Máquina Nemo
+/sbin/iptables -A INPUT -d 10.101.85.18 -j ACCEPT &&
+
+# Máquina Gateway
+/sbin/iptables -A INPUT -d 10.101.148.1 -j ACCEPT &&
+
+# Máquina Proxy
+/sbin/iptables -A INPUT -d 10.101.85.134 -j ACCEPT &&
+
+# Regras de OUTPUT
+# Máquinas DC
+/sbin/iptables -A OUTPUT -d 10.101.253.11 -j ACCEPT &&
+/sbin/iptables -A OUTPUT -d 10.101.253.12 -j ACCEPT &&
+/sbin/iptables -A OUTPUT -d 10.101.253.13 -j ACCEPT &&
+/sbin/iptables -A OUTPUT -d 10.121.53.14 -j ACCEPT &&
+/sbin/iptables -A OUTPUT -d 10.121.53.15 -j ACCEPT &&
+/sbin/iptables -A OUTPUT -d 10.101.53.16 -j ACCEPT &&
+
+# Máquina Storage
+/sbin/iptables -A OUTPUT -d 10.101.249.63 -j ACCEPT &&
+
+# Máquina Iate/Falua
+/sbin/iptables -A OUTPUT -d 10.101.85.6 -j ACCEPT &&
+/sbin/iptables -A OUTPUT -d 10.101.85.138 -j ACCEPT &&
+
+# Máquina Nemo
+/sbin/iptables -A OUTPUT -d 10.101.85.18 -j ACCEPT &&
+
+# Máquina Gateway
+/sbin/iptables -A OUTPUT -d 10.101.148.1 -j ACCEPT &&
+
+# Máquina Proxy
+/sbin/iptables -A OUTPUT -d 10.101.85.134 -j ACCEPT &&
+
+# Regra 2
+/sbin/iptables -A INPUT -s 10.101.148.10/23 -d 10.101.148.10 -p icmp -j ACCEPT &&
+
+# Regra 3
+/sbin/iptables -A INPUT -s 10.101.148.11 -d 10.101.148.10 -p TCP --dport 22 -j ACCEPT &&
+
+# Regra 4
+/sbin/iptables -A OUTPUT -s 10.101.148.10 -d 10.101.151.5 -p icmp -j ACCEPT &&
+
+# Regra 5
+/sbin/iptables -A INPUT -d 10.101.148.10 -p tcp -j ACCEPT &&
+
+# Regra 6
+/sbin/iptables -A OUTPUT -d 10.101.148.10 -p tcp --dport 4567 -j ACCEPT &&
+
+# Regra 7
+/sbin/iptables -A INPUT -j DROP &&
+
+# Regra 8
+/sbin/iptables -A OUTPUT -j DROP
+
+
+
+
