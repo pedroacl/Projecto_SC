@@ -1,0 +1,24 @@
+
+Regra 1
+
+Regra 4
+
+fc40251@DI1223-09:~/Desktop/SC_Trabalho_1$ ping 10.101.148.130
+PING 10.101.148.130 (10.101.148.130) 56(84) bytes of data.
+ping: sendmsg: Operation not permitted
+ping: sendmsg: Operation not permitted
+
+--- 10.101.148.130 ping statistics ---
+2 packets transmitted, 0 received, 100% packet loss, time 1008ms
+
+
+
+fc40251@DI1223-09:~/Desktop/SC_Trabalho_1$ ping gcc
+PING gcc.alunos.di.fc.ul.pt (10.101.151.5) 56(84) bytes of data.
+64 bytes from gcc.alunos.di.fc.ul.pt (10.101.151.5): icmp_seq=1 ttl=64 time=0.224 ms
+64 bytes from gcc.alunos.di.fc.ul.pt (10.101.151.5): icmp_seq=2 ttl=64 time=0.275 ms
+64 bytes from gcc.alunos.di.fc.ul.pt (10.101.151.5): icmp_seq=3 ttl=64 time=0.231 ms
+^C
+--- gcc.alunos.di.fc.ul.pt ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2000ms
+rtt min/avg/max/mdev = 0.224/0.243/0.275/0.025 ms

@@ -1,0 +1,77 @@
+# flush
+sudo /sbin/iptables -F INPUT &&
+sudo /sbin/iptables -F OUTPUT &&
+
+# Máquinas DC
+sudo /sbin/iptables -A INPUT -d 10.101.253.11 -j ACCEPT &&
+sudo /sbin/iptables -A INPUT -d 10.101.253.12 -j ACCEPT &&
+sudo /sbin/iptables -A INPUT -d 10.101.253.13 -j ACCEPT &&
+sudo /sbin/iptables -A INPUT -d 10.121.53.14 -j ACCEPT &&
+sudo /sbin/iptables -A INPUT -d 10.121.53.15 -j ACCEPT &&
+sudo /sbin/iptables -A INPUT -d 10.101.53.16 -j ACCEPT &&
+
+# Máquina Storage
+sudo /sbin/iptables -A INPUT -d 10.101.249.63 -j ACCEPT &&
+
+# Máquina Iate/Falua
+sudo /sbin/iptables -A INPUT -d 10.101.85.6 -j ACCEPT &&
+sudo /sbin/iptables -A INPUT -d 10.101.85.138 -j ACCEPT &&
+
+# Máquina Nemo
+sudo /sbin/iptables -A INPUT -d 10.101.85.18 -j ACCEPT &&
+
+# Máquina Gateway
+sudo /sbin/iptables -A INPUT -d 10.101.148.1 -j ACCEPT &&
+
+# Máquina Proxy
+sudo /sbin/iptables -A INPUT -d 10.101.85.134 -j ACCEPT &&
+
+# Regras de OUTPUT
+# Máquinas DC
+sudo /sbin/iptables -A OUTPUT -d 10.101.253.11 -j ACCEPT &&
+sudo /sbin/iptables -A OUTPUT -d 10.101.253.12 -j ACCEPT &&
+sudo /sbin/iptables -A OUTPUT -d 10.101.253.13 -j ACCEPT &&
+sudo /sbin/iptables -A OUTPUT -d 10.121.53.14 -j ACCEPT &&
+sudo /sbin/iptables -A OUTPUT -d 10.121.53.15 -j ACCEPT &&
+sudo /sbin/iptables -A OUTPUT -d 10.101.53.16 -j ACCEPT &&
+
+# Máquina Storage
+sudo /sbin/iptables -A OUTPUT -d 10.101.249.63 -j ACCEPT &&
+
+# Máquina Iate/Falua
+sudo /sbin/iptables -A OUTPUT -d 10.101.85.6 -j ACCEPT &&
+sudo /sbin/iptables -A OUTPUT -d 10.101.85.138 -j ACCEPT &&
+
+# Máquina Nemo
+sudo /sbin/iptables -A OUTPUT -d 10.101.85.18 -j ACCEPT &&
+
+# Máquina Gateway
+sudo /sbin/iptables -A OUTPUT -d 10.101.148.1 -j ACCEPT &&
+
+# Máquina Proxy
+sudo /sbin/iptables -A OUTPUT -d 10.101.85.134 -j ACCEPT &&
+
+# Regra 2
+sudo /sbin/iptables -A INPUT -s 10.101.148.10/23 -d 10.101.148.10 -p icmp -j ACCEPT &&
+
+# Regra 3
+sudo /sbin/iptables -A INPUT -s 10.101.148.11 -d 10.101.148.10 -p TCP --dport 22 -j ACCEPT &&
+
+# Regra 4
+sudo /sbin/iptables -A OUTPUT -s 10.101.148.10 -d 10.101.151.5 -p icmp -j ACCEPT &&
+
+# Regra 5
+sudo /sbin/iptables -A INPUT -d 10.101.148.10 -p tcp -j ACCEPT &&
+
+# Regra 6
+sudo /sbin/iptables -A OUTPUT -d 10.101.148.10 -p tcp --dport 4567 -j ACCEPT &&
+
+# Regra 7
+sudo /sbin/iptables -A INPUT -j DROP &&
+
+# Regra 8
+sudo /sbin/iptables -A OUTPUT -j DROP
+
+
+
+

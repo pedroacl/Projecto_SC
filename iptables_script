@@ -72,12 +72,9 @@ sudo /sbin/iptables -A OUTPUT -s 10.101.148.129 -d 10.101.151.5 -p icmp -j ACCEP
 sudo /sbin/iptables -A INPUT -d 10.101.148.129 -p tcp --dport 4567 -j ACCEPT &&
 
 # Regra 6
-sudo /sbin/iptables -A OUTPUT -d 10.101.148.129 -p tcp --dport 4567 -j ACCEPT &&
-
-# Regra 7
 sudo /sbin/iptables -A INPUT -j DROP &&
 
-# Regra 8
+# Regra 7
 sudo /sbin/iptables -A OUTPUT -j DROP
 
 
