@@ -60,19 +60,19 @@ sudo /sbin/iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
 
 # Regra 2
-sudo /sbin/iptables -A INPUT -s 10.101.148.10/23 -d 10.101.148.10 -p icmp -j ACCEPT &&
+sudo /sbin/iptables -A INPUT -s 10.101.148.10/23 -d 10.101.148.18 -p icmp -j ACCEPT &&
 
 # Regra 3
-sudo /sbin/iptables -A INPUT -s 10.101.148.11 -d 10.101.148.10 -p TCP --dport 22 -j ACCEPT &&
+sudo /sbin/iptables -A INPUT -s 10.101.151.5 -d 10.101.148.18 -p TCP --dport 22 -j ACCEPT &&
 
 # Regra 4
-sudo /sbin/iptables -A OUTPUT -s 10.101.148.10 -d 10.101.151.5 -p icmp -j ACCEPT &&
+sudo /sbin/iptables -A OUTPUT -s 10.101.148.18 -d 10.101.151.5 -p icmp -j ACCEPT &&
 
 # Regra 5
-sudo /sbin/iptables -A INPUT -d 10.101.148.10 -p tcp -j ACCEPT &&
+sudo /sbin/iptables -A INPUT -d 10.101.148.18 -p tcp -j ACCEPT &&
 
 # Regra 6
-sudo /sbin/iptables -A OUTPUT -d 10.101.148.10 -p tcp --dport 4567 -j ACCEPT &&
+sudo /sbin/iptables -A OUTPUT -d 10.101.148.18 -p tcp --dport 4567 -j ACCEPT &&
 
 # Regra 7
 sudo /sbin/iptables -A INPUT -j DROP &&
