@@ -1,0 +1,8 @@
+fc45588@DI1223-10:~/Desktop/SC_Trabalho_1$ java -Djava.security.manager -Djava.security.policy=policies/client.policy -jar client.jar myWhats maria 10.101.148.129:4567 -p mariamaria -m pedro "test"
+Não existe esse contact
+fc45588@DI1223-10:~/Desktop/SC_Trabalho_1$ 
+
+
+fc45588@DI1223-10:~/Desktop/SC_Trabalho_1$ java -Djava.security.manager -Djava.security.policy=policies/client.policy -jar client.jar myWhats maria 10.101.148.129:4568 -p mariamaria -m pedro "test"
+
+Servidor nao devolve resposta devido a fazer drop ao pacote
