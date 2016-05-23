@@ -42,7 +42,6 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import domain.server.ServerClientMessageParser;
 import exceptions.InvalidMacException;
 
 public class SecurityUtils {
@@ -557,13 +556,6 @@ public class SecurityUtils {
 
 		try {
 			// obter chave secreta atraves da password
-			/*
-			 * PBEKeySpec keySpec = new
-			 * PBEKeySpec(serverPassword.toCharArray()); SecretKeyFactory kf =
-			 * SecretKeyFactory.getInstance("PBEWithMD5AndDES"); SecretKey
-			 * secretKey = kf.generateSecret(keySpec);
-			 */
-			// obter chave secreta
 			SecretKey secretKey = getPBESecretKey(serverPassword);
 
 			// inicializar MAC

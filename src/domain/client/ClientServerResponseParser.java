@@ -1,14 +1,10 @@
 package domain.client;
 
-import java.io.IOException;
-import java.security.KeyStoreException;
-import java.security.PublicKey;
 import java.util.ArrayList;
 
 import network.messages.ChatMessage;
 import network.messages.NetworkMessage;
 import network.messages.ServerMessage;
-import util.SecurityUtils;
 import util.UserUtil;
 
 /**
@@ -20,13 +16,10 @@ import util.UserUtil;
 public class ClientServerResponseParser {
 
 	private String username;
-	
-	private String userPassword;
 
 	public ClientServerResponseParser(ArgsParser argsParser) {
 		// this.userUtil = userInterface;
 		this.username = argsParser.getUsername();
-		this.userPassword = argsParser.getPassword();
 	}
 
 	/**
@@ -62,7 +55,6 @@ public class ClientServerResponseParser {
 		// ultima mensagem de cada conversa em que o utilizador participou
 		case LAST_MESSAGES:
 			ArrayList<ChatMessage> chatMessages = ((ServerMessage) serverMessage).getMessageList();
-			
 			UserUtil.printContactChatMessages(((ServerMessage) serverMessage).getMessageList(), username);
 			
 			break;

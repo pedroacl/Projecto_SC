@@ -9,8 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.crypto.SecretKey;
-
 import entities.Conversation;
 import factories.ConversationFactory;
 import network.messages.ChatMessage;
