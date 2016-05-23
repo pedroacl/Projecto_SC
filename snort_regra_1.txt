@@ -1,8 +1,0 @@
-fc45588@DI1223-10:~/Desktop/SC_Trabalho_1$ telnet 10.101.148.129 4567
-Trying 10.101.148.129...
-Connected to 10.101.148.129.
-Escape character is '^]'.
-^CConnection closed by foreign host.
-fc45588@DI1223-10:~/Desktop/SC_Trabalho_1$ 
-
-
